@@ -23,10 +23,10 @@ export default function Splash() {
               Explore the Wall
             </Link>
             <Link className="text-[#C19A6B] hover:text-white" href="/wall">
-              Buy Blocks
+              Buy Bricks
             </Link>
             <Link className="text-[#C19A6B] hover:text-white" href="/owned">
-              My Blocks
+              My Bricks
             </Link>
           </nav>
         </div>

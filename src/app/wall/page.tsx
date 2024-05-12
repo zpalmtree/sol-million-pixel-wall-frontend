@@ -23,10 +23,10 @@ export default function Component() {
               Explore the Wall
             </Link>
             <Link className="text-[#C19A6B] hover:text-white" href="/wall">
-              Buy Blocks
+              Buy Bricks
             </Link>
             <Link className="text-[#C19A6B] hover:text-white" href="/owned">
-              My Blocks
+              My Bricks
             </Link>
           </nav>
         </div>
@@ -55,12 +55,12 @@ export default function Component() {
             width={400}
           />
           <div className="flex items-center gap-4 bg-[#2d2d2d] p-4 rounded-lg shadow-lg w-full max-w-xs">
-            <span className="text-white text-sm sm:text-base">Selected Blocks:</span>
+            <span className="text-white text-sm sm:text-base">Selected Bricks:</span>
             <span className="text-2xl font-bold text-[#C19A6B]">0</span>
           </div>
 
           <div className="flex items-center gap-4 bg-[#2d2d2d] p-4 rounded-lg shadow-lg w-full max-w-xs">
-            <span className="text-white text-sm sm:text-base">Cost of Selected Blocks:</span>
+            <span className="text-white text-sm sm:text-base">Cost of Selected Bricks:</span>
             <span className="text-2xl font-bold text-[#C19A6B]">0 SOL</span>
           </div>
 
@@ -74,21 +74,21 @@ export default function Component() {
         </div>
         <div className="w-full md:w-80 bg-[#1a1a1a] border-l border-[#2d2d2d] p-4 sm:p-6 flex flex-col gap-6">
           <div>
-            <h2 className="text-xl font-bold text-[#C19A6B] mb-2">My Blocks</h2>
+            <h2 className="text-xl font-bold text-[#C19A6B] mb-2">My Bricks</h2>
             <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
               <Button
                 className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B] w-full"
                 size="sm"
                 variant="transparent"
               >
-                View Owned Blocks
+                View Owned Bricks
               </Button>
               <Button
                 className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B] w-full"
                 size="sm"
                 variant="transparent"
               >
-                Edit Owned Blocks
+                Edit Owned Bricks
               </Button>
             </div>
           </div>
