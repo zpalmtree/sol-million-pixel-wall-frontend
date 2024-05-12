@@ -9,27 +9,39 @@ import { Button } from "@/components/ui/button"
 
 export default function Splash() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-[#1A1A1A] text-white">
-      <header className="flex items-center justify-between w-full px-6 lg:px-12 h-14">
-        <Link className="flex items-center justify-center" href="#">
-          <ImageIcon className="h-6 w-6 text-[#C19A6B]" />
-          <span className="sr-only">Million Pixel Wall</span>
-        </Link>
-        <nav className="flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4 text-[#C19A6B]" href="#">
-            Features
+    <>
+      <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
+        <div className="flex items-center gap-8">
+          <Link className="text-2xl font-bold tracking-tighter text-[#C19A6B]" href="/">
+            The Million Pixel Wall
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4 text-[#C19A6B]" href="#">
-            Project
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4 text-[#C19A6B]" href="#">
-            About
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4 text-[#C19A6B]" href="#">
-            Contact
-          </Link>
-        </nav>
+          <nav className="hidden md:flex items-center gap-8">
+            <Link className="text-[#C19A6B] hover:text-white" href="/">
+              Home
+            </Link>
+            <Link className="text-[#C19A6B] hover:text-white" href="/wall">
+              Explore the Wall
+            </Link>
+            <Link className="text-[#C19A6B] hover:text-white" href="/wall">
+              Buy Blocks
+            </Link>
+            <Link className="text-[#C19A6B] hover:text-white" href="/owned">
+              My Blocks
+            </Link>
+          </nav>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button
+            className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B]"
+            size="sm"
+            variant="transparent"
+          >
+            Connect Wallet
+          </Button>
+        </div>
       </header>
+
+    <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-[#1A1A1A] text-white">
       <main className="flex flex-col items-center justify-center flex-1 w-full mt-12">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2">
@@ -44,13 +56,13 @@ export default function Splash() {
           <div className="space-x-4">
             <Link
               className="inline-flex h-9 items-center justify-center rounded-md bg-[#C19A6B] px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:bg-[#C19A6B]/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C19A6B] disabled:pointer-events-none disabled:opacity-50 dark:bg-[#C19A6B] dark:text-[#1A1A1A] dark:hover:bg-[#C19A6B]/90 dark:focus-visible:ring-[#C19A6B]"
-              href="#"
+              href="/wall"
             >
               Explore the Wall
             </Link>
             <Link
               className="inline-flex h-9 items-center justify-center rounded-md border border-[#C19A6B] bg-[#1A1A1A] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:text-[#C19A6B] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C19A6B] disabled:pointer-events-none disabled:opacity-50 dark:border-[#C19A6B] dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:text-[#C19A6B] dark:focus-visible:ring-[#C19A6B]"
-              href="#"
+              href=""
             >
               Learn More
             </Link>
@@ -124,6 +136,7 @@ export default function Splash() {
         </nav>
       </footer>
     </div>
+    </>
   )
 }
 
