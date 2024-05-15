@@ -62,7 +62,7 @@ export default function Component() {
                     <section className="w-full md:py-24 dark bg-[#1A1A1A]">
                         <div className="container flex flex-wrap w-full items-center justify-center gap-4 sm:px-4 md:px-6 xl:gap-12">
                             <div className="container flex flex-wrap w-full items-center justify-center gap-4 xl:gap-12">
-                                <div className="flex justify-center rounded-lg border-2 border-primary">
+                                <div className="flex justify-center border-2 border-primary">
                                     <PixelWall
                                         interactable={true}
                                     />
