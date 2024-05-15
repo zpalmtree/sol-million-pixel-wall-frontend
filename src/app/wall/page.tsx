@@ -6,6 +6,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { PixelWall } from "@/components/pixelwall";
 
 export default function Component() {
     return (
@@ -13,32 +14,32 @@ export default function Component() {
             <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
                 <div className="flex items-center gap-8">
                     <Link
-                        className="text-2xl font-bold tracking-tighter text-[#C19A6B]"
+                        className="text-2xl font-bold tracking-tighter text-primary"
                         href="/"
                     >
                         The Million Pixel Wall
                     </Link>
                     <nav className="hidden md:flex items-center gap-8">
                         <Link
-                            className="text-[#C19A6B] hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/"
                         >
                             Home
                         </Link>
                         <Link
-                            className="text-[#C19A6B] hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/wall"
                         >
                             Explore the Wall
                         </Link>
                         <Link
-                            className="text-[#C19A6B] hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/wall"
                         >
                             Buy Bricks
                         </Link>
                         <Link
-                            className="text-[#C19A6B] hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/owned"
                         >
                             My Bricks
@@ -47,7 +48,7 @@ export default function Component() {
                 </div>
                 <div className="flex items-center gap-4">
                     <Button
-                        className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B]"
+                        className="text-white hover:text-primary hover:bg-white/10 border border-primary"
                         size="sm"
                         variant="transparent"
                     >
@@ -61,23 +62,19 @@ export default function Component() {
                     <section className="w-full md:py-24 dark bg-[#1A1A1A]">
                         <div className="container flex flex-wrap w-full items-center justify-center gap-4 sm:px-4 md:px-6 xl:gap-12">
                             <div className="container flex flex-wrap w-full items-center justify-center gap-4 xl:gap-12">
-                                <div className="flex justify-center">
-                                    <img
-                                        alt="Placeholder"
-                                        className="aspect-square object-cover rounded-lg"
-                                        height={600}
-                                        src="/placeholder.svg"
-                                        width={600}
+                                <div className="flex justify-center rounded-lg border-2 border-primary">
+                                    <PixelWall
+                                        interactable={true}
                                     />
                                 </div>
 
                                 <div className="flex flex-col gap-4 xl:gap-6 h-[600px]">
-                                    <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] mx-auto relative border-l-4 border-[#C19A6B]">
+                                    <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] mx-auto relative border-l-4 border-primary">
                                         <div className="flex items-center gap-x-3">
                                             <span className="text-white">
                                                 Selected Bricks:
                                             </span>{" "}
-                                            <span className="text-[#C19A6B] text-xl font-bold">
+                                            <span className="text-primary text-xl font-bold">
                                                 0
                                             </span>
                                         </div>
@@ -85,13 +82,13 @@ export default function Component() {
                                             <span className="text-white">
                                                 Cost of Selected Bricks:
                                             </span>{" "}
-                                            <span className="text-[#C19A6B] text-xl font-bold">
+                                            <span className="text-primary text-xl font-bold">
                                                 0 SOL
                                             </span>
                                         </div>
 
                                         <Button
-                                            className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B] w-full"
+                                            className="text-white hover:text-primary hover:bg-white/10 border border-primary w-full"
                                             size="sm"
                                             variant="transparent"
                                         >
@@ -99,8 +96,8 @@ export default function Component() {
                                         </Button>
                                     </div>
                                     <div className="flex flex-wrap justify-center gap-4 h-full">
-                                        <div className="flex flex-col gap-4 rounded-lg bg-[#2d2d2d] p-4 w-[350px] xl:w-[370px] relative border-l-4 border-[#C19A6B]">
-                                            <p className="text-[#C19A6B] text-bold text-lg tracking-tighter">
+                                        <div className="flex flex-col gap-4 rounded-lg bg-[#2d2d2d] p-4 w-[350px] xl:w-[370px] relative border-l-4 border-primary">
+                                            <p className="text-primary text-bold text-lg tracking-tighter">
                                                 Elevate Your Digital Presence on the Ultimate Canvas
                                             </p>
                                             <p className="text-gray-300">
@@ -115,8 +112,8 @@ export default function Component() {
                             </div>
 
                             <div className="flex flex-wrap justify-center gap-4">
-                                <div className="flex flex-col gap-2 rounded-lg bg-[#2d2d2d] p-4 w-[350px] relative border-l-4 border-[#C19A6B]">
-                                    <p className="text-[#C19A6B] text-bold text-lg tracking-tighter">
+                                <div className="flex flex-col gap-2 rounded-lg bg-[#2d2d2d] p-4 w-[350px] relative border-l-4 border-primary">
+                                    <p className="text-primary text-bold text-lg tracking-tighter">
                                         Unleash Boundless Creativity
                                     </p>
                                     <p className="text-gray-300">
@@ -127,8 +124,8 @@ export default function Component() {
                                     </p>
                                 </div>
 
-                                <div className="flex flex-col gap-2 rounded-lg bg-[#2d2d2d] p-4 w-[350px] relative border-l-4 border-[#C19A6B]">
-                                    <p className="text-[#C19A6B] text-bold text-lg tracking-tighter">
+                                <div className="flex flex-col gap-2 rounded-lg bg-[#2d2d2d] p-4 w-[350px] relative border-l-4 border-primary">
+                                    <p className="text-primary text-bold text-lg tracking-tighter">
                                         Capture Prime Digital Real Estate
                                     </p>
 
@@ -140,8 +137,8 @@ export default function Component() {
                                     </p>
                                 </div>
 
-                                <div className="flex flex-col gap-2 rounded-lg bg-[#2d2d2d] p-4 w-[350px] relative border-l-4 border-[#C19A6B]">
-                                    <p className="text-[#C19A6B] text-bold text-lg tracking-tighter">
+                                <div className="flex flex-col gap-2 rounded-lg bg-[#2d2d2d] p-4 w-[350px] relative border-l-4 border-primary">
+                                    <p className="text-primary text-bold text-lg tracking-tighter">
                                         Be Part of a Growing Masterpiece
                                     </p>
 
@@ -164,19 +161,19 @@ export default function Component() {
                     />
 
                     <div>
-                        <h2 className="text-xl font-bold text-[#C19A6B] mb-2">
+                        <h2 className="text-xl font-bold text-primary mb-2">
                             My Bricks
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                             <Button
-                                className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B] w-full"
+                                className="text-white hover:text-primary hover:bg-white/10 border border-primary w-full"
                                 size="sm"
                                 variant="transparent"
                             >
                                 View Owned Bricks
                             </Button>
                             <Button
-                                className="text-white hover:text-[#C19A6B] hover:bg-white/10 border border-[#C19A6B] w-full"
+                                className="text-white hover:text-primary hover:bg-white/10 border border-primary w-full"
                                 size="sm"
                                 variant="transparent"
                             >
@@ -187,19 +184,19 @@ export default function Component() {
                 </div>
             </main>
 
-            <footer className="flex flex-col gap-2 sm:flex-row items-center justify-between w-full px-4 md:px-6 py-6 border-t border-[#C19A6B] bg-[#1A1A1A]">
+            <footer className="flex flex-col gap-2 sm:flex-row items-center justify-between w-full px-4 md:px-6 py-6 border-t border-primary bg-[#1A1A1A]">
                 <p className="text-xs text-[#EEEEEE] dark:text-[#EEEEEE]">
                     © 2024 Wall On Solana. All rights reserved.
                 </p>
                 <nav className="flex gap-4 sm:gap-6">
                     <Link
-                        className="text-xs hover:underline underline-offset-4 text-[#C19A6B]"
+                        className="text-xs hover:underline underline-offset-4 text-primary"
                         href="https://twitter.com/WallOnSolana"
                     >
                         Twitter
                     </Link>
                     <Link
-                        className="text-xs hover:underline underline-offset-4 text-[#C19A6B]"
+                        className="text-xs hover:underline underline-offset-4 text-primary"
                         href="http://wallonsolana.com/"
                     >
                         Website
