@@ -4,16 +4,14 @@ import React, { useEffect, useRef } from 'react';
 import {
     Canvas,
     StaticCanvas,
-    Line,
     Rect,
-    Group,
 } from 'fabric';
 
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 
-const BRICKS_PER_ROW = 40;
-const BRICKS_PER_COLUMN = 40;
+const BRICKS_PER_ROW = 50;
+const BRICKS_PER_COLUMN = 50;
 
 export interface PixelWallProps {
     /* Width of canvas. Defaults to DEFAULT_WIDTH. */
@@ -40,19 +38,19 @@ export function PixelWall(props: PixelWallProps) {
     const canvasWidth = React.useMemo(() => width || DEFAULT_WIDTH, [ width ]);
     const canvasHeight = React.useMemo(() => height || DEFAULT_HEIGHT, [ height ]);
 
-    const canvasRef = useRef(null);
+    const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = interactable
-            ? new Canvas(canvasRef.current)
-            : new StaticCanvas(canvasRef.current);
+            ? new Canvas(canvasRef.current!)
+            : new StaticCanvas(canvasRef.current!);
 
         canvas.setDimensions({
             width: canvasWidth,
             height: canvasHeight,
         });
 
-        const handleBrickSelected = (e) => {
+        const handleBrickSelected = (e: any) => {
             const target = e.target;
 
             if (target) {
@@ -99,8 +97,8 @@ export function PixelWall(props: PixelWallProps) {
             }
         }
 
-        const handleSelection = (event) => {
-            const selection = canvas.getActiveObject();
+        const handleSelection = () => {
+            const selection = (canvas as any).getActiveObject();
 
             console.log('selection');
 
@@ -117,7 +115,12 @@ export function PixelWall(props: PixelWallProps) {
         return () => {
             canvas.dispose();
         };
-    }, [displayGridLines]);
+    }, [
+        displayGridLines,
+        canvasHeight,
+        canvasWidth,
+        interactable,
+    ]);
 
     // Canvas style can be adjusted via css or inline style
     return (

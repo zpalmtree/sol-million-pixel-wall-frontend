@@ -50,7 +50,6 @@ export default function Component() {
                     <Button
                         className="text-white hover:text-primary hover:bg-white/10 border border-primary"
                         size="sm"
-                        variant="transparent"
                     >
                         Connect Wallet
                     </Button>
@@ -90,7 +89,6 @@ export default function Component() {
                                         <Button
                                             className="text-white hover:text-primary hover:bg-white/10 border border-primary w-full"
                                             size="sm"
-                                            variant="transparent"
                                         >
                                             Purchase
                                         </Button>
@@ -133,7 +131,7 @@ export default function Component() {
                                         In the realm of the Solana Million Pixel Wall, location is everything.
                                     </p>
                                     <p className="text-gray-300">
-                                        Secure the most sought-after sections before they're claimed. The early bird doesn't just get the worm; it gets to dictate the aesthetic and cultural heart of this digital masterpiece.
+                                        {`Secure the most sought-after sections before they're claimed. The early bird doesn't just get the worm; it gets to dictate the aesthetic and cultural heart of this digital masterpiece.`}
                                     </p>
                                 </div>
 
@@ -168,14 +166,12 @@ export default function Component() {
                             <Button
                                 className="text-white hover:text-primary hover:bg-white/10 border border-primary w-full"
                                 size="sm"
-                                variant="transparent"
                             >
                                 View Owned Bricks
                             </Button>
                             <Button
                                 className="text-white hover:text-primary hover:bg-white/10 border border-primary w-full"
                                 size="sm"
-                                variant="transparent"
                             >
                                 Edit Owned Bricks
                             </Button>

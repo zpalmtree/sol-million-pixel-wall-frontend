@@ -4,7 +4,6 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PixelWall } from "@/components/pixelwall";
 
@@ -50,7 +49,6 @@ export default function Splash() {
                     <Button
                         className="text-white hover:text-primary hover:bg-white/10 border border-primary"
                         size="sm"
-                        variant="transparent"
                     >
                         Connect Wallet
                     </Button>
@@ -65,9 +63,9 @@ export default function Splash() {
                                 The Million Pixel Wall
                             </h1>
                             <p className="max-w-[700px] text-[#EEEEEE] md:text-xl dark:text-[#EEEEEE]">
-                                Explore the world's largest NFT-powered pixel
+                                {`Explore the world's largest NFT-powered pixel
                                 wall, where creativity and community collide on
-                                the Solana blockchain.
+                                the Solana blockchain.`}
                             </p>
                         </div>
                         <div className="space-x-4">
