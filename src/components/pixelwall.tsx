@@ -83,8 +83,6 @@ export function PixelWall(props: PixelWallProps) {
             newSelectedBricks.push(brick);
         }
 
-        console.log(newSelectedBricks);
-
         setSelectedBricks(newSelectedBricks);
     }, [
         selectedBricks,
@@ -124,6 +122,7 @@ export function PixelWall(props: PixelWallProps) {
             ) {
                 continue; // Skip bricks that are within the new range
             }
+
             newSelectedBricks.push(b);
         }
 
@@ -132,7 +131,6 @@ export function PixelWall(props: PixelWallProps) {
             newSelectedBricks.push(b);
         }
 
-        console.log(newSelectedBricks);
         setSelectedBricks(newSelectedBricks);
     }, [selectedBricks, setSelectedBricks]);
 
@@ -142,8 +140,23 @@ export function PixelWall(props: PixelWallProps) {
             return;
         }
 
+        // Clamping function to ensure pointer values are within canvas boundaries
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+        // Clamp the last pointer position to be within the canvas
+        const clampedLastPointerPosition = {
+            x: clamp(lastPointerPosition.x, 0, canvasWidth - 1),
+            y: clamp(lastPointerPosition.y, 0, canvasHeight - 1),
+        };
+
+        // Clamp the current pointer position to be within the canvas
+        const clampedPointerPosition = {
+            x: clamp(e.pointer.x, 0, canvasWidth - 1),
+            y: clamp(e.pointer.y, 0, canvasHeight - 1),
+        };
+
         const startBrick = getBrickFromPointerPosition(
-            lastPointerPosition,
+            clampedLastPointerPosition,
             canvasWidth,
             canvasHeight,
             BRICKS_PER_ROW,
@@ -151,7 +164,7 @@ export function PixelWall(props: PixelWallProps) {
         );
 
         const endBrick = getBrickFromPointerPosition(
-            e.pointer,
+            clampedPointerPosition,
             canvasWidth,
             canvasHeight,
             BRICKS_PER_ROW,
