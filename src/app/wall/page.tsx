@@ -1,14 +1,26 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/dBZAmpyDpGu
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
+"use client";
+
 import Link from "next/link";
+import * as React from 'react';
+import { useRecoilValue } from 'recoil';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
+import { selectedBricksState } from '@/state/bricks';
+import { PRICE_PER_BRICK } from '@/constants';
+import { formatSOL } from '@/lib/utils';
 
 export default function Component() {
+    const selectedBricks = useRecoilValue(selectedBricksState);
+
+    const costInSol = React.useMemo(() => {
+        const lamports = selectedBricks.length * PRICE_PER_BRICK;
+        return formatSOL(lamports, 1);
+    }, [
+        selectedBricks,
+    ]);
+
     return (
         <>
             <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
@@ -74,7 +86,7 @@ export default function Component() {
                                                 Selected Bricks:
                                             </span>{" "}
                                             <span className="text-primary text-xl font-bold">
-                                                0
+                                                {selectedBricks.length}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-x-3">
@@ -82,7 +94,7 @@ export default function Component() {
                                                 Cost of Selected Bricks:
                                             </span>{" "}
                                             <span className="text-primary text-xl font-bold">
-                                                0 SOL
+                                                {`${costInSol} SOL`}
                                             </span>
                                         </div>
 

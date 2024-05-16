@@ -1,23 +1,32 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { useRecoilState } from 'recoil';
 import {
     Canvas,
     StaticCanvas,
     Rect,
+    Line,
+    TPointerEvent,
+    TPointerEventInfo,
 } from 'fabric';
 
-const DEFAULT_WIDTH = 600;
-const DEFAULT_HEIGHT = 600;
-
-const BRICKS_PER_ROW = 50;
-const BRICKS_PER_COLUMN = 50;
+import { Coordinate } from '@/types/coordinate';
+import { Brick } from '@/types/brick';
+import { getBrickFromPointerPosition } from '@/lib/wall-utils';
+import { selectedBricksState } from '@/state/bricks';
+import {
+    CANVAS_WIDTH,
+    CANVAS_HEIGHT,
+    BRICKS_PER_ROW,
+    BRICKS_PER_COLUMN,
+} from '@/constants';
 
 export interface PixelWallProps {
-    /* Width of canvas. Defaults to DEFAULT_WIDTH. */
+    /* Width of canvas. Defaults to CANVAS_WIDTH. */
     width?: number;
 
-    /* Height of canvas. Defaults to DEFAULT_HEIGHT. */
+    /* Height of canvas. Defaults to CANVAS_HEIGHT. */
     height?: number;
 
     /* Whether the user can interactive with the canvas. Defaults to false */
@@ -27,6 +36,7 @@ export interface PixelWallProps {
     displayGridLines?: boolean;
 }
 
+
 export function PixelWall(props: PixelWallProps) {
     const {
         width,
@@ -35,91 +45,196 @@ export function PixelWall(props: PixelWallProps) {
         displayGridLines = true,
     } = props;
 
-    const canvasWidth = React.useMemo(() => width || DEFAULT_WIDTH, [ width ]);
-    const canvasHeight = React.useMemo(() => height || DEFAULT_HEIGHT, [ height ]);
+    const canvasWidth = React.useMemo(() => width || CANVAS_WIDTH, [ width ]);
+    const canvasHeight = React.useMemo(() => height || CANVAS_HEIGHT, [ height ]);
+
+    const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [ canvasWidth ]);
+    const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [ canvasHeight ]);
 
     const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
+    const [ canvas, setCanvas ] = React.useState<Canvas | StaticCanvas | undefined>();
+    const [ lastPointerPosition, setLastPointerPosition ] = React.useState<Coordinate | undefined>();
+    const [ selectedCanvasObjects, setSelectedCanvasObjects ] = React.useState<any[]>([]);
+
+    const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
+
+    const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
+        setLastPointerPosition(e.pointer);
+    }, [
+        setLastPointerPosition,
+    ]);
+
+    const toggleBrickSelectedState = React.useCallback((brick: Brick) => {
+        const newSelectedBricks = [];
+
+        let found = false;
+
+        for (const b of selectedBricks) {
+            if (b.name === brick.name) {
+                found = true;
+                continue;
+            }
+
+            newSelectedBricks.push(b);
+        }
+
+        if (!found) {
+            newSelectedBricks.push(brick);
+        }
+
+        console.log(newSelectedBricks);
+
+        setSelectedBricks(newSelectedBricks);
+    }, [
+        selectedBricks,
+        setSelectedBricks,
+    ]);
+
+    const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
+        if (!lastPointerPosition) {
+            console.log(`No last pointer position??`);
+            return;
+        }
+
+        const startBrick = getBrickFromPointerPosition(
+            lastPointerPosition,
+            canvasWidth,
+            canvasHeight,
+            BRICKS_PER_ROW,
+            BRICKS_PER_COLUMN,
+        );
+
+        const endBrick = getBrickFromPointerPosition(
+            e.pointer,
+            canvasWidth,
+            canvasHeight,
+            BRICKS_PER_ROW,
+            BRICKS_PER_COLUMN,
+        );
+
+        /* Selected single brick. Basic toggle */
+        /* TODO: Validate bricks are not owned already */
+        if (startBrick.name === endBrick.name) {
+            toggleBrickSelectedState(startBrick);
+        }
+
+        console.log(`Starting brick: ${startBrick.name}, Ending brick: ${endBrick.name}`);
+    }, [
+        lastPointerPosition,
+        canvasHeight,
+        canvasWidth,
+        toggleBrickSelectedState,
+    ]);
+
     useEffect(() => {
-        const canvas = interactable
+        if (!canvas) {
+            return;
+        }
+
+        for (const canvasObject of selectedCanvasObjects) {
+            canvas.remove(canvasObject);
+        }
+
+        const newSelectedCanvasObjects = [];
+
+        /* TODO: Somewhat inefficient adding and removing all. Ideally we would just
+         * modify the delta */
+        for (const brick of selectedBricks) {
+            const rectangle = new Rect({
+                width: brickWidth,
+                height: brickHeight,
+                fill: '#C19A6B',
+                opacity: 0.3,
+                selectable: false,
+                evented: false,
+                left: (brick.x * brickWidth),
+                top: (brick.y * brickHeight),
+                strokeWidth: 0,
+            });
+
+            newSelectedCanvasObjects.push(rectangle);
+            canvas.add(rectangle);
+        }
+
+        setSelectedCanvasObjects(newSelectedCanvasObjects);
+    }, [
+        canvas,
+        selectedBricks,
+        brickHeight,
+        brickWidth,
+        selectedCanvasObjects,
+    ]);
+
+    useEffect(() => {
+        if (!canvas || !interactable) {
+            return;
+        }
+
+        canvas.on('mouse:down', handleMouseDown);
+        canvas.on('mouse:up', handleMouseUp);
+
+        return () => {
+            canvas.off('mouse:down', handleMouseDown);
+            canvas.off('mouse:up', handleMouseUp);
+        }
+    }, [
+        canvas,
+        lastPointerPosition,
+        handleMouseDown,
+        handleMouseUp,
+        interactable,
+    ]);
+
+    useEffect(() => {
+        const c = interactable
             ? new Canvas(canvasRef.current!)
             : new StaticCanvas(canvasRef.current!);
 
-        canvas.setDimensions({
+        setCanvas(c);
+
+        c.setDimensions({
             width: canvasWidth,
             height: canvasHeight,
         });
 
-        const handleBrickSelected = (e: any) => {
-            const target = e.target;
-
-            if (target) {
-                if (target.fill === '#C19A6B') {
-                    target.set({
-                        fill: '#1A1A1A',
-                        opacity: 1,
-                    });
-                } else {
-                    target.set({
-                        fill: '#C19A6B',
-                        opacity: 0.3,
-                    });
-                }
-            }
-        }
-
         if (displayGridLines) {
-            /* TODO: What if these aren't round numbers? */
-            const brickWidth = canvasWidth / BRICKS_PER_ROW;
-            const brickHeight = canvasHeight / BRICKS_PER_COLUMN;
+            for (let i = 1; i < BRICKS_PER_ROW; i++) {
+                const line = new Line([i * brickWidth, 0, i * brickWidth, canvasHeight], {
+                    evented: false,
+                    selectable: false,
+                    stroke: '#C19A6B',
+                    strokeWidth: 1,
+                    opacity: 0.3,
+                });
 
-            for (let i = 0; i < BRICKS_PER_COLUMN; i++) {
-                for (let j = 0; j < BRICKS_PER_ROW; j++) {
-                    const leftOffset = j * brickWidth;
-                    const topOffset = i * brickHeight;
+                c.add(line);
+            }
 
-                    const brick = new Rect({
-                        left: leftOffset,
-                        top: topOffset,
-                        fill: '#1A1A1A',
-                        stroke: '#C19A6B',
-                        strokeWidth: 1,
-                        width: brickWidth,
-                        height: brickHeight,
-                        selectable: false,
-                        hoverCursor: 'pointer', /* TODO: Disable if purchased? */
-                    });
+            for (let i = 1; i < BRICKS_PER_COLUMN; i++) {
+                const line = new Line([0, i * brickHeight, canvasWidth, i * brickHeight], {
+                    evented: false,
+                    selectable: false,
+                    stroke: '#C19A6B',
+                    strokeWidth: 1,
+                    opacity: 0.3,
+                });
 
-                    brick.on('mousedown', handleBrickSelected);
-
-                    canvas.add(brick);
-                }
+                c.add(line);
             }
         }
-
-        const handleSelection = () => {
-            const selection = (canvas as any).getActiveObject();
-
-            console.log('selection');
-
-            if (selection && selection.type === 'activeSelection') {
-                const { left, top, width, height } = selection;
-                console.log('Selection Box Coordinates:', { left, top, width, height });
-            }
-        };
-
-        canvas.on('selection:created', handleSelection);
-        canvas.on('selection:updated', handleSelection);
 
         // Clean up on component unmount
         return () => {
-            canvas.dispose();
+            c.dispose();
         };
     }, [
         displayGridLines,
         canvasHeight,
         canvasWidth,
         interactable,
+        brickHeight,
+        brickWidth,
     ]);
 
     // Canvas style can be adjusted via css or inline style
