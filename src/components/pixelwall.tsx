@@ -141,7 +141,7 @@ export function PixelWall(props: PixelWallProps) {
         }
 
         // Clamping function to ensure pointer values are within canvas boundaries
-        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+        const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
         // Clamp the last pointer position to be within the canvas
         const clampedLastPointerPosition = {
@@ -185,6 +185,7 @@ export function PixelWall(props: PixelWallProps) {
         canvasHeight,
         canvasWidth,
         toggleBrickSelectedState,
+        selectBrickRange,
     ]);
 
     useEffect(() => {
@@ -201,12 +202,12 @@ export function PixelWall(props: PixelWallProps) {
         const visited = new Set();
 
         // Function to perform a DFS to find all connected bricks
-        const dfs = (x, y, bricks, cluster) => {
+        const dfs = (x: number, y: number, bricks: Brick[], cluster: Brick[]) => {
             const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
             const stack = [[x, y]];
 
             while (stack.length) {
-                const [cx, cy] = stack.pop();
+                const [cx, cy] = stack.pop()!;
                 const key = `${cx},${cy}`;
 
                 if (visited.has(key)) {
@@ -214,11 +215,16 @@ export function PixelWall(props: PixelWallProps) {
                 }
 
                 visited.add(key);
-                cluster.push({ x: cx, y: cy });
+
+                cluster.push({
+                    x: cx,
+                    y: cy,
+                    name: `${cx},${cy}`,
+                });
 
                 for (const [dx, dy] of directions) {
                     const nx = cx + dx, ny = cy + dy;
-                    if (bricks.some(b => b.x === nx && b.y === ny) && !visited.has(`${nx},${ny}`)) {
+                    if (bricks.some((b: Brick) => b.x === nx && b.y === ny) && !visited.has(`${nx},${ny}`)) {
                         stack.push([nx, ny]);
                     }
                 }
@@ -226,12 +232,13 @@ export function PixelWall(props: PixelWallProps) {
         };
 
         // Function to group bricks into clusters
-        const groupBricks = (bricks) => {
-            const clusters = [];
+        const groupBricks = (bricks: Brick[]) => {
+            const clusters: Brick[][] = [];
+
             for (const brick of bricks) {
                 const key = `${brick.x},${brick.y}`;
                 if (!visited.has(key)) {
-                    const cluster = [];
+                    const cluster: Brick[] = [];
                     dfs(brick.x, brick.y, bricks, cluster);
                     clusters.push(cluster);
                 }
@@ -240,8 +247,8 @@ export function PixelWall(props: PixelWallProps) {
         };
 
         // Function to create rectangles from a cluster of bricks
-        const createRectanglesFromCluster = (cluster) => {
-            const bricksSet = new Set(cluster.map(brick => `${brick.x},${brick.y}`));
+        const createRectanglesFromCluster = (cluster: Brick[]) => {
+            const bricksSet: Set<string> = new Set(cluster.map(brick => `${brick.x},${brick.y}`));
             const rectangles = [];
 
             while (bricksSet.size > 0) {
@@ -250,10 +257,13 @@ export function PixelWall(props: PixelWallProps) {
                 const currentCluster = [];
 
                 while (queue.length > 0) {
-                    const [cx, cy] = queue.shift();
+                    const [cx, cy] = queue.shift()!;
                     const key = `${cx},${cy}`;
 
-                    if (!bricksSet.has(key)) continue;
+                    if (!bricksSet.has(key)) {
+                        continue;
+                    }
+
                     bricksSet.delete(key);
                     currentCluster.push({ x: cx, y: cy });
 
@@ -340,7 +350,12 @@ export function PixelWall(props: PixelWallProps) {
         }
 
         setSelectedCanvasObjects(newSelectedCanvasObjects);
-    }, [canvas, selectedBricks, brickHeight, brickWidth]);
+    }, [
+        canvas,
+        selectedBricks,
+        brickHeight,
+        brickWidth,
+    ]);
 
     useEffect(() => {
         if (!canvas || !interactable) {
