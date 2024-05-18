@@ -19,6 +19,7 @@ import {
     calculateZoomLevel,
     calculateBrickCenter,
     zoomToCoordinate,
+    getBrickFromPointerPosition,
 } from '@/lib/wall-utils';
 import { selectedBricksState } from '@/state/bricks';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
@@ -54,7 +55,20 @@ export function UploadPreview(props: UploadPreviewProps) {
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [ canvasHeight ]);
 
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
+        if (!canvas) {
+            return;
+        }
+
+        const brick = getBrickFromPointerPosition(
+            e.pointer,
+            canvas,
+            BRICKS_PER_ROW,
+            BRICKS_PER_COLUMN,
+        );
+
+        console.log(brick.name);
     }, [
+        canvas,
     ]);
 
     useEffect(() => {
@@ -308,6 +322,8 @@ export function UploadPreview(props: UploadPreviewProps) {
             width: canvasWidth,
             height: canvasHeight,
         });
+
+        c.defaultCursor = 'pointer';
 
         for (let i = 1; i < BRICKS_PER_ROW; i++) {
             const line = new Line([i * brickWidth, 0, i * brickWidth, canvasHeight], {

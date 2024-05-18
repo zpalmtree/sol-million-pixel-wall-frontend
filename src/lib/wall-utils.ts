@@ -8,16 +8,34 @@ import {
 
 export function getBrickFromPointerPosition(
     pointer: Coordinate,
-    canvasWidth: number,
-    canvasHeight: number,
+    canvas: Canvas,
     bricksPerRow: number,
     bricksPerColumn: number,
 ): Brick {
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    
+    const canvasWidth = canvas.getWidth();
+    const canvasHeight = canvas.getHeight();
+
+    // Clamp the pointer position to ensure it is within the canvas boundaries
+    const clampedPointerPosition = {
+        x: clamp(pointer.x, 0, canvasWidth - 1),
+        y: clamp(pointer.y, 0, canvasHeight - 1),
+    };
+
+    const zoom = canvas.getZoom();
+    const panX = canvas.viewportTransform[4];
+    const panY = canvas.viewportTransform[5];
+
+    // Correct the pointer coordinates for zoom and pan
+    const transformedPointerX = (clampedPointerPosition.x - panX) / zoom;
+    const transformedPointerY = (clampedPointerPosition.y - panY) / zoom;
+
     const brickWidth = canvasWidth / bricksPerRow;
     const brickHeight = canvasHeight / bricksPerColumn;
 
-    const x = Math.floor(pointer.x / brickWidth);
-    const y = Math.floor(pointer.y / brickHeight);
+    const x = Math.floor(transformedPointerX / brickWidth);
+    const y = Math.floor(transformedPointerY / brickHeight);
 
     return {
         x,

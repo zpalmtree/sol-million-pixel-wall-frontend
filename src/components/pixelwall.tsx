@@ -135,57 +135,40 @@ export function PixelWall(props: PixelWallProps) {
     }, [selectedBricks, setSelectedBricks]);
 
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
+        if (!canvas) {
+            return;
+        }
+
         if (!lastPointerPosition) {
             console.log(`No last pointer position??`);
             return;
         }
 
-        // Clamping function to ensure pointer values are within canvas boundaries
-        const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-
-        // Clamp the last pointer position to be within the canvas
-        const clampedLastPointerPosition = {
-            x: clamp(lastPointerPosition.x, 0, canvasWidth - 1),
-            y: clamp(lastPointerPosition.y, 0, canvasHeight - 1),
-        };
-
-        // Clamp the current pointer position to be within the canvas
-        const clampedPointerPosition = {
-            x: clamp(e.pointer.x, 0, canvasWidth - 1),
-            y: clamp(e.pointer.y, 0, canvasHeight - 1),
-        };
-
         const startBrick = getBrickFromPointerPosition(
-            clampedLastPointerPosition,
-            canvasWidth,
-            canvasHeight,
+            lastPointerPosition,
+            canvas,
             BRICKS_PER_ROW,
             BRICKS_PER_COLUMN,
         );
 
         const endBrick = getBrickFromPointerPosition(
-            clampedPointerPosition,
-            canvasWidth,
-            canvasHeight,
+            e.pointer,
+            canvas,
             BRICKS_PER_ROW,
             BRICKS_PER_COLUMN,
         );
 
-        /* Selected single brick. Basic toggle */
         /* TODO: Validate bricks are not owned already */
         if (startBrick.name === endBrick.name) {
             toggleBrickSelectedState(startBrick);
         } else {
             selectBrickRange(startBrick, endBrick);
         }
-
-        console.log(`Starting brick: ${startBrick.name}, Ending brick: ${endBrick.name}`);
     }, [
         lastPointerPosition,
-        canvasHeight,
-        canvasWidth,
         toggleBrickSelectedState,
         selectBrickRange,
+        canvas,
     ]);
 
     useEffect(() => {
