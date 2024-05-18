@@ -1,8 +1,6 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/UexXVo7aNbl
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
+import * as React from 'react';
+import { useRecoilValue } from 'recoil';
+
 import {
     DialogTitle,
     DialogDescription,
@@ -13,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { UploadPreview } from '@/components/upload-preview';
+import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import {
     CardTitle,
     CardDescription,
@@ -22,6 +22,19 @@ import {
 } from "@/components/ui/card";
 
 export function CheckoutDialog() {
+    const uploadPreviewCanvas = useRecoilValue(uploadPreviewCanvasState);
+
+    const handleResetZoom = React.useCallback(() => {
+        if (!uploadPreviewCanvas) {
+            return;
+        }
+
+        uploadPreviewCanvas.setZoom(1);
+        uploadPreviewCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    }, [
+        uploadPreviewCanvas,
+    ]);
+
     return (
         <DialogContent>
             <div className="max-w-full rounded-lg bg-[#1A1A1A] p-6 text-white border border-[#C19A6B]">
@@ -68,13 +81,11 @@ export function CheckoutDialog() {
                     >
                         <div className="flex flex-col md:flex-row gap-6">
                             <div className="flex-1">
-                                <div className="md:h-[550px] flex items-center justify-center w-full md:w-[550px] rounded-md bg-[#333333] p-4 border border-[#C19A6B] aspect-square">
-                                    <div className="flex h-full items-center justify-center">
-                                        <span className="text-sm text-gray-400 text-center">
-                                            Your masterpiece will be previewed
-                                            here.
-                                        </span>
-                                    </div>
+                                <div className="md:h-[550px] flex items-center justify-center w-full md:w-[550px] rounded-md bg-[#333333] border border-[#C19A6B] aspect-square">
+                                    <UploadPreview
+                                        width={550}
+                                        height={550}
+                                    />
                                 </div>
                             </div>
                             <div className="w-full items-center md:w-[250px] p-4 border border-[#C19A6B] rounded-md flex flex-col justify-between">
@@ -128,18 +139,29 @@ export function CheckoutDialog() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-center w-full">
-                                    <Separator className="my-4 w-full bg-[#2d2d2d]" />
+
+                                <div className="flex flex-col items-center w-full gap-y-2">
+                                    <Button
+                                        className="w-full max-w-[250px]"
+                                        onClick={handleResetZoom}
+                                    >
+                                        Reset Zoom
+                                    </Button>
+
                                     <Button className="rounded-md border-none bg-red-500 px-12 py-2 text-white hover:bg-red-600 transition-colors duration-200 w-full max-w-[250px]">
                                         Clear Canvas
                                     </Button>
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-6">
+                        <div className="mt-6 flex flex-row items-center justify-between w-full gap-x-4">
                             <Button className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[150px]">
                                 Continue
                             </Button>
+
+                            <span>
+                                Hint: You can scroll in and out on the canvas!
+                            </span>
                         </div>
                     </TabsContent>
                     <TabsContent
