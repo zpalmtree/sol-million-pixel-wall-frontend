@@ -81,7 +81,7 @@ export function CheckoutDialog() {
                     >
                         <div className="flex flex-col md:flex-row gap-6">
                             <div className="flex-1">
-                                <div className="md:h-[550px] flex items-center justify-center w-full md:w-[550px] rounded-md bg-[#333333] border border-[#C19A6B] aspect-square">
+                                <div className="flex items-center justify-center w-full bg-[#333333] border border-[#C19A6B] aspect-square">
                                     <UploadPreview
                                         width={550}
                                         height={550}

@@ -4,4 +4,6 @@ export interface Brick {
     y: number;
 
     name: string;
+
+    color?: string;
 }

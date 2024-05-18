@@ -153,10 +153,10 @@ export function UploadPreview(props: UploadPreviewProps) {
         }
 
         const newSelectedCanvasObjects = [];
-        const visited = new Set();
+        const visited = new Set<string>();
 
-        // Function to perform a DFS to find all connected bricks
-        const dfs = (x: number, y: number, bricks: Brick[], cluster: Brick[]) => {
+        // Function to perform a DFS to find all connected bricks of the same color
+        const dfs = (x: number, y: number, color: string, bricks: Brick[], cluster: Brick[]) => {
             const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
             const stack = [[x, y]];
 
@@ -173,12 +173,13 @@ export function UploadPreview(props: UploadPreviewProps) {
                 cluster.push({
                     x: cx,
                     y: cy,
+                    color,
                     name: `${cx},${cy}`,
                 });
 
                 for (const [dx, dy] of directions) {
                     const nx = cx + dx, ny = cy + dy;
-                    if (bricks.some((b: Brick) => b.x === nx && b.y === ny) && !visited.has(`${nx},${ny}`)) {
+                    if (bricks.some((b: Brick) => b.x === nx && b.y === ny && (b.color ?? '#c19a6b') === color) && !visited.has(`${nx},${ny}`)) {
                         stack.push([nx, ny]);
                     }
                 }
@@ -193,7 +194,7 @@ export function UploadPreview(props: UploadPreviewProps) {
                 const key = `${brick.x},${brick.y}`;
                 if (!visited.has(key)) {
                     const cluster: Brick[] = [];
-                    dfs(brick.x, brick.y, bricks, cluster);
+                    dfs(brick.x, brick.y, brick.color ?? '#c19a6b', bricks, cluster);
                     clusters.push(cluster);
                 }
             }
@@ -289,7 +290,7 @@ export function UploadPreview(props: UploadPreviewProps) {
                 const rectangle = new Rect({
                     width: (maxX - minX + 1) * brickWidth,
                     height: (maxY - minY + 1) * brickHeight,
-                    fill: '#C19A6B',
+                    fill: cluster[0].color ?? '#c19a6b',
                     opacity: 0.3,
                     selectable: false,
                     evented: false,
@@ -303,6 +304,8 @@ export function UploadPreview(props: UploadPreviewProps) {
             }
         }
 
+        console.log(newSelectedCanvasObjects.length);
+
         setSelectedCanvasObjects(newSelectedCanvasObjects);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
@@ -311,7 +314,6 @@ export function UploadPreview(props: UploadPreviewProps) {
         brickHeight,
         brickWidth,
     ]);
-
 
     useEffect(() => {
         const c = new Canvas(canvasRef.current!);
@@ -322,6 +324,8 @@ export function UploadPreview(props: UploadPreviewProps) {
             width: canvasWidth,
             height: canvasHeight,
         });
+
+        c.backgroundColor = '#1A1A1A';
 
         c.defaultCursor = 'pointer';
 
