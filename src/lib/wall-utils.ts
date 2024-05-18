@@ -1,6 +1,6 @@
 import { Coordinate } from '@/types/coordinate';
 import { Brick } from '@/types/brick';
-import { Canvas } from 'fabric';
+import { StaticCanvas, Canvas } from 'fabric';
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
@@ -8,11 +8,11 @@ import {
 
 export function getBrickFromPointerPosition(
     pointer: Coordinate,
-    canvas: Canvas,
+    canvas: Canvas | StaticCanvas,
     bricksPerRow: number,
     bricksPerColumn: number,
 ): Brick {
-    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
     
     const canvasWidth = canvas.getWidth();
     const canvasHeight = canvas.getHeight();

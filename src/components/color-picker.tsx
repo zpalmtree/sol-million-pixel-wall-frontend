@@ -39,7 +39,7 @@ export function ColorPicker() {
         return colors.map((c) => {
             const isSelected = c === selectedColor;
 
-            let bgColor = c === '#ffffff'
+            const bgColor = c === '#ffffff'
                 ? 'border-blue-800'
                 : 'border-white';
 
