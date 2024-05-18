@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UploadPreview } from '@/components/upload-preview';
+import { ColorPicker } from '@/components/color-picker';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import {
     CardTitle,
@@ -104,39 +105,8 @@ export function CheckoutDialog() {
                                         />
                                     </div>
 
-                                    <div className="bg-[#1A1A1A] rounded-lg p-4 border border-[#C19A6B]">
-                                        <div className="grid grid-cols-4 gap-2">
-                                            <div className="w-7 h-7 rounded-md bg-[#FF6B6B] cursor-pointer hover:ring-2 hover:ring-[#FF6B6B]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#FFC107] cursor-pointer hover:ring-2 hover:ring-[#FFC107]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#4CAF50] cursor-pointer hover:ring-2 hover:ring-[#4CAF50]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#2196F3] cursor-pointer hover:ring-2 hover:ring-[#2196F3]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#9B59B6] cursor-pointer hover:ring-2 hover:ring-[#9B59B6]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#E91E63] cursor-pointer hover:ring-2 hover:ring-[#E91E63]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#673AB7] cursor-pointer hover:ring-2 hover:ring-[#673AB7]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#03A9F4] cursor-pointer hover:ring-2 hover:ring-[#03A9F4]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#8BC34A] cursor-pointer hover:ring-2 hover:ring-[#8BC34A]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#FF9800] cursor-pointer hover:ring-2 hover:ring-[#FF9800]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#795548] cursor-pointer hover:ring-2 hover:ring-[#795548]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#607D8B] cursor-pointer hover:ring-2 hover:ring-[#607D8B]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#F44336] cursor-pointer hover:ring-2 hover:ring-[#F44336]" />
-                                            <div className="w-7 h-7 rounded-md bg-[#9E9E9E] cursor-pointer hover:ring-2 hover:ring-[#9E9E9E]" />
-                                            <div className="w-7 h-7 rounded-md bg-black cursor-pointer hover:ring-2 hover:ring-black border-gray-800" />
-                                            <div className="w-7 h-7 rounded-md bg-white cursor-pointer hover:ring-2 hover:ring-white" />
-                                        </div>
-                                        <div className="mt-4 flex items-center justify-between gap-x-1">
-                                            <Label
-                                                className="text-sm"
-                                                htmlFor="customColor"
-                                            >
-                                                Custom Color
-                                            </Label>
-                                            <Input
-                                                className="bg-transparent border-none h-[48px] w-[60px] -mr-2"
-                                                id="customColor"
-                                                type="color"
-                                            />
-                                        </div>
-                                    </div>
+                                    <ColorPicker
+                                    />
                                 </div>
 
                                 <div className="flex flex-col items-center w-full gap-y-2">
