@@ -21,7 +21,10 @@ import {
     zoomToCoordinate,
     getBrickFromPointerPosition,
 } from '@/lib/wall-utils';
-import { selectedBricksState } from '@/state/bricks';
+import {
+    selectedBricksState,
+    selectedBrickNamesSetState,
+} from '@/state/bricks';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import {
     CANVAS_WIDTH,
@@ -45,6 +48,7 @@ export function UploadPreview(props: UploadPreviewProps) {
     } = props;
 
     const selectedBricks = useRecoilValue(selectedBricksState);
+    const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
     const [ canvas, setCanvas ] = useRecoilState(uploadPreviewCanvasState);
     const canvasRef = useRef<null | HTMLCanvasElement>(null);
     const [ selectedCanvasObjects, setSelectedCanvasObjects ] = React.useState<any[]>([]);
@@ -66,9 +70,14 @@ export function UploadPreview(props: UploadPreviewProps) {
             BRICKS_PER_COLUMN,
         );
 
-        console.log(brick.name);
+        if (selectedBricksSet.has(brick.name)) {
+            console.log('brick selected');
+        } else {
+            console.log('not selected');
+        }
     }, [
         canvas,
+        selectedBricksSet,
     ]);
 
     useEffect(() => {
