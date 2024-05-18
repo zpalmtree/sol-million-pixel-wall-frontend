@@ -47,7 +47,6 @@ export default function Splash() {
                 </div>
                 <div className="flex items-center gap-4">
                     <Button
-                        className="text-white hover:text-primary hover:bg-white/10 border border-primary"
                         size="sm"
                     >
                         Connect Wallet

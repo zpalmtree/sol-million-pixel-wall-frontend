@@ -350,6 +350,7 @@ export function PixelWall(props: PixelWallProps) {
         }
 
         setSelectedCanvasObjects(newSelectedCanvasObjects);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         canvas,
         selectedBricks,
