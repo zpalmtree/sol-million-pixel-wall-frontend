@@ -1,8 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { useRecoilValue } from 'recoil';
+import {
+    useRecoilValue,
+    useRecoilState,
+    useSetRecoilState,
+} from 'recoil';
 import Link from "next/link";
+import * as fabric from 'fabric';
 
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -11,6 +16,11 @@ import { Button } from "@/components/ui/button";
 import { UploadPreview } from '@/components/upload-preview';
 import { ColorPicker } from '@/components/color-picker';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
+import { selectedPixelsState } from '@/state/pixels';
+import { addedImagesState } from '@/state/images';
+import {
+    selectedBricksState,
+} from '@/state/bricks';
 import {
     CardTitle,
     CardDescription,
@@ -18,19 +28,114 @@ import {
     CardContent,
     Card,
 } from "@/components/ui/card";
+import {
+    calculateZoomLevel,
+    calculateBrickCenter,
+    zoomToCoordinate,
+} from '@/lib/wall-utils';
+import {
+    BRICKS_PER_ROW,
+    BRICKS_PER_COLUMN,
+} from '@/constants';
 
 export default function Checkout() {
-    const uploadPreviewCanvas = useRecoilValue(uploadPreviewCanvasState);
+    const canvas = useRecoilValue(uploadPreviewCanvasState);
+
+    const [ images, setImages ] = useRecoilState(addedImagesState);
+    const setSelectedPixels = useSetRecoilState(selectedPixelsState);
+    const selectedBricks = useRecoilValue(selectedBricksState);
+
+    const canvasWidth = 1000;
+    const canvasHeight = 1000;
+    const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [ canvasWidth ]);
+    const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [ canvasHeight ]);
 
     const handleResetZoom = React.useCallback(() => {
-        if (!uploadPreviewCanvas) {
+        if (!canvas) {
             return;
         }
 
-        uploadPreviewCanvas.setZoom(1);
-        uploadPreviewCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+        const zoom = calculateZoomLevel(
+            selectedBricks,
+            canvasWidth,
+            canvasHeight,
+        );
+
+        const center = calculateBrickCenter(
+            selectedBricks,
+            brickWidth,
+            brickHeight,
+        );
+
+        if (zoom !== 1) {
+            zoomToCoordinate(
+                canvas,
+                center,
+                zoom,
+            );
+        } else {
+            canvas.setZoom(1);
+            canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+        }
     }, [
-        uploadPreviewCanvas,
+        canvas,
+        brickHeight,
+        brickWidth,
+        selectedBricks,
+    ]);
+
+    const handleClearCanvas = React.useCallback(() => {
+        if (!canvas) {
+            return;
+        }
+
+        setSelectedPixels([]);
+
+        for (const image of images) {
+            canvas.remove(image);
+        }
+
+        setImages([]);
+    }, [
+        canvas,
+        setImages,
+        setSelectedPixels,
+        images,
+    ]);
+
+    const handleImageUpload = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+
+        if (!file || !canvas) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            if (e.target?.result) {
+                const image = await fabric.Image.fromURL(e.target.result as string);
+
+                image.set({
+                    left: 0,
+                    top: 0,
+                });
+
+                canvas.add(image);
+                canvas.sendObjectBackwards(image);
+
+                setImages((images) => {
+                    const newImages = [...images];
+                    newImages.push(image);
+                    return newImages;
+                });
+            }
+        };
+
+        reader.readAsDataURL(file);
+    }, [
+        canvas,
+        setImages,
     ]);
 
     return (
@@ -82,7 +187,6 @@ export default function Checkout() {
             <div className="flex flex-col items-center min-h-[100dvh] bg-[#1A1A1A] text-white">
                 <main className="flex flex-col items-center mt-4 w-full px-8">
                     <Tabs className="flex w-full gap-x-4 justify-start items-start" defaultValue="create" orientation="vertical">
-                        
                         <TabsContent
                             className="w-[1280px]"
                             value="create"
@@ -110,6 +214,7 @@ export default function Checkout() {
                                                 className="rounded-md bg-[#333333] px-3 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-[#C19A6B] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:bg-[#444444] transition-colors duration-200 h-full"
                                                 id="image"
                                                 type="file"
+                                                onChange={handleImageUpload}
                                             />
                                         </div>
 
@@ -125,7 +230,10 @@ export default function Checkout() {
                                             Reset Zoom
                                         </Button>
 
-                                        <Button className="rounded-md border-none bg-red-500 px-12 py-2 text-white hover:bg-red-600 transition-colors duration-200 w-full max-w-[250px]">
+                                        <Button
+                                            className="rounded-md border-none bg-red-500 px-12 py-2 text-white hover:bg-red-600 transition-colors duration-200 w-full max-w-[250px]"
+                                            onClick={handleClearCanvas}
+                                        >
                                             Clear Canvas
                                         </Button>
                                     </div>

@@ -129,8 +129,6 @@ export function UploadPreview(props: UploadPreviewProps) {
             canvas,
         );
 
-        console.log(pixel);
-
         togglePixelColor(pixel);
     }, [
         canvas,
@@ -496,6 +494,7 @@ export function UploadPreview(props: UploadPreviewProps) {
 
                 newSelectedCanvasObjects.push(rectangle);
                 canvas.add(rectangle);
+                canvas.sendObjectBackwards(rectangle);
             }
         }
 
@@ -521,6 +520,7 @@ export function UploadPreview(props: UploadPreviewProps) {
 
                 newSelectedCanvasObjects.push(rectangle);
                 canvas.add(rectangle);
+                canvas.sendObjectBackwards(rectangle);
             }
         }
 
@@ -558,6 +558,7 @@ export function UploadPreview(props: UploadPreviewProps) {
             });
 
             c.add(line);
+            c.sendObjectToBack(line);
         }
 
         for (let i = 1; i < BRICKS_PER_COLUMN; i++) {
@@ -570,6 +571,7 @@ export function UploadPreview(props: UploadPreviewProps) {
             });
 
             c.add(line);
+            c.sendObjectToBack(line);
         }
 
         // Clean up on component unmount
