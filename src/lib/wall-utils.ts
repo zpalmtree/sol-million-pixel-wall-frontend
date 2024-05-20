@@ -1,5 +1,6 @@
 import { Coordinate } from '@/types/coordinate';
 import { Brick } from '@/types/brick';
+import { Pixel } from '@/types/pixel';
 import { StaticCanvas, Canvas } from 'fabric';
 import {
     BRICKS_PER_ROW,
@@ -41,6 +42,41 @@ export function getBrickFromPointerPosition(
         x,
         y,
         name: `${x},${y}`,
+    };
+}
+
+export function getPixelFromPointerPosition(
+    pointer: Coordinate,
+    canvas: Canvas | StaticCanvas
+): Pixel {
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+    
+    const canvasWidth = canvas.getWidth();
+    const canvasHeight = canvas.getHeight();
+
+    // Clamp the pointer position to ensure it is within the canvas boundaries
+    const clampedPointerPosition = {
+        x: clamp(pointer.x, 0, canvasWidth - 1),
+        y: clamp(pointer.y, 0, canvasHeight - 1),
+    };
+
+    const zoom = canvas.getZoom();
+    const panX = canvas.viewportTransform[4];
+    const panY = canvas.viewportTransform[5];
+
+    // Correct the pointer coordinates for zoom and pan
+    const transformedPointerX = (clampedPointerPosition.x - panX) / zoom;
+    const transformedPointerY = (clampedPointerPosition.y - panY) / zoom;
+
+    // Since each pixel is 1x1, the pixel coordinates are the same as the transformed pointer coordinates
+    const x = Math.floor(transformedPointerX);
+    const y = Math.floor(transformedPointerY);
+
+    return {
+        x,
+        y,
+        name: `${x},${y}`,
+        color: '#000000',
     };
 }
 

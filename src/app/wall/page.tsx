@@ -109,14 +109,16 @@ export default function Component() {
                                                 </span>
                                             </div>
 
-                                            <Button
-                                                className="w-full"
-                                                size="sm"
-                                                disabled={selectedBricks.length === 0}
-                                                onClick={handleCheckout}
+                                            <Link
+                                                className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
+                                                href="/checkout"
+                                                style={{
+                                                    pointerEvents: selectedBricks.length === 0 ? 'none' : 'auto',
+                                                    opacity: selectedBricks.length === 0 ? '50%' : '100%',
+                                                }}
                                             >
                                                 Continue
-                                            </Button>
+                                            </Link>
                                         </div>
                                         <div className="flex flex-wrap justify-center gap-4 h-full">
                                             <div className="flex flex-col gap-4 rounded-lg bg-[#2d2d2d] p-4 w-[350px] xl:w-[370px] relative border-l-4 border-primary">
