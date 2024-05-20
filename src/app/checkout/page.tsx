@@ -4,11 +4,6 @@ import * as React from 'react';
 import { useRecoilValue } from 'recoil';
 import Link from "next/link";
 
-import {
-    DialogTitle,
-    DialogDescription,
-    DialogContent,
-} from "@/components/ui/dialog";
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";

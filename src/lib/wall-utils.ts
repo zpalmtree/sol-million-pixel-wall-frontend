@@ -116,8 +116,8 @@ export function calculateZoomLevel(
 
     let zoom = Math.min(zoomLevelX, zoomLevelY);
 
-    if (zoom > 10) {
-        zoom = 10;
+    if (zoom > 30) {
+        zoom = 30;
     }
 
     if (zoom < 1) {

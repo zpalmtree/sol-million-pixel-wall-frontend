@@ -15,3 +15,11 @@ export const selectedPixelNamesSetState = selector<Set<string>>({
         return nameSet;
     },
 });
+
+export const selectedPixelsMapState = selector<Map<string, Pixel>>({
+    key: 'selectedPixelsMap',
+    get: ({ get }) => {
+        const selectedPixels = get(selectedPixelsState);
+        return new Map(selectedPixels.map((p) => [p.name, p]));
+    },
+});
