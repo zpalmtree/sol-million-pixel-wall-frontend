@@ -19,9 +19,13 @@ import { Pixel } from '@/types/pixel';
 import {
     calculateZoomLevel,
     calculateBrickCenter,
-    zoomToCoordinate,
+    zoomToCoordinate, 
     getBrickFromPointerPosition,
     getPixelFromPointerPosition,
+    groupBricks,
+    groupPixels,
+    createRectanglesFromCluster,
+    createRectanglesFromPixelCluster,
 } from '@/lib/wall-utils';
 import {
     selectedBricksState,
@@ -226,254 +230,8 @@ export function UploadPreview(props: UploadPreviewProps) {
         const visitedBricks = new Set<string>();
         const visitedPixels = new Set<string>();
 
-        // Function to perform a DFS to find all connected bricks
-        const dfsBricks = (x: number, y: number, bricks: Brick[], cluster: Brick[]) => {
-            const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-            const stack = [[x, y]];
-
-            while (stack.length) {
-                const [cx, cy] = stack.pop()!;
-                const key = `${cx},${cy}`;
-
-                if (visitedBricks.has(key)) {
-                    continue;
-                }
-
-                visitedBricks.add(key);
-
-                cluster.push({
-                    x: cx,
-                    y: cy,
-                    name: `${cx},${cy}`,
-                });
-
-                for (const [dx, dy] of directions) {
-                    const nx = cx + dx, ny = cy + dy;
-                    if (bricks.some((b: Brick) => b.x === nx && b.y === ny) && !visitedBricks.has(`${nx},${ny}`)) {
-                        stack.push([nx, ny]);
-                    }
-                }
-            }
-        };
-
-        // Function to perform a DFS to find all connected pixels of the same color
-        const dfsPixels = (x: number, y: number, color: string, pixels: Pixel[], cluster: Pixel[]) => {
-            const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-            const stack = [[x, y]];
-
-            while (stack.length) {
-                const [cx, cy] = stack.pop()!;
-                const key = `${cx},${cy}`;
-
-                if (visitedPixels.has(key)) {
-                    continue;
-                }
-
-                visitedPixels.add(key);
-
-                cluster.push({
-                    x: cx,
-                    y: cy,
-                    color: color,
-                    name: `${cx},${cy}`,
-                });
-
-                for (const [dx, dy] of directions) {
-                    const nx = cx + dx, ny = cy + dy;
-                    if (pixels.some((p: Pixel) => p.x === nx && p.y === ny && p.color === color) && !visitedPixels.has(`${nx},${ny}`)) {
-                        stack.push([nx, ny]);
-                    }
-                }
-            }
-        };
-
-        // Function to group bricks into clusters
-        const groupBricks = (bricks: Brick[]) => {
-            const clusters: Brick[][] = [];
-
-            for (const brick of bricks) {
-                const key = `${brick.x},${brick.y}`;
-                if (!visitedBricks.has(key)) {
-                    const cluster: Brick[] = [];
-                    dfsBricks(brick.x, brick.y, bricks, cluster);
-                    clusters.push(cluster);
-                }
-            }
-            return clusters;
-        };
-
-        // Function to group pixels into clusters of the same color
-        const groupPixels = (pixels: Pixel[]) => {
-            const clusters: Pixel[][] = [];
-
-            for (const pixel of pixels) {
-                const key = `${pixel.x},${pixel.y}`;
-                if (!visitedPixels.has(key)) {
-                    const cluster: Pixel[] = [];
-                    dfsPixels(pixel.x, pixel.y, pixel.color, pixels, cluster);
-                    clusters.push(cluster);
-                }
-            }
-            return clusters;
-        };
-
-        // Function to create rectangles from a cluster of bricks
-        const createRectanglesFromCluster = (cluster: Brick[]) => {
-            const bricksSet: Set<string> = new Set(cluster.map(brick => `${brick.x},${brick.y}`));
-            const rectangles = [];
-
-            while (bricksSet.size > 0) {
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                const queue = [Array.from(bricksSet)[0].split(',').map(Number)];
-                const currentCluster = [];
-
-                while (queue.length > 0) {
-                    const [cx, cy] = queue.shift()!;
-                    const key = `${cx},${cy}`;
-
-                    if (!bricksSet.has(key)) {
-                        continue;
-                    }
-
-                    bricksSet.delete(key);
-                    currentCluster.push({ x: cx, y: cy });
-
-                    minX = Math.min(minX, cx);
-                    minY = Math.min(minY, cy);
-                    maxX = Math.max(maxX, cx);
-                    maxY = Math.max(maxY, cy);
-
-                    [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(([dx, dy]) => {
-                        const nx = cx + dx, ny = cy + dy;
-                        if (bricksSet.has(`${nx},${ny}`)) {
-                            queue.push([nx, ny]);
-                        }
-                    });
-                }
-
-                const grid = Array.from({ length: maxY - minY + 1 }, () =>
-                    Array.from({ length: maxX - minX + 1 }, () => false)
-                );
-
-                currentCluster.forEach(({ x, y }) => {
-                    grid[y - minY][x - minX] = true;
-                });
-
-                for (let i = 0; i < grid.length; i++) {
-                    for (let j = 0; j < grid[i].length; j++) {
-                        if (grid[i][j]) {
-                            let width = 1, height = 1;
-
-                            while (j + width < grid[i].length && grid[i][j + width]) {
-                                width++;
-                            }
-
-                            while (i + height < grid.length && grid[i + height].slice(j, j + width).every(v => v)) {
-                                height++;
-                            }
-
-                            for (let y = 0; y < height; y++) {
-                                for (let x = 0; x < width; x++) {
-                                    grid[i + y][j + x] = false;
-                                }
-                            }
-
-                            rectangles.push({
-                                minX: j + minX,
-                                minY: i + minY,
-                                maxX: j + minX + width - 1,
-                                maxY: i + minY + height - 1
-                            });
-                        }
-                    }
-                }
-            }
-
-            return rectangles;
-        };
-
-        // Function to create rectangles from a cluster of pixels
-        const createRectanglesFromPixelCluster = (cluster: Pixel[]) => {
-            const pixelsSet: Set<string> = new Set(cluster.map(pixel => `${pixel.x},${pixel.y}`));
-            const rectangles = [];
-
-            while (pixelsSet.size > 0) {
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                const queue = [Array.from(pixelsSet)[0].split(',').map(Number)];
-                const currentCluster = [];
-
-                while (queue.length > 0) {
-                    const [cx, cy] = queue.shift()!;
-                    const key = `${cx},${cy}`;
-
-                    if (!pixelsSet.has(key)) {
-                        continue;
-                    }
-
-                    pixelsSet.delete(key);
-                    currentCluster.push({ x: cx, y: cy, color: cluster[0].color });
-
-                    minX = Math.min(minX, cx);
-                    minY = Math.min(minY, cy);
-                    maxX = Math.max(maxX, cx);
-                    maxY = Math.max(maxY, cy);
-
-                    [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(([dx, dy]) => {
-                        const nx = cx + dx, ny = cy + dy;
-                        if (pixelsSet.has(`${nx},${ny}`)) {
-                            queue.push([nx, ny]);
-                        }
-                    });
-                }
-
-                const grid = Array.from({ length: maxY - minY + 1 }, () =>
-                    Array.from({ length: maxX - minX + 1 }, () => false)
-                );
-
-                currentCluster.forEach(({ x, y }) => {
-                    grid[y - minY][x - minX] = true;
-                });
-
-                for (let i = 0; i < grid.length; i++) {
-                    for (let j = 0; j < grid[i].length; j++) {
-                        if (grid[i][j]) {
-                            let width = 1, height = 1;
-
-                            while (j + width < grid[i].length && grid[i][j + width]) {
-                                width++;
-                            }
-
-                            while (i + height < grid.length && grid[i + height].slice(j, j + width).every(v => v)) {
-                                height++;
-                            }
-
-                            for (let y = 0; y < height; y++) {
-                                for (let x = 0; x < width; x++) {
-                                    grid[i + y][j + x] = false;
-                                }
-                            }
-
-                            rectangles.push({
-                                minX: j + minX,
-                                minY: i + minY,
-                                maxX: j + minX + width - 1,
-                                maxY: i + minY + height - 1,
-                                color: cluster[0].color,
-                            });
-                        }
-                    }
-                }
-            }
-
-            return rectangles;
-        };
-
-        // Reset visited sets before processing selected bricks and pixels
-        visitedBricks.clear();
-        visitedPixels.clear();
-
         // Detect and merge overlapping bricks
-        const brickClusters = groupBricks(selectedBricks);
+        const brickClusters = groupBricks(selectedBricks, visitedBricks);
 
         // Create rectangles for each cluster of bricks
         for (const cluster of brickClusters) {
@@ -499,7 +257,7 @@ export function UploadPreview(props: UploadPreviewProps) {
         }
 
         // Detect and merge overlapping pixels of the same color
-        const pixelClusters = groupPixels(selectedPixels);
+        const pixelClusters = groupPixels(selectedPixels, visitedPixels);
 
         // Create rectangles for each cluster of pixels
         for (const cluster of pixelClusters) {
