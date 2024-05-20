@@ -14,7 +14,6 @@ import {
     Point,
 } from 'fabric';
 
-import { Brick } from '@/types/brick';
 import { Pixel } from '@/types/pixel';
 import {
     calculateZoomLevel,

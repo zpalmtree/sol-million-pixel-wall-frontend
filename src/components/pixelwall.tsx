@@ -13,7 +13,11 @@ import {
 
 import { Coordinate } from '@/types/coordinate';
 import { Brick } from '@/types/brick';
-import { getBrickFromPointerPosition } from '@/lib/wall-utils';
+import {
+    getBrickFromPointerPosition,
+    groupBricks,
+    createRectanglesFromCluster,
+} from '@/lib/wall-utils';
 import { selectedBricksState } from '@/state/bricks';
 import {
     CANVAS_WIDTH,
@@ -181,137 +185,14 @@ export function PixelWall(props: PixelWallProps) {
             canvas.remove(canvasObject);
         }
 
-        const newSelectedCanvasObjects = [];
-        const visited = new Set();
-
-        // Function to perform a DFS to find all connected bricks
-        const dfs = (x: number, y: number, bricks: Brick[], cluster: Brick[]) => {
-            const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-            const stack = [[x, y]];
-
-            while (stack.length) {
-                const [cx, cy] = stack.pop()!;
-                const key = `${cx},${cy}`;
-
-                if (visited.has(key)) {
-                    continue;
-                }
-
-                visited.add(key);
-
-                cluster.push({
-                    x: cx,
-                    y: cy,
-                    name: `${cx},${cy}`,
-                });
-
-                for (const [dx, dy] of directions) {
-                    const nx = cx + dx, ny = cy + dy;
-                    if (bricks.some((b: Brick) => b.x === nx && b.y === ny) && !visited.has(`${nx},${ny}`)) {
-                        stack.push([nx, ny]);
-                    }
-                }
-            }
-        };
-
-        // Function to group bricks into clusters
-        const groupBricks = (bricks: Brick[]) => {
-            const clusters: Brick[][] = [];
-
-            for (const brick of bricks) {
-                const key = `${brick.x},${brick.y}`;
-                if (!visited.has(key)) {
-                    const cluster: Brick[] = [];
-                    dfs(brick.x, brick.y, bricks, cluster);
-                    clusters.push(cluster);
-                }
-            }
-            return clusters;
-        };
-
-        // Function to create rectangles from a cluster of bricks
-        const createRectanglesFromCluster = (cluster: Brick[]) => {
-            const bricksSet: Set<string> = new Set(cluster.map(brick => `${brick.x},${brick.y}`));
-            const rectangles = [];
-
-            while (bricksSet.size > 0) {
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                const queue = [Array.from(bricksSet)[0].split(',').map(Number)];
-                const currentCluster = [];
-
-                while (queue.length > 0) {
-                    const [cx, cy] = queue.shift()!;
-                    const key = `${cx},${cy}`;
-
-                    if (!bricksSet.has(key)) {
-                        continue;
-                    }
-
-                    bricksSet.delete(key);
-                    currentCluster.push({ x: cx, y: cy });
-
-                    minX = Math.min(minX, cx);
-                    minY = Math.min(minY, cy);
-                    maxX = Math.max(maxX, cx);
-                    maxY = Math.max(maxY, cy);
-
-                    [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(([dx, dy]) => {
-                        const nx = cx + dx, ny = cy + dy;
-                        if (bricksSet.has(`${nx},${ny}`)) {
-                            queue.push([nx, ny]);
-                        }
-                    });
-                }
-
-                const grid = Array.from({ length: maxY - minY + 1 }, () =>
-                    Array.from({ length: maxX - minX + 1 }, () => false)
-                );
-
-                currentCluster.forEach(({ x, y }) => {
-                    grid[y - minY][x - minX] = true;
-                });
-
-                for (let i = 0; i < grid.length; i++) {
-                    for (let j = 0; j < grid[i].length; j++) {
-                        if (grid[i][j]) {
-                            let width = 1, height = 1;
-
-                            while (j + width < grid[i].length && grid[i][j + width]) {
-                                width++;
-                            }
-
-                            while (i + height < grid.length && grid[i + height].slice(j, j + width).every(v => v)) {
-                                height++;
-                            }
-
-                            for (let y = 0; y < height; y++) {
-                                for (let x = 0; x < width; x++) {
-                                    grid[i + y][j + x] = false;
-                                }
-                            }
-
-                            rectangles.push({
-                                minX: j + minX,
-                                minY: i + minY,
-                                maxX: j + minX + width - 1,
-                                maxY: i + minY + height - 1
-                            });
-                        }
-                    }
-                }
-            }
-
-            return rectangles;
-        };
-
-        // Reset visited set before processing selected bricks
-        visited.clear();
+        const newSelectedCanvasObjects: any[] = [];
+        const visitedBricks = new Set<string>();
 
         // Detect and merge overlapping bricks
-        const clusters = groupBricks(selectedBricks);
+        const brickClusters = groupBricks(selectedBricks, visitedBricks);
 
-        // Create rectangles for each cluster
-        for (const cluster of clusters) {
+        // Create rectangles for each cluster of bricks
+        for (const cluster of brickClusters) {
             const rectangles = createRectanglesFromCluster(cluster);
 
             for (const { minX, minY, maxX, maxY } of rectangles) {
@@ -333,6 +214,8 @@ export function PixelWall(props: PixelWallProps) {
         }
 
         setSelectedCanvasObjects(newSelectedCanvasObjects);
+
+        console.log(newSelectedCanvasObjects.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         canvas,
