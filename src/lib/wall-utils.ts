@@ -442,3 +442,24 @@ export function createRectanglesFromPixelCluster(
 
     return rectangles;
 }
+
+
+export function getAllBricks(
+    canvasWidth: number,
+    canvasHeight: number,
+    brickWidth: number,
+    brickHeight: number,
+): Brick[] {
+    const allBricks: Brick[] = [];
+    
+    const numBricksX = Math.floor(canvasWidth / brickWidth);
+    const numBricksY = Math.floor(canvasHeight / brickHeight);
+
+    for (let x = 0; x < numBricksX; x++) {
+        for (let y = 0; y < numBricksY; y++) {
+            allBricks.push({ x, y, name: `${x},${y}` });
+        }
+    }
+
+    return allBricks;
+}

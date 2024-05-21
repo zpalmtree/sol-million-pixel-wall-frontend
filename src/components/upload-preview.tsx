@@ -25,6 +25,7 @@ import {
     groupPixels,
     createRectanglesFromCluster,
     createRectanglesFromPixelCluster,
+    getAllBricks,
 } from '@/lib/wall-utils';
 import {
     selectedBricksState,
@@ -215,6 +216,7 @@ export function UploadPreview(props: UploadPreviewProps) {
         handleMouseUp,
     ]);
 
+    /*
     useEffect(() => {
         if (!canvas) {
             return;
@@ -278,6 +280,113 @@ export function UploadPreview(props: UploadPreviewProps) {
                 newSelectedCanvasObjects.push(rectangle);
                 canvas.add(rectangle);
                 canvas.sendObjectBackwards(rectangle);
+            }
+        }
+
+        setSelectedCanvasObjects(newSelectedCanvasObjects);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        canvas,
+        selectedBricks,
+        selectedPixels,
+        brickHeight,
+        brickWidth,
+    ]);
+        */
+
+    useEffect(() => {
+        if (!canvas) {
+            return;
+        }
+
+        // Remove existing rectangles
+        for (const canvasObject of selectedCanvasObjects) {
+            canvas.remove(canvasObject);
+        }
+
+        const newSelectedCanvasObjects: any[] = [];
+        const visitedBricks = new Set<string>();
+        const visitedPixels = new Set<string>();
+
+        // Detect and merge overlapping bricks
+        const brickClusters = groupBricks(selectedBricks, visitedBricks);
+
+        // Create rectangles for each cluster of bricks
+        for (const cluster of brickClusters) {
+            const rectangles = createRectanglesFromCluster(cluster);
+
+            for (const { minX, minY, maxX, maxY } of rectangles) {
+                const rectangle = new Rect({
+                    width: (maxX - minX + 1) * brickWidth,
+                    height: (maxY - minY + 1) * brickHeight,
+                    fill: '#C19A6B',
+                    opacity: 0.3,
+                    selectable: false,
+                    evented: false,
+                    left: minX * brickWidth,
+                    top: minY * brickHeight,
+                    strokeWidth: 0,
+                });
+
+                newSelectedCanvasObjects.push(rectangle);
+                canvas.add(rectangle);
+                canvas.sendObjectBackwards(rectangle);
+            }
+        }
+
+        // Detect and merge overlapping pixels of the same color
+        const pixelClusters = groupPixels(selectedPixels, visitedPixels);
+
+        // Create rectangles for each cluster of pixels
+        for (const cluster of pixelClusters) {
+            const rectangles = createRectanglesFromPixelCluster(cluster);
+
+            for (const { minX, minY, maxX, maxY, color } of rectangles) {
+                const rectangle = new Rect({
+                    width: (maxX - minX + 1),
+                    height: (maxY - minY + 1),
+                    fill: color,
+                    opacity: 1,
+                    selectable: false,
+                    evented: false,
+                    left: minX,
+                    top: minY,
+                    strokeWidth: 0,
+                });
+
+                newSelectedCanvasObjects.push(rectangle);
+                canvas.add(rectangle);
+                canvas.sendObjectBackwards(rectangle);
+            }
+        }
+
+        // Get all bricks
+        const allBricks = getAllBricks(canvas.width, canvas.height, brickWidth, brickHeight);
+        const deselectedBricks = allBricks.filter(brick => !selectedBricksSet.has(brick.name));
+
+        // Detect and merge overlapping deselected bricks
+        const deselectedBrickClusters = groupBricks(deselectedBricks, new Set<string>());
+
+        // Create rectangles for each cluster of deselected bricks
+        for (const cluster of deselectedBrickClusters) {
+            const rectangles = createRectanglesFromCluster(cluster);
+
+            for (const { minX, minY, maxX, maxY } of rectangles) {
+                const rectangle = new Rect({
+                    width: (maxX - minX + 1) * brickWidth,
+                    height: (maxY - minY + 1) * brickHeight,
+                    fill: '#2f2f2f',
+                    opacity: 0.9,
+                    selectable: false,
+                    evented: false,
+                    left: minX * brickWidth,
+                    top: minY * brickHeight,
+                    strokeWidth: 0,
+                });
+
+                newSelectedCanvasObjects.push(rectangle);
+                canvas.add(rectangle);
+                canvas.bringObjectToFront(rectangle);
             }
         }
 

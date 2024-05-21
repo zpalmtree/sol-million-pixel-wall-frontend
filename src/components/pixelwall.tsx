@@ -214,8 +214,6 @@ export function PixelWall(props: PixelWallProps) {
         }
 
         setSelectedCanvasObjects(newSelectedCanvasObjects);
-
-        console.log(newSelectedCanvasObjects.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         canvas,

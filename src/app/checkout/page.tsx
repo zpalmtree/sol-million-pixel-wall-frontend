@@ -32,6 +32,8 @@ import {
     calculateZoomLevel,
     calculateBrickCenter,
     zoomToCoordinate,
+    groupBricks,
+    createRectanglesFromCluster,
 } from '@/lib/wall-utils';
 import {
     BRICKS_PER_ROW,
@@ -116,13 +118,42 @@ export default function Checkout() {
             if (e.target?.result) {
                 const image = await fabric.Image.fromURL(e.target.result as string);
 
+                // Calculate the center of the selected bricks
+                const center = calculateBrickCenter(
+                    selectedBricks,
+                    brickWidth,
+                    brickHeight,
+                );
+
+                // Determine the dimensions of the largest continuous selection area
+                const brickClusters = groupBricks(selectedBricks, new Set<string>());
+                let maxWidth = 0;
+                let maxHeight = 0;
+
+                for (const cluster of brickClusters) {
+                    const rectangles = createRectanglesFromCluster(cluster);
+                    for (const { minX, minY, maxX, maxY } of rectangles) {
+                        const width = (maxX - minX + 1) * brickWidth;
+                        const height = (maxY - minY + 1) * brickHeight;
+                        if (width > maxWidth) {
+                            maxWidth = width;
+                        }
+                        if (height > maxHeight) {
+                            maxHeight = height;
+                        }
+                    }
+                }
+
+                // Set the image properties
                 image.set({
-                    left: 0,
-                    top: 0,
+                    left: center.x - maxWidth / 2,
+                    top: center.y - maxHeight / 2,
+                    scaleX: maxWidth / image.width,
+                    scaleY: maxHeight / image.height,
                 });
 
                 canvas.add(image);
-                canvas.sendObjectBackwards(image);
+                canvas.bringObjectToFront(image);
 
                 setImages((images) => {
                     const newImages = [...images];
@@ -136,6 +167,9 @@ export default function Checkout() {
     }, [
         canvas,
         setImages,
+        selectedBricks,
+        brickWidth,
+        brickHeight,
     ]);
 
     return (
