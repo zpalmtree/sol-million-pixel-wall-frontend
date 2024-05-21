@@ -189,18 +189,38 @@ export function zoomToCoordinate(
     canvas.viewportTransform![5] = -newCenterY;
 }
 
-export function dfsBricks(
+export function groupBricks(
+    bricks: Brick[],
+    visitedBricks: Set<string>
+): Brick[][] {
+    const clusters: Brick[][] = [];
+    const brickSet = new Set(bricks.map(brick => `${brick.x},${brick.y}`));
+
+    for (const brick of bricks) {
+        const key = `${brick.x},${brick.y}`;
+
+        if (!visitedBricks.has(key)) {
+            const cluster: Brick[] = [];
+            bfsBricks(brick.x, brick.y, brickSet, cluster, visitedBricks);
+            clusters.push(cluster);
+        }
+    }
+
+    return clusters;
+}
+
+export function bfsBricks(
     x: number,
     y: number,
-    bricks: Brick[],
+    brickSet: Set<string>,
     cluster: Brick[],
     visitedBricks: Set<string>
 ) {
     const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-    const stack = [[x, y]];
+    const queue = [[x, y]];
 
-    while (stack.length) {
-        const [cx, cy] = stack.pop()!;
+    while (queue.length) {
+        const [cx, cy] = queue.shift()!;
         const key = `${cx},${cy}`;
 
         if (visitedBricks.has(key)) {
@@ -208,86 +228,68 @@ export function dfsBricks(
         }
 
         visitedBricks.add(key);
-
-        cluster.push({ x: cx, y: cy, name: `${cx},${cy}` });
+        cluster.push({ x: cx, y: cy, name: key });
 
         for (const [dx, dy] of directions) {
             const nx = cx + dx, ny = cy + dy;
-            if (bricks.some((b: Brick) => b.x === nx && b.y === ny) && !visitedBricks.has(`${nx},${ny}`)) {
-                stack.push([nx, ny]);
+            const nKey = `${nx},${ny}`;
+            if (brickSet.has(nKey) && !visitedBricks.has(nKey)) {
+                queue.push([nx, ny]);
             }
         }
     }
 }
 
-export function dfsPixels(
+export function groupPixels(
+    pixels: Pixel[],
+    visitedPixels: Set<string>
+): Pixel[][] {
+    const clusters: Pixel[][] = [];
+    const pixelSet = new Set(pixels.map(pixel => `${pixel.x},${pixel.y},${pixel.color}`));
+
+    for (const pixel of pixels) {
+        const key = `${pixel.x},${pixel.y},${pixel.color}`;
+
+        if (!visitedPixels.has(key)) {
+            const cluster: Pixel[] = [];
+            bfsPixels(pixel.x, pixel.y, pixel.color, pixelSet, cluster, visitedPixels);
+            clusters.push(cluster);
+        }
+    }
+
+    return clusters;
+}
+
+export function bfsPixels(
     x: number,
     y: number,
     color: string,
-    pixels: Pixel[],
+    pixelSet: Set<string>,
     cluster: Pixel[],
     visitedPixels: Set<string>
 ) {
     const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-    const stack = [[x, y]];
+    const queue = [[x, y]];
 
-    while (stack.length) {
-        const [cx, cy] = stack.pop()!;
-        const key = `${cx},${cy}`;
+    while (queue.length) {
+        const [cx, cy] = queue.shift()!;
+        const key = `${cx},${cy},${color}`;
 
         if (visitedPixels.has(key)) {
             continue;
         }
 
         visitedPixels.add(key);
-
         cluster.push({ x: cx, y: cy, color, name: `${cx},${cy}` });
 
         for (const [dx, dy] of directions) {
             const nx = cx + dx, ny = cy + dy;
-            if (pixels.some((p: Pixel) => p.x === nx && p.y === ny && p.color === color) && !visitedPixels.has(`${nx},${ny}`)) {
-                stack.push([nx, ny]);
+            const nKey = `${nx},${ny},${color}`;
+            if (pixelSet.has(nKey) && !visitedPixels.has(nKey)) {
+                queue.push([nx, ny]);
             }
         }
     }
-}
-
-export function groupBricks(
-    bricks: Brick[],
-    visitedBricks: Set<string>
-): Brick[][] {
-    const clusters: Brick[][] = [];
-
-    for (const brick of bricks) {
-        const key = `${brick.x},${brick.y}`;
-
-        if (!visitedBricks.has(key)) {
-            const cluster: Brick[] = [];
-            dfsBricks(brick.x, brick.y, bricks, cluster, visitedBricks);
-            clusters.push(cluster);
-        }
-    }
-
-    return clusters;
-}
-
-export function groupPixels (
-    pixels: Pixel[],
-    visitedPixels: Set<string>,
-): Pixel[][] {
-    const clusters: Pixel[][] = [];
-
-    for (const pixel of pixels) {
-        const key = `${pixel.x},${pixel.y}`;
-
-        if (!visitedPixels.has(key)) {
-            const cluster: Pixel[] = [];
-            dfsPixels(pixel.x, pixel.y, pixel.color, pixels, cluster, visitedPixels);
-            clusters.push(cluster);
-        }
-    }
-
-    return clusters;
 }
 
 export function createRectanglesFromCluster(

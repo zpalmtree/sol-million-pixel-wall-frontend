@@ -176,7 +176,7 @@ export function PixelWall(props: PixelWallProps) {
     ]);
 
     useEffect(() => {
-        if (!canvas) {
+        if (!canvas || !interactable) {
             return;
         }
 
