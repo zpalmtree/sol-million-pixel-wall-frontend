@@ -153,7 +153,7 @@ export default function Checkout() {
                 });
 
                 canvas.add(image);
-                canvas.bringObjectToFront(image);
+                canvas.bringObjectForward(image);
 
                 setImages((images) => {
                     const newImages = [...images];

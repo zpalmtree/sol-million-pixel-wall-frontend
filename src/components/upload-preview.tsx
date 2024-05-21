@@ -113,52 +113,21 @@ export function UploadPreview(props: UploadPreviewProps) {
         selectedPixels,
     ]);
 
-const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
-    if (!canvas) {
-        return;
-    }
-
-    const pointer = canvas.getPointer(e.e);
-    
-    // Check if there is an image below the pointer
-    const isImageBelowPointer = images.some(image => {
-        const { left, top, width, height } = image.getBoundingRect();
-        return pointer.x >= left && pointer.x <= left + width && pointer.y >= top && pointer.y <= top + height;
-    });
-
-    if (isImageBelowPointer) {
-        console.log(`Image below pointer, not drawing pixel`);
-        return;
-    }
-
-    const brick = getBrickFromPointerPosition(
-        e.pointer,
-        canvas,
-        BRICKS_PER_ROW,
-        BRICKS_PER_COLUMN,
-    );
-
-    if (!selectedBricksSet.has(brick.name)) {
-        console.log(`Brick not selected, returning`);
-        return;
-    }
-
-    const pixel = getPixelFromPointerPosition(
-        e.pointer,
-        canvas,
-    );
-
-    togglePixelColor(pixel);
-}, [
-    canvas,
-    selectedBricksSet,
-    togglePixelColor,
-    images, // Add images to the dependency array
-]);
-
-/*
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         if (!canvas) {
+            return;
+        }
+
+        const pointer = canvas.getPointer(e.e);
+        
+        // Check if there is an image below the pointer
+        const isImageBelowPointer = images.some(image => {
+            const { left, top, width, height } = image.getBoundingRect();
+            return pointer.x >= left && pointer.x <= left + width && pointer.y >= top && pointer.y <= top + height;
+        });
+
+        if (isImageBelowPointer) {
+            console.log(`Image below pointer, not drawing pixel`);
             return;
         }
 
@@ -184,8 +153,8 @@ const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) =>
         canvas,
         selectedBricksSet,
         togglePixelColor,
+        images, // Add images to the dependency array
     ]);
- */
 
     useEffect(() => {
         if (!canvas) {
@@ -299,7 +268,7 @@ const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) =>
 
                 newSelectedCanvasObjects.push(rectangle);
                 canvas.add(rectangle);
-                canvas.sendObjectBackwards(rectangle);
+                canvas.sendObjectToBack(rectangle);
             }
         }
 
@@ -369,6 +338,7 @@ const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) =>
         selectedBricksSet,
         brickHeight,
         brickWidth,
+        images,
     ]);
 
     useEffect(() => {
