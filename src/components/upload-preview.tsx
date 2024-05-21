@@ -51,12 +51,15 @@ export interface UploadPreviewProps {
 
     /* Height of canvas. Defaults to CANVAS_HEIGHT. */
     height?: number;
+
+    visible: boolean;
 }
 
 export function UploadPreview(props: UploadPreviewProps) {
     const {
         width,
         height,
+        visible = true,
     } = props;
 
     const selectedBricks = useRecoilValue(selectedBricksState);
@@ -400,6 +403,7 @@ export function UploadPreview(props: UploadPreviewProps) {
             style={{
                 width: canvasWidth,
                 height: canvasHeight,
+                display: visible ? 'block' : 'none',
             }}
         />
     );

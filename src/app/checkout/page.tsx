@@ -15,19 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UploadPreview } from '@/components/upload-preview';
 import { ColorPicker } from '@/components/color-picker';
+import { PurchaseTab } from '@/components/purchase-tab';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedPixelsState } from '@/state/pixels';
 import { addedImagesState } from '@/state/images';
 import {
     selectedBricksState,
 } from '@/state/bricks';
-import {
-    CardTitle,
-    CardDescription,
-    CardHeader,
-    CardContent,
-    Card,
-} from "@/components/ui/card";
 import {
     calculateZoomLevel,
     calculateBrickCenter,
@@ -51,6 +45,33 @@ export default function Checkout() {
     const canvasHeight = 1000;
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [ canvasWidth ]);
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [ canvasHeight ]);
+
+    const [ currentTab, setCurrentTab ] = React.useState<string>('create');
+
+    const nextTab = React.useMemo(() => {
+        switch (currentTab) {
+            case 'create': {
+                return 'purchase';
+            }
+            case 'purchase': {
+                return 'complete';
+            }
+            case 'complete': {
+                return undefined;
+            }
+            default: {
+                throw new Error('Unknown tab!');
+            }
+        }
+    }, [
+        currentTab,
+    ]);
+
+    const handleTabClicked = React.useCallback((e: any, tab: string) => {
+        setCurrentTab(tab);
+    }, [
+        setCurrentTab,
+    ]);
 
     const handleResetZoom = React.useCallback(() => {
         if (!canvas) {
@@ -220,10 +241,16 @@ export default function Checkout() {
 
             <div className="flex flex-col items-center min-h-[100dvh] bg-[#1A1A1A] text-white">
                 <main className="flex flex-col items-center mt-4 w-full px-8">
-                    <Tabs className="flex w-full gap-x-4 justify-start items-start" defaultValue="create" orientation="vertical">
+                    <Tabs
+                        className="flex w-full gap-x-4 justify-start items-start"
+                        orientation="vertical"
+                        value={currentTab}
+                    >
                         <TabsContent
                             className="w-[1280px]"
                             value="create"
+                            forceMount={true}
+                            style={{ display: currentTab === 'create' ? 'block' : 'none' }}
                         >
                             <div className="flex flex-col md:flex-row gap-6">
                                 <div className="flex-1">
@@ -231,6 +258,7 @@ export default function Checkout() {
                                         <UploadPreview
                                             width={1000}
                                             height={1000}
+                                            visible={currentTab === 'create'}
                                         />
                                     </div>
                                 </div>
@@ -284,30 +312,8 @@ export default function Checkout() {
                             className="w-[1280px] h-[800px]"
                             value="purchase"
                         >
-                            <div className="">
-                                <Card className="bg-[#333333] p-6 border border-[#C19A6B]">
-                                    <CardHeader>
-                                        <CardTitle className="text-white">
-                                            Solana Payment
-                                        </CardTitle>
-                                        <CardDescription className="text-white">
-                                            Approve the transaction in your wallet
-                                            to purchase your brick NFTs and upload
-                                            your creation!
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="grid gap-4">
-                                        <div className="text-4xl font-bold text-primary">
-                                            0.5 SOL
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                            <div className="mt-6">
-                                <Button className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[150px]">
-                                    Pay
-                                </Button>
-                            </div>
+                            <PurchaseTab
+                            />
                         </TabsContent>
 
                         <TabsContent
@@ -334,6 +340,8 @@ export default function Checkout() {
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                     value="create"
+                                    onClick={(e) => handleTabClicked(e, 'create')}
+                                    disabled={!nextTab}
                                 >
                                     <span className="block truncate sm:hidden">
                                         Create
@@ -343,6 +351,8 @@ export default function Checkout() {
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                     value="purchase"
+                                    onClick={(e) => handleTabClicked(e, 'purchase')}
+                                    disabled={!nextTab}
                                 >
                                     <span className="block truncate sm:hidden">
                                         Purchase
@@ -352,6 +362,8 @@ export default function Checkout() {
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                     value="complete"
+                                    onClick={(e) => handleTabClicked(e, 'complete')}
+                                    disabled={nextTab !== undefined}
                                 >
                                     <span className="block truncate sm:hidden">
                                         Complete
@@ -360,9 +372,16 @@ export default function Checkout() {
                                 </TabsTrigger>
                             </div>
 
-                            <Button className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-full">
-                                Continue
-                            </Button>
+                            <TabsTrigger
+                                className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
+                                value={nextTab || ''}
+                                disabled={!nextTab}
+                                onClick={(e) => handleTabClicked(e, nextTab!)}
+                            >
+                                <span className="block truncate">
+                                    Continue
+                                </span>
+                            </TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </main>

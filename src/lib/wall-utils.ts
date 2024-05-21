@@ -2,6 +2,7 @@ import { Coordinate } from '@/types/coordinate';
 import { Brick } from '@/types/brick';
 import { Pixel } from '@/types/pixel';
 import { StaticCanvas, Canvas } from 'fabric';
+import * as fabric from 'fabric';
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
@@ -464,4 +465,115 @@ export function getAllBricks(
     }
 
     return allBricks;
+}
+
+export async function renderSelectedBricksToImage(
+    selectedBricks: Brick[],
+    canvas: fabric.Canvas,
+    brickWidth: number,
+    brickHeight: number,
+): Promise<string | null> {
+    if (!canvas || selectedBricks.length === 0) {
+        return null;
+    }
+
+    const clusters = groupBricks(selectedBricks, new Set<string>());
+
+    // Store the current zoom, viewport transform, and selection state
+    const originalZoom = canvas.getZoom();
+    const originalViewportTransform = canvas.viewportTransform;
+    const originalSelection = canvas.selection;
+
+    // Store the currently active object to restore later
+    const activeObject = canvas.getActiveObject();
+
+    // Reset zoom and pan to default values
+    canvas.setZoom(1);
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+
+    // Deselect all objects
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
+    const multiplier = originalZoom;
+
+    const images = clusters.map((cluster) => {
+        // Get the bounding box of the cluster
+        const { minX, minY, maxX, maxY } = cluster.reduce((acc, brick) => ({
+            minX: Math.min(acc.minX, brick.x),
+            minY: Math.min(acc.minY, brick.y),
+            maxX: Math.max(acc.maxX, brick.x),
+            maxY: Math.max(acc.maxY, brick.y),
+        }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+
+        // Use toDataURL with cropping options and higher resolution
+        return canvas.toDataURL({
+            left: minX * brickWidth,
+            top: minY * brickHeight,
+            width: (maxX - minX + 1) * brickWidth,
+            height: (maxY - minY + 1) * brickHeight,
+            format: 'png',
+            quality: 1.0,
+            multiplier,
+        });
+    });
+
+    // Restore the original zoom, pan, and selection state
+    canvas.setZoom(originalZoom);
+    canvas.viewportTransform = originalViewportTransform;
+    canvas.selection = originalSelection;
+
+    // Restore the previously active object
+    if (activeObject) {
+        canvas.setActiveObject(activeObject);
+    }
+
+    // Calculate total width and height for the final canvas including gaps between clusters
+    const totalBounds = clusters.reduce((acc, cluster) => {
+        const { minX, minY, maxX, maxY } = cluster.reduce((acc, brick) => ({
+            minX: Math.min(acc.minX, brick.x),
+            minY: Math.min(acc.minY, brick.y),
+            maxX: Math.max(acc.maxX, brick.x),
+            maxY: Math.max(acc.maxY, brick.y),
+        }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+
+        return {
+            minX: Math.min(acc.minX, minX),
+            minY: Math.min(acc.minY, minY),
+            maxX: Math.max(acc.maxX, maxX),
+            maxY: Math.max(acc.maxY, maxY)
+        };
+    }, { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+
+    const totalWidth = (totalBounds.maxX - totalBounds.minX + 1) * brickWidth;
+    const totalHeight = (totalBounds.maxY - totalBounds.minY + 1) * brickHeight;
+
+    // Create a new Fabric canvas to assemble the cropped images
+    const finalCanvas = new fabric.StaticCanvas(undefined, {
+        width: totalWidth * multiplier,
+        height: totalHeight * multiplier,
+    });
+
+    await Promise.all(images.map((imageDataURL, index) => {
+        return fabric.Image.fromURL(imageDataURL).then(img => {
+            const { minX, minY } = clusters[index].reduce((acc, brick) => ({
+                minX: Math.min(acc.minX, brick.x),
+                minY: Math.min(acc.minY, brick.y),
+            }), { minX: Infinity, minY: Infinity });
+
+            img.set({
+                left: (minX - totalBounds.minX) * brickWidth * multiplier,
+                top: (minY - totalBounds.minY) * brickHeight * multiplier,
+            });
+
+            finalCanvas.add(img);
+            finalCanvas.renderAll();
+        });
+    }));
+
+    return finalCanvas.toDataURL({
+        format: 'png',
+        quality: 1.0,
+        multiplier: 1,
+    });
 }
