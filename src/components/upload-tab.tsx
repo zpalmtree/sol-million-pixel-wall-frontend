@@ -22,7 +22,7 @@ export function UploadTab() {
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [canvasWidth]);
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [canvasHeight]);
 
-    const handleUpload = async () => {
+    const handleUpload = React.useCallback(async () => {
         if (!publicKey || !signMessage || !canvas) {
             setError("Wallet not connected or signMessage not available");
             return;
@@ -52,22 +52,35 @@ export function UploadTab() {
                 },
                 body: JSON.stringify({
                     images,
-                    address: publicKey.toString(),
-                    signedMessage: Array.from(signedMessage)
+                    solAddress: publicKey.toString(),
+                    signedMessage: Array.from(signedMessage),
                 }),
             });
 
-            if (response.ok) {
+            const { success, error } = await response.json();
+
+            if (success) {
                 setComplete(true);
             } else {
-                setError('Upload failed. Please try again.');
+                if (error) {
+                    setError(`Upload failed: ${error}. Please try again.`);
+                } else {
+                    setError('Upload failed. Please try again.');
+                }
             }
         } catch (err: any) {
             setError(`Upload failed: ${err.message}. Please try again.`);
         } finally {
             setUploading(false);
         }
-    };
+    }, [
+        publicKey,
+        brickHeight,
+        brickWidth,
+        canvas,
+        selectedBricks,
+        signMessage,
+    ]);
 
     if (complete) {
         return (
