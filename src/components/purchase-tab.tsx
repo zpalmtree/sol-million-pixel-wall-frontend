@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
     useRecoilValue,
     useSetRecoilState,
+    useRecoilState,
 } from 'recoil';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction } from '@solana/web3.js';
@@ -16,9 +17,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { WalletMultiButton } from '@/components/wallet-button';
 import { selectedBricksState } from '@/state/bricks';
-import { uploadPreviewCanvasState } from '@/state/upload-preview';
+import {
+    uploadPreviewCanvasState,
+    uploadPreviewImageState,
+} from '@/state/upload-preview';
 import { renderSelectedBricksToImage } from '@/lib/wall-utils';
-import { uploadTabEnabledState } from '@/state/tabs';
+import {
+    uploadTabEnabledState,
+    currentTabState,
+} from '@/state/tabs';
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
@@ -40,13 +47,15 @@ export function PurchaseTab() {
     const canvas = useRecoilValue(uploadPreviewCanvasState);
     const selectedBricks = useRecoilValue(selectedBricksState);
     const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
+    const setCurrentTab = useSetRecoilState(currentTabState);
+    const [imageSrc, setImageSrc] = useRecoilState(uploadPreviewImageState);
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [canvasWidth]);
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [canvasHeight]);
 
-    const [imageSrc, setImageSrc] = React.useState<string | undefined>();
+
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | undefined>();
     const [success, setSuccess] = React.useState<string | undefined>();
@@ -84,6 +93,12 @@ export function PurchaseTab() {
         success,
     ]);
 
+    const handleNextTab = React.useCallback(() => {
+        setCurrentTab('upload');
+    }, [
+        setCurrentTab,
+    ]);
+
     const checkBalance = React.useCallback(async () => {
         if (!publicKey) {
             return false;
@@ -94,13 +109,6 @@ export function PurchaseTab() {
 
         return balance >= selectedBricks.length * PRICE_PER_BRICK;
     }, [publicKey, selectedBricks.length]);
-
-    React.useEffect(() => {
-        setUploadTabEnabled(false);
-    }, [
-        selectedBricks,
-        setUploadTabEnabled,
-    ]);
 
     const handlePurchasePixels = React.useCallback(async (retryBricks: Brick[] = selectedBricks) => {
         if (!publicKey || !signAllTransactions) {
@@ -143,11 +151,11 @@ export function PurchaseTab() {
             const connection = new Connection(RPC);
             const transactionObjects = transactions.map((txBase64: string) => Transaction.from(Buffer.from(txBase64, 'base64')));
 
-            setStatusText('Sign the transactions in your wallet to proceed with your purchase.');
+            setStatusText('Sign the transaction(s) in your wallet to proceed with your purchase.');
 
             const signedTransactions: Transaction[] = await signAllTransactions(transactionObjects);
 
-            setStatusText('Sending transactions, please wait...');
+            setStatusText('Sending transaction(s), please wait...');
 
             if (signedTransactions.length !== transactionObjects.length) {
                 console.log(`Expected ${transactionObjects.length} from adapter, got ${signedTransactions.length}`);
@@ -168,7 +176,7 @@ export function PurchaseTab() {
                     connection,
                     signedTransaction,
                     Math.floor(120 / 20),
-                    20_000,
+                    4_000,
                     true,
                 );
 
@@ -208,15 +216,15 @@ export function PurchaseTab() {
             }
 
             if (timeouts.length > 0) {
-                setError(`Timeout occurred for ${timeouts.length} transactions.`);
+                setError(`Timeout occurred for ${timeouts.length} transaction(s).`);
             }
 
             if (errors.length > 0) {
-                setError(`Error occurred for ${errors.length} transactions: ${errorMessages.join(', ')}`);
+                setError(`Error occurred for ${errors.length} transaction(s): ${errorMessages.join(', ')}`);
             }
 
             if (errors.length === 0 && timeouts.length === 0) {
-                setSuccess('Bricks successfully purchased! Proceed to the next tab to upload your creation.');
+                setSuccess('Brick(s) successfully purchased! Proceed to the next tab to upload your creation.');
                 setUploadTabEnabled(true);
             }
 
@@ -258,7 +266,20 @@ export function PurchaseTab() {
         };
 
         generateImage();
-    }, [canvas, selectedBricks, brickWidth, brickHeight]);
+    }, [
+        canvas,
+        selectedBricks,
+        brickWidth,
+        brickHeight,
+        setImageSrc,
+    ]);
+
+    React.useEffect(() => {
+        setUploadTabEnabled(false);
+    }, [
+        selectedBricks,
+        setUploadTabEnabled,
+    ]);
 
     return (
         <div className="">
@@ -269,7 +290,7 @@ export function PurchaseTab() {
                     </CardTitle>
                     <CardDescription className="text-white">
                         Approve the transaction in your wallet
-                        to purchase your brick NFTs!
+                        to purchase your brick NFT(s)!
                     </CardDescription>
                 </CardHeader>
 
@@ -325,7 +346,11 @@ export function PurchaseTab() {
                         </Button>
                     )}
 
-                    {publicKey ? (
+                    {!publicKey && (
+                        <WalletMultiButton/>
+                    )}
+
+                    {publicKey && !success && (
                         <Button
                             className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[220px]"
                             onClick={() => handlePurchasePixels()}
@@ -333,8 +358,15 @@ export function PurchaseTab() {
                         >
                             Pay
                         </Button>
-                    ) : (
-                        <WalletMultiButton />
+                    )}
+
+                    {success && (
+                        <Button
+                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[220px]"
+                            onClick={handleNextTab}
+                        >
+                            Continue
+                        </Button>
                     )}
                 </CardContent>
             </Card>

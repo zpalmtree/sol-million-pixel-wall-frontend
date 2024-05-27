@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { UploadPreview } from '@/components/upload-preview';
 import { ColorPicker } from '@/components/color-picker';
 import { PurchaseTab } from '@/components/purchase-tab';
+import { UploadTab } from '@/components/upload-tab';
 import { WalletMultiButton } from '@/components/wallet-button';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedPixelsState } from '@/state/pixels';
@@ -36,12 +37,14 @@ import {
 } from '@/constants';
 import {
     uploadTabEnabledState,
+    currentTabState,
 } from '@/state/tabs';
 
 export default function Checkout() {
     const canvas = useRecoilValue(uploadPreviewCanvasState);
 
     const [ images, setImages ] = useRecoilState(addedImagesState);
+    const [ currentTab, setCurrentTab ] = useRecoilState(currentTabState);
     const setSelectedPixels = useSetRecoilState(selectedPixelsState);
     const selectedBricks = useRecoilValue(selectedBricksState);
     const uploadTabEnabled = useRecoilValue(uploadTabEnabledState);
@@ -51,8 +54,6 @@ export default function Checkout() {
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [ canvasWidth ]);
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [ canvasHeight ]);
 
-    const [ currentTab, setCurrentTab ] = React.useState<string>('create');
-
     const nextTab = React.useMemo(() => {
         switch (currentTab) {
             case 'create': {
@@ -61,7 +62,7 @@ export default function Checkout() {
             case 'purchase': {
                 return 'complete';
             }
-            case 'complete': {
+            case 'upload': {
                 return undefined;
             }
             default: {
@@ -320,21 +321,10 @@ export default function Checkout() {
 
                         <TabsContent
                             className="w-[1280px] h-[800px]"
-                            value="complete"
+                            value="upload"
                         >
-                            <div className="flex items-center justify-center h-full">
-                                <div className="text-center">
-                                    <CircleCheckIcon className="mx-auto mb-4 h-16 w-16 text-[#C19A6B]" />
-                                    <h3 className="text-2xl font-semibold tracking-tighter">
-                                        Congratulations!
-                                    </h3>
-                                    <p className="mt-2 text-gray-400">
-                                        Your masterpiece has been immortalized on
-                                        our digital canvas.
-                                    </p>
-                                    <Button variant="brown">View Wall</Button>
-                                </div>
-                            </div>
+                            <UploadTab
+                            />
                         </TabsContent>
 
                         <TabsList className="flex flex-col justify-between rounded-md bg-[#1A1A1A] p-4 gap-y-4 border border-[#C19A6B] md:w-[250px] h-[400px]">
@@ -364,7 +354,7 @@ export default function Checkout() {
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                     value="upload"
-                                    onClick={(e) => handleTabClicked(e, 'complete')}
+                                    onClick={(e) => handleTabClicked(e, 'upload')}
                                     disabled={!uploadTabEnabled}
                                 >
                                     <span className="block truncate sm:hidden">
@@ -409,25 +399,5 @@ export default function Checkout() {
                 </footer>
             </div>
         </>
-    );
-}
-
-function CircleCheckIcon(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <circle cx="12" cy="12" r="10" />
-            <path d="m9 12 2 2 4-4" />
-        </svg>
     );
 }

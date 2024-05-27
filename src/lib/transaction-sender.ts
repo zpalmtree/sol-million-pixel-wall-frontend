@@ -34,17 +34,29 @@ export class TransactionSender {
             this.transaction,
         );
 
-        if (simulation.value.err) {
-            console.log(simulation);
+        let simulationAttempts = 0;
 
-            const error = simulation.value.logs?.join('\n') || 'Unknown Error'; 
+        while (simulationAttempts < 3) {
+            if (simulation.value.err) {
+                if (simulation.value.err === 'BlockhashNotFound') {
+                    console.log(`Blockhash not found, retrying simulation, attempt ${simulationAttempts}...`);
+                    simulationAttempts++;
+                    continue;
+                }
 
-            return {
-                error,
-                timeout: false,
-                signature: undefined,
-                slot: undefined,
-            };
+                console.log(simulation);
+
+                const error = simulation.value.logs?.join('\n') || simulation.value.err;
+
+                return {
+                    error,
+                    timeout: false,
+                    signature: undefined,
+                    slot: undefined,
+                };
+            } else {
+                break;
+            }
         }
 
         const serialized = this.transaction.serialize();

@@ -6,3 +6,8 @@ export const uploadPreviewCanvasState = atom<Canvas | undefined>({
     default: undefined,
     dangerouslyAllowMutability: true,
 });
+
+export const uploadPreviewImageState = atom<string | undefined>({
+    key: 'uploadPreviewImage',
+    default: undefined,
+});
