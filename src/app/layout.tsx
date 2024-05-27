@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { RecoilRootWrapper } from '@/wrappers/recoil-root-wrapper';
+import { WalletWrapper } from '@/wrappers/wallet-wrapper';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,9 @@ export default function RootLayout({
         <html lang="en">
             <body className={inter.className}>
                 <RecoilRootWrapper>
-                    {children}
+                    <WalletWrapper>
+                        {children}
+                    </WalletWrapper>
                 </RecoilRootWrapper>
             </body>
         </html>

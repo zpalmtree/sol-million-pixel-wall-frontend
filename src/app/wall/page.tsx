@@ -3,6 +3,7 @@
 import Link from "next/link";
 import * as React from 'react';
 import { useRecoilValue } from 'recoil';
+import { WalletMultiButton } from '@/components/wallet-button';
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -59,12 +60,8 @@ export default function Component() {
                     </nav>
                 </div>
                 <div className="flex items-center gap-4">
-                    <Button
-                        size="sm"
-                        variant="transparent"
-                    >
-                        Connect Wallet
-                    </Button>
+                    <WalletMultiButton
+                    />
                 </div>
             </header>
 

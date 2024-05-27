@@ -1,11 +1,8 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/QBKrD6hmfVm
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { PixelWall } from "@/components/pixelwall";
+import { WalletMultiButton } from '@/components/wallet-button';
 
 export default function Splash() {
     return (
@@ -46,11 +43,8 @@ export default function Splash() {
                     </nav>
                 </div>
                 <div className="flex items-center gap-4">
-                    <Button
-                        size="sm"
-                    >
-                        Connect Wallet
-                    </Button>
+                    <WalletMultiButton
+                    />
                 </div>
             </header>
 

@@ -15,6 +15,10 @@
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.91.8",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "bigint-buffer": "^1.1.5",
@@ -25,6 +29,7 @@
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-toastify": "^10.0.5",
     "recoil": "^0.7.7",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
