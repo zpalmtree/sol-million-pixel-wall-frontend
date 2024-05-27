@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import {
     Canvas,
@@ -17,8 +18,15 @@ import {
     getBrickFromPointerPosition,
     groupBricks,
     createRectanglesFromCluster,
+    getWallInfo,
 } from '@/lib/wall-utils';
-import { selectedBricksState } from '@/state/bricks';
+import {
+    selectedBricksState,
+    startingBricksState,
+} from '@/state/bricks';
+import {
+    startingPixelWallImageState,
+} from '@/state/images';
 import {
     CANVAS_WIDTH,
     CANVAS_HEIGHT,
@@ -61,7 +69,9 @@ export function PixelWall(props: PixelWallProps) {
     const [ lastPointerPosition, setLastPointerPosition ] = React.useState<Coordinate | undefined>();
     const [ selectedCanvasObjects, setSelectedCanvasObjects ] = React.useState<any[]>([]);
 
+    const [ startingBricks, setStartingBricks ] = useRecoilState(startingBricksState);
     const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
+    const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         setLastPointerPosition(e.pointer);
@@ -173,6 +183,27 @@ export function PixelWall(props: PixelWallProps) {
         toggleBrickSelectedState,
         selectBrickRange,
         canvas,
+    ]);
+
+    const loadInitialInfo = React.useCallback(async () => {
+        if (startingPixelWallImage) {
+            return;
+        }
+
+        const { image, bricks, error } = await getWallInfo();
+
+        if (error) {
+            toast.warn(`Failed to load wall info: ${error}`);
+            return;
+        }
+
+        setStartingPixelWallImage(image);
+        setStartingBricks(bricks);
+
+    }, [
+        startingPixelWallImage,
+        setStartingPixelWallImage,
+        setStartingBricks,
     ]);
 
     useEffect(() => {
@@ -291,6 +322,12 @@ export function PixelWall(props: PixelWallProps) {
         interactable,
         brickHeight,
         brickWidth,
+    ]);
+
+    useEffect(() => {
+        loadInitialInfo();
+    }, [
+        loadInitialInfo,
     ]);
 
     // Canvas style can be adjusted via css or inline style

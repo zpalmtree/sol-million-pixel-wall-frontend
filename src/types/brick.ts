@@ -5,3 +5,7 @@ export interface Brick {
 
     name: string;
 }
+
+export interface BrickInfo extends Brick {
+    purchased: boolean;
+}

@@ -1,6 +1,7 @@
 import { atom, selector } from 'recoil';
 
 import { SelectedBrick } from '@/types/selected-brick';
+import { BrickInfo } from '@/types/brick';
 
 export const selectedBricksState = atom<SelectedBrick[]>({
     key: 'selectedBricks',
@@ -14,4 +15,9 @@ export const selectedBrickNamesSetState = selector<Set<string>>({
         const nameSet = new Set(selectedBricks.map(brick => brick.name));
         return nameSet;
     },
+});
+
+export const startingBricksState = atom<BrickInfo[]>({
+    key: 'startingBricks',
+    default: [],
 });

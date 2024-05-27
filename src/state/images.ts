@@ -6,3 +6,8 @@ export const addedImagesState = atom<fabric.Image[]>({
     default: [],
     dangerouslyAllowMutability: true,
 });
+
+export const startingPixelWallImageState = atom<string | undefined>({
+    key: 'startingPixelWallImage',
+    default: undefined,
+});
