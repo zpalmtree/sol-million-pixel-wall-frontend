@@ -2,7 +2,10 @@
 
 import React, { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useRecoilState } from 'recoil';
+import {
+    useRecoilState,
+    useSetRecoilState,
+} from 'recoil';
 import {
     Canvas,
     StaticCanvas,
@@ -10,6 +13,7 @@ import {
     Line,
     TPointerEvent,
     TPointerEventInfo,
+    Image,
 } from 'fabric';
 
 import { Coordinate } from '@/types/coordinate';
@@ -67,9 +71,10 @@ export function PixelWall(props: PixelWallProps) {
 
     const [ canvas, setCanvas ] = React.useState<Canvas | StaticCanvas | undefined>();
     const [ lastPointerPosition, setLastPointerPosition ] = React.useState<Coordinate | undefined>();
-    const [ selectedCanvasObjects, setSelectedCanvasObjects ] = React.useState<any[]>([]);
+    const [ itemsOnCanvas, setItemsOnCanvas ] = React.useState<any[]>([]);
+    const [ backgroundImage, setBackgroundImage ] = React.useState<Image | undefined>(undefined);
 
-    const [ startingBricks, setStartingBricks ] = useRecoilState(startingBricksState);
+    const setStartingBricks = useSetRecoilState(startingBricksState);
     const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
 
@@ -186,6 +191,8 @@ export function PixelWall(props: PixelWallProps) {
     ]);
 
     const loadInitialInfo = React.useCallback(async () => {
+        console.log('Loading initial info');
+
         if (startingPixelWallImage) {
             return;
         }
@@ -206,51 +213,82 @@ export function PixelWall(props: PixelWallProps) {
         setStartingBricks,
     ]);
 
-    useEffect(() => {
-        if (!canvas || !interactable) {
+    const drawCanvas = React.useCallback(async () => {
+        if (!canvas) {
             return;
         }
 
-        // Remove existing rectangles
-        for (const canvasObject of selectedCanvasObjects) {
+        /* Remove previously drawn items */
+        for (const canvasObject of itemsOnCanvas) {
             canvas.remove(canvasObject);
         }
 
-        const newSelectedCanvasObjects: any[] = [];
-        const visitedBricks = new Set<string>();
+        const newItemsOnCanvas: any[] = [];
 
-        // Detect and merge overlapping bricks
-        const brickClusters = groupBricks(selectedBricks, visitedBricks);
+        if (interactable) {
+            const visitedBricks = new Set<string>();
 
-        // Create rectangles for each cluster of bricks
-        for (const cluster of brickClusters) {
-            const rectangles = createRectanglesFromCluster(cluster);
+            // Detect and merge overlapping bricks
+            const brickClusters = groupBricks(selectedBricks, visitedBricks);
 
-            for (const { minX, minY, maxX, maxY } of rectangles) {
-                const rectangle = new Rect({
-                    width: (maxX - minX + 1) * brickWidth,
-                    height: (maxY - minY + 1) * brickHeight,
-                    fill: '#C19A6B',
-                    opacity: 0.3,
-                    selectable: false,
-                    evented: false,
-                    left: minX * brickWidth,
-                    top: minY * brickHeight,
-                    strokeWidth: 0,
-                });
+            // Create rectangles for each cluster of bricks
+            for (const cluster of brickClusters) {
+                const rectangles = createRectanglesFromCluster(cluster);
 
-                newSelectedCanvasObjects.push(rectangle);
-                canvas.add(rectangle);
+                for (const { minX, minY, maxX, maxY } of rectangles) {
+                    const rectangle = new Rect({
+                        width: (maxX - minX + 1) * brickWidth,
+                        height: (maxY - minY + 1) * brickHeight,
+                        fill: '#C19A6B',
+                        opacity: 0.3,
+                        selectable: false,
+                        evented: false,
+                        left: minX * brickWidth,
+                        top: minY * brickHeight,
+                        strokeWidth: 0,
+                    });
+
+                    newItemsOnCanvas.push(rectangle);
+                    canvas.add(rectangle);
+                }
             }
         }
 
-        setSelectedCanvasObjects(newSelectedCanvasObjects);
+        if (startingPixelWallImage && !backgroundImage) {
+            const backgroundImage = await Image.fromURL(startingPixelWallImage);
+
+            backgroundImage.scaleToWidth(canvasWidth);
+            backgroundImage.scaleToHeight(canvasHeight);
+            backgroundImage.selectable = false;
+            backgroundImage.evented = false;
+
+            canvas.add(backgroundImage);
+            setBackgroundImage(backgroundImage);
+        }
+
+        setItemsOnCanvas(newItemsOnCanvas);
+    }, [
+        canvas,
+        selectedBricks,
+        brickHeight,
+        brickWidth,
+        startingPixelWallImage,
+        canvasHeight,
+        canvasWidth,
+        interactable,
+        itemsOnCanvas,
+        backgroundImage,
+    ]);
+
+    useEffect(() => {
+        drawCanvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         canvas,
         selectedBricks,
         brickHeight,
         brickWidth,
+        startingPixelWallImage,
     ]);
 
     useEffect(() => {

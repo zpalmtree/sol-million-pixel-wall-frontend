@@ -578,6 +578,62 @@ export async function renderSelectedBricksToImage(
     });
 }
 
+export async function renderBrickToImage(
+    brick: Brick,
+    canvas: fabric.Canvas,
+    brickWidth: number,
+    brickHeight: number,
+): Promise<string | null> {
+    if (!canvas || !brick) {
+        return null;
+    }
+
+    // Store the current zoom, viewport transform, and selection state
+    const originalZoom = canvas.getZoom();
+    const originalViewportTransform = canvas.viewportTransform;
+    const originalSelection = canvas.selection;
+
+    // Store the currently active object to restore later
+    const activeObject = canvas.getActiveObject();
+
+    // Reset zoom and pan to default values
+    canvas.setZoom(1);
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+
+    // Deselect all objects
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
+    // Calculate the cropping area
+    const left = brick.x * brickWidth;
+    const top = brick.y * brickHeight;
+    const width = brickWidth;
+    const height = brickHeight;
+
+    // Use toDataURL with cropping options
+    const imageDataURL = canvas.toDataURL({
+        left,
+        top,
+        width,
+        height,
+        format: 'png',
+        quality: 1.0,
+        multiplier: 1,
+    });
+
+    // Restore the original zoom, pan, and selection state
+    canvas.setZoom(originalZoom);
+    canvas.viewportTransform = originalViewportTransform;
+    canvas.selection = originalSelection;
+
+    // Restore the previously active object
+    if (activeObject) {
+        canvas.setActiveObject(activeObject);
+    }
+
+    return imageDataURL;
+}
+
 export async function getWallInfo() {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/info`);

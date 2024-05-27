@@ -4,7 +4,7 @@ import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/com
 import { Button } from "@/components/ui/button";
 import { uploadPreviewImageState, uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedBricksState } from '@/state/bricks';
-import { renderSelectedBricksToImage } from '@/lib/wall-utils';
+import { renderBrickToImage } from '@/lib/wall-utils';
 import { BRICKS_PER_ROW, BRICKS_PER_COLUMN } from '@/constants';
 import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -37,7 +37,8 @@ export function UploadTab() {
             const signedMessage = await signMessage(encodedMessage);
 
             const images = await Promise.all(selectedBricks.map(async (brick) => {
-                const imageDataURL = await renderSelectedBricksToImage([brick], canvas, brickWidth, brickHeight);
+                const imageDataURL = await renderBrickToImage(brick, canvas, brickWidth, brickHeight);
+
                 return {
                     x: brick.x,
                     y: brick.y,
