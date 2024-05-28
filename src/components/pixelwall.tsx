@@ -246,6 +246,7 @@ export function PixelWall(props: PixelWallProps) {
                         left: minX * brickWidth,
                         top: minY * brickHeight,
                         strokeWidth: 0,
+                        hasBorders: false,
                     });
 
                     newItemsOnCanvas.push(rectangle);

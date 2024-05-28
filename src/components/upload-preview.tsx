@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import {
     useRecoilState,
     useRecoilValue,
+    useSetRecoilState,
 } from 'recoil';
 import {
     Canvas,
@@ -12,6 +13,7 @@ import {
     TPointerEvent,
     TPointerEventInfo,
     Point,
+    Image,
 } from 'fabric';
 
 import { Pixel } from '@/types/pixel';
@@ -26,16 +28,21 @@ import {
     createRectanglesFromCluster,
     createRectanglesFromPixelCluster,
     getAllBricks,
+    getWallInfo,
 } from '@/lib/wall-utils';
 import {
     selectedBricksState,
     selectedBrickNamesSetState,
+    startingBricksState,
 } from '@/state/bricks';
 import {
     selectedPixelsState,
 } from '@/state/pixels';
 import { selectedColorState } from '@/state/color-picker';
-import { addedImagesState } from '@/state/images';
+import {
+    addedImagesState,
+    startingPixelWallImageState,
+} from '@/state/images';
 
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import {
@@ -62,16 +69,18 @@ export function UploadPreview(props: UploadPreviewProps) {
         visible = true,
     } = props;
 
-    const selectedBricks = useRecoilValue(selectedBricksState);
     const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
     const selectedColor = useRecoilValue(selectedColorState);
     const images = useRecoilValue(addedImagesState);
+    const setStartingBricks = useSetRecoilState(startingBricksState);
 
     const [ selectedPixels, setSelectedPixels ] = useRecoilState(selectedPixelsState);
+    const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
+    const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
 
     const [ canvas, setCanvas ] = useRecoilState(uploadPreviewCanvasState);
     const canvasRef = useRef<null | HTMLCanvasElement>(null);
-    const [ selectedCanvasObjects, setSelectedCanvasObjects ] = React.useState<any[]>([]);
+    const [ itemsOnCanvas, setItemsOnCanvas ] = React.useState<any[]>([]);
     
     const canvasWidth = React.useMemo(() => width || CANVAS_WIDTH, [ width ]);
     const canvasHeight = React.useMemo(() => height || CANVAS_HEIGHT, [ height ]);
@@ -116,13 +125,178 @@ export function UploadPreview(props: UploadPreviewProps) {
         selectedPixels,
     ]);
 
+    const loadInitialInfo = React.useCallback(async () => {
+        console.log('Loading initial info');
+
+        if (startingPixelWallImage) {
+            return;
+        }
+
+        const { image, bricks, error } = await getWallInfo();
+
+        if (error) {
+            toast.warn(`Failed to load wall info: ${error}`);
+            return;
+        }
+
+        setStartingPixelWallImage(image);
+        setStartingBricks(bricks);
+
+    }, [
+        startingPixelWallImage,
+        setStartingPixelWallImage,
+        setStartingBricks,
+    ]);
+
+    const drawCanvas = React.useCallback(async () => {
+        if (!canvas) {
+            return;
+        }
+
+        for (image of images) {
+            canvas.remove(image);
+        }
+
+        // Remove existing rectangles
+        for (const canvasObject of itemsOnCanvas) {
+            canvas.remove(canvasObject);
+        }
+
+        const allBricks = getAllBricks(canvas.width, canvas.height, brickWidth, brickHeight);
+        const deselectedBricks = allBricks.filter(brick => !selectedBricksSet.has(brick.name));
+        const deselectedBrickClusters = groupBricks(deselectedBricks, new Set<string>());
+
+        const newItemsOnCanvas: any[] = [];
+
+        const visitedBricks = new Set<string>();
+        const visitedPixels = new Set<string>();
+
+        // Detect and merge overlapping bricks
+        const brickClusters = groupBricks(selectedBricks, visitedBricks);
+
+        // Detect and merge overlapping pixels of the same color
+        const pixelClusters = groupPixels(selectedPixels, visitedPixels);
+
+        /* STEP 1: Draw background image */
+        if (startingPixelWallImage) {
+            const backgroundImage = await Image.fromURL(startingPixelWallImage);
+
+            backgroundImage.scaleToWidth(canvasWidth);
+            backgroundImage.scaleToHeight(canvasHeight);
+            backgroundImage.selectable = false;
+            backgroundImage.evented = false;
+
+            newItemsOnCanvas.push(backgroundImage);
+            canvas.add(backgroundImage);
+        }
+
+        /* STEP 2: Draw grid lines */
+        for (let i = 1; i < BRICKS_PER_ROW; i++) {
+            const line = new Line([i * brickWidth, 0, i * brickWidth, canvasHeight], {
+                evented: false,
+                selectable: false,
+                stroke: '#C19A6B',
+                strokeWidth: 0.1,
+                opacity: 0.3,
+            });
+
+            newItemsOnCanvas.push(line);
+            canvas.add(line);
+        }
+
+        for (let i = 1; i < BRICKS_PER_COLUMN; i++) {
+            const line = new Line([0, i * brickHeight, canvasWidth, i * brickHeight], {
+                evented: false,
+                selectable: false,
+                stroke: '#C19A6B',
+                strokeWidth: 0.1,
+                opacity: 0.3,
+            });
+
+            newItemsOnCanvas.push(line);
+            canvas.add(line);
+        }
+        
+        /* Step 3: Draw selected bricks */
+        for (const cluster of brickClusters) {
+            const rectangles = createRectanglesFromCluster(cluster);
+
+            for (const { minX, minY, maxX, maxY } of rectangles) {
+                const rectangle = new Rect({
+                    width: ((maxX - minX + 1) * brickWidth) + 0.03,
+                    height: ((maxY - minY + 1) * brickHeight) + 0.03,
+                    fill: '#4C4032',
+                    opacity: 1,
+                    selectable: false,
+                    evented: false,
+                    left: minX * brickWidth,
+                    top: minY * brickHeight,
+                    strokeWidth: 0,
+                    hasBorders: false,
+                });
+
+                newItemsOnCanvas.push(rectangle);
+                canvas.add(rectangle);
+            }
+        }
+
+        // Create rectangles for each cluster of pixels
+        /* Step 4: Draw drawn pixels */
+        for (const cluster of pixelClusters) {
+            const rectangles = createRectanglesFromPixelCluster(cluster);
+
+            for (const { minX, minY, maxX, maxY, color } of rectangles) {
+                const rectangle = new Rect({
+                    width: (maxX - minX + 1) + 0.03,
+                    height: (maxY - minY + 1) + 0.03,
+                    fill: color,
+                    opacity: 1,
+                    selectable: false,
+                    evented: false,
+                    left: minX,
+                    top: minY,
+                    strokeWidth: 0,
+                    hasBorders: false,
+                });
+
+                newItemsOnCanvas.push(rectangle);
+                canvas.add(rectangle);
+            }
+        }
+
+        /* Step 5: Draw images */
+        for (const image of images) {
+            canvas.add(image);
+            canvas.bringObjectToFront(image);
+        }
+
+        setItemsOnCanvas(newItemsOnCanvas);
+    }, [
+        canvas,
+        selectedBricks,
+        selectedPixels,
+        selectedBricksSet,
+        brickHeight,
+        brickWidth,
+        images,
+        startingPixelWallImage,
+    ]);
+    
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         if (!canvas) {
             return;
         }
 
         const pointer = canvas.getPointer(e.e);
-        
+
+        // Check if there is an active object being manipulated
+        const activeObject = canvas.getActiveObject();
+
+        if (activeObject) {
+            console.log(`Object is being manipulated, not drawing pixel`);
+            return;
+        }
+
         // Check if there is an image below the pointer
         const isImageBelowPointer = images.some(image => {
             const { left, top, width, height } = image.getBoundingRect();
@@ -156,7 +330,7 @@ export function UploadPreview(props: UploadPreviewProps) {
         canvas,
         selectedBricksSet,
         togglePixelColor,
-        images, // Add images to the dependency array
+        images,
     ]);
 
     useEffect(() => {
@@ -175,8 +349,6 @@ export function UploadPreview(props: UploadPreviewProps) {
             brickWidth,
             brickHeight,
         );
-
-        console.log(`Zoom: ${zoom}, center: ${center.x}, ${center.y}`);
 
         if (zoom !== 1) {
             zoomToCoordinate(
@@ -210,8 +382,8 @@ export function UploadPreview(props: UploadPreviewProps) {
 
             zoom *= 0.999 ** delta;
 
-            if (zoom > 30) {
-                zoom = 30;
+            if (zoom > 40) {
+                zoom = 40;
             }
 
             if (zoom < 1) {
@@ -236,103 +408,7 @@ export function UploadPreview(props: UploadPreviewProps) {
     ]);
 
     useEffect(() => {
-        if (!canvas) {
-            return;
-        }
-
-        // Remove existing rectangles
-        for (const canvasObject of selectedCanvasObjects) {
-            canvas.remove(canvasObject);
-        }
-
-        const newSelectedCanvasObjects: any[] = [];
-        const visitedBricks = new Set<string>();
-        const visitedPixels = new Set<string>();
-
-        // Detect and merge overlapping bricks
-        const brickClusters = groupBricks(selectedBricks, visitedBricks);
-
-        // Create rectangles for each cluster of bricks
-        for (const cluster of brickClusters) {
-            const rectangles = createRectanglesFromCluster(cluster);
-
-            for (const { minX, minY, maxX, maxY } of rectangles) {
-                const rectangle = new Rect({
-                    width: (maxX - minX + 1) * brickWidth,
-                    height: (maxY - minY + 1) * brickHeight,
-                    fill: '#C19A6B',
-                    opacity: 0.3,
-                    selectable: false,
-                    evented: false,
-                    left: minX * brickWidth,
-                    top: minY * brickHeight,
-                    strokeWidth: 0,
-                });
-
-                newSelectedCanvasObjects.push(rectangle);
-                canvas.add(rectangle);
-                canvas.sendObjectToBack(rectangle);
-            }
-        }
-
-        // Detect and merge overlapping pixels of the same color
-        const pixelClusters = groupPixels(selectedPixels, visitedPixels);
-
-        // Create rectangles for each cluster of pixels
-        for (const cluster of pixelClusters) {
-            const rectangles = createRectanglesFromPixelCluster(cluster);
-
-            for (const { minX, minY, maxX, maxY, color } of rectangles) {
-                const rectangle = new Rect({
-                    width: (maxX - minX + 1),
-                    height: (maxY - minY + 1),
-                    fill: color,
-                    opacity: 1,
-                    selectable: false,
-                    evented: false,
-                    left: minX,
-                    top: minY,
-                    strokeWidth: 0,
-                });
-
-                newSelectedCanvasObjects.push(rectangle);
-                canvas.add(rectangle);
-                canvas.sendObjectBackwards(rectangle);
-            }
-        }
-
-        // Get all bricks
-        const allBricks = getAllBricks(canvas.width, canvas.height, brickWidth, brickHeight);
-
-        const deselectedBricks = allBricks.filter(brick => !selectedBricksSet.has(brick.name));
-
-        // Detect and merge overlapping deselected bricks
-        const deselectedBrickClusters = groupBricks(deselectedBricks, new Set<string>());
-
-        // Create rectangles for each cluster of deselected bricks
-        for (const cluster of deselectedBrickClusters) {
-            const rectangles = createRectanglesFromCluster(cluster);
-
-            for (const { minX, minY, maxX, maxY } of rectangles) {
-                const rectangle = new Rect({
-                    width: (maxX - minX + 1) * brickWidth,
-                    height: (maxY - minY + 1) * brickHeight,
-                    fill: '#2f2f2f',
-                    opacity: 0.9,
-                    selectable: false,
-                    evented: false,
-                    left: minX * brickWidth,
-                    top: minY * brickHeight,
-                    strokeWidth: 0,
-                });
-
-                newSelectedCanvasObjects.push(rectangle);
-                canvas.add(rectangle);
-                canvas.bringObjectToFront(rectangle);
-            }
-        }
-
-        setSelectedCanvasObjects(newSelectedCanvasObjects);
+        drawCanvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         canvas,
@@ -342,6 +418,7 @@ export function UploadPreview(props: UploadPreviewProps) {
         brickHeight,
         brickWidth,
         images,
+        startingPixelWallImage,
     ]);
 
     useEffect(() => {
@@ -355,34 +432,7 @@ export function UploadPreview(props: UploadPreviewProps) {
         });
 
         c.backgroundColor = '#1A1A1A';
-
         c.defaultCursor = 'pointer';
-
-        for (let i = 1; i < BRICKS_PER_ROW; i++) {
-            const line = new Line([i * brickWidth, 0, i * brickWidth, canvasHeight], {
-                evented: false,
-                selectable: false,
-                stroke: '#C19A6B',
-                strokeWidth: 0.3,
-                opacity: 0.3,
-            });
-
-            c.add(line);
-            c.sendObjectToBack(line);
-        }
-
-        for (let i = 1; i < BRICKS_PER_COLUMN; i++) {
-            const line = new Line([0, i * brickHeight, canvasWidth, i * brickHeight], {
-                evented: false,
-                selectable: false,
-                stroke: '#C19A6B',
-                strokeWidth: 0.3,
-                opacity: 0.3,
-            });
-
-            c.add(line);
-            c.sendObjectToBack(line);
-        }
 
         // Clean up on component unmount
         return () => {
@@ -394,6 +444,12 @@ export function UploadPreview(props: UploadPreviewProps) {
         brickHeight,
         brickWidth,
         setCanvas,
+    ]);
+
+    useEffect(() => {
+        loadInitialInfo();
+    }, [
+        loadInitialInfo,
     ]);
 
     // Canvas style can be adjusted via css or inline style

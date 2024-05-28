@@ -117,8 +117,8 @@ export function calculateZoomLevel(
 
     let zoom = Math.min(zoomLevelX, zoomLevelY);
 
-    if (zoom > 30) {
-        zoom = 30;
+    if (zoom > 40) {
+        zoom = 40;
     }
 
     if (zoom < 1) {
@@ -618,7 +618,7 @@ export async function renderBrickToImage(
         height,
         format: 'png',
         quality: 1.0,
-        multiplier: 1,
+        multiplier: 10,
     });
 
     // Restore the original zoom, pan, and selection state
