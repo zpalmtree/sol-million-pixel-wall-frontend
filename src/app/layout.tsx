@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { RecoilRootWrapper } from '@/wrappers/recoil-root-wrapper';
 import { WalletWrapper } from '@/wrappers/wallet-wrapper';
@@ -25,6 +27,20 @@ export default function RootLayout({
                         {children}
                     </WalletWrapper>
                 </RecoilRootWrapper>
+
+                <ToastContainer
+                    position="bottom-center"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme='dark'
+                    limit={1}
+                />
             </body>
         </html>
     );

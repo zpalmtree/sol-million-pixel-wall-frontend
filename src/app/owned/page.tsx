@@ -2,15 +2,8 @@
 
 import Link from "next/link";
 import * as React from 'react';
-import { useRecoilValue } from 'recoil';
 import { WalletMultiButton } from '@/components/wallet-button';
 
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { PixelWall } from "@/components/pixelwall";
-import { selectedBricksState } from '@/state/bricks';
-import { PRICE_PER_BRICK } from '@/constants';
-import { formatSOL } from '@/lib/utils';
 import { OwnedBricks } from '@/components/owned-bricks';
 
 export default function Component() {

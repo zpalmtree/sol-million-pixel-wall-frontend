@@ -1,8 +1,83 @@
+import * as React from 'react';
 import Link from "next/link";
+import { useWallet } from '@solana/wallet-adapter-react';
+import { toast } from 'react-toastify';
+import {
+    useRecoilValue,
+    useSetRecoilState,
+} from 'recoil';
 
-import { Button } from "@/components/ui/button";
+import { WalletMultiButton } from '@/components/wallet-button';
+import {
+    ownedBricksWithArtState,
+    ownedBricksWithoutArtState,
+    ownedBricksState,
+} from '@/state/bricks';
 
 export function OwnedBricks() {
+    const {
+        publicKey,
+    } = useWallet();
+
+    const ownedBricksWithArt = useRecoilValue(ownedBricksWithArtState);
+    const ownedBricksWithoutArt = useRecoilValue(ownedBricksWithoutArtState);
+    const setOwnedBricks = useSetRecoilState(ownedBricksState);
+
+    const fetchOwnedBricks = React.useCallback(async () => {
+        if (!publicKey) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/owned`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    solAddress: publicKey.toString(),
+                }),
+            });
+
+            const data = await response.json();
+
+            console.log(data);
+
+            if (data.error) {
+                toast.error(`Failed to fetch owned bricks: ${data.error}`);
+            } else {
+                setOwnedBricks(data.bricks);
+            }
+        } catch (err) {
+            toast.error(`Failed to fetch owned bricks: ${err}`);
+        }
+    }, [
+        publicKey,
+        setOwnedBricks,
+    ]);
+
+    React.useEffect(() => {
+        fetchOwnedBricks();
+    }, [
+        publicKey,
+        fetchOwnedBricks,
+    ]);
+
+    if (!publicKey) {
+        return (
+            <div className="bg-[#1a1a1a] text-white rounded-lg flex flex-wrap mt-16 gap-4 sm:px-4 md:px-6 xl:gap-12">
+                <div className="mx-auto gap-x-28 px-4 py-6 flex flex-col gap-y-6 border-l-4 border-primary bg-[#2d2d2d] rounded-lg h-min">
+                    <span>
+                        To view your owned bricks, connect your wallet.
+                    </span>
+
+                    <WalletMultiButton/>
+                </div>
+            </div>
+
+        );
+    }
+
     return (
         <div className="bg-[#1a1a1a] text-white rounded-lg flex flex-wrap w-full mt-16 justify-center gap-4 sm:px-4 md:px-6 xl:gap-12">
             <div className="mx-auto gap-x-28 px-4 py-8 flex flex-col md:flex-row">
@@ -14,187 +89,46 @@ export function OwnedBricks() {
                     <div className="flex flex-col gap-y-6">
                         <div className="mb-6 md:mr-6">
                             <h2 className="text-xl font-bold mb-3">
-
-                                Missing art - upload for free
+                                {`Missing art - upload for free (${ownedBricksWithoutArt.length})`}
                             </h2>
                             <div className="flex flex-wrap max-w-[900px] gap-x-6 gap-y-5">
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
-                                    <img
-                                        alt="NFT Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-
+                                {ownedBricksWithoutArt.map((b) => (
+                                    <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
+                                        <img
+                                            alt="NFT Image"
+                                            className="object-cover rounded-md"
+                                            height={170}
+                                            src="/placeholder.svg"
+                                            style={{
+                                                aspectRatio: "170/170",
+                                                objectFit: "cover",
+                                            }}
+                                            width={170}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         <div>
                             <h2 className="text-xl font-bold mb-3">
-                                Already designed - update for a fee
+                                {`Already designed - update for a fee (${ownedBricksWithArt.length})`}
                             </h2>
                             <div className="flex flex-wrap max-w-[900px] gap-x-6 gap-y-5">
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center">
-                                    <img
-                                        alt="Placeholder Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center">
-                                    <img
-                                        alt="Placeholder Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center">
-                                    <img
-                                        alt="Placeholder Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
-                                <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center">
-                                    <img
-                                        alt="Placeholder Image"
-                                        className="object-cover rounded-md"
-                                        height={170}
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "170/170",
-                                            objectFit: "cover",
-                                        }}
-                                        width={170}
-                                    />
-                                </div>
+                                {ownedBricksWithArt.map((b) => (
+                                    <div className="bg-[#C19A6B] rounded-md cursor-pointer hover:opacity-80 transition-opacity">
+                                        <img
+                                            alt="NFT Image"
+                                            className="object-cover rounded-md"
+                                            height={170}
+                                            src="/placeholder.svg"
+                                            style={{
+                                                aspectRatio: "170/170",
+                                                objectFit: "cover",
+                                            }}
+                                            width={170}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -212,7 +146,7 @@ export function OwnedBricks() {
 
                         <div className="flex items-center gap-x-3">
                             <span className="text-white">
-                                Cost of Selected Bricks:
+                                Cost To Update Bricks:
                             </span>{" "}
                             <span className="text-primary text-xl font-bold">
                                 {`${0} SOL`}

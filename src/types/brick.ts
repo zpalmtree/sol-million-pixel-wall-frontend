@@ -9,3 +9,9 @@ export interface Brick {
 export interface BrickInfo extends Brick {
     purchased: boolean;
 }
+
+export interface OwnedBrick extends Brick {
+    assetId: string;
+
+    hasImage: boolean;
+}

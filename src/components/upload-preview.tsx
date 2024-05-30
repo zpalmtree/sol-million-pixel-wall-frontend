@@ -28,7 +28,6 @@ import {
     groupPixels,
     createRectanglesFromCluster,
     createRectanglesFromPixelCluster,
-    getAllBricks,
     getWallInfo,
 } from '@/lib/wall-utils';
 import {
@@ -72,11 +71,11 @@ export function UploadPreview(props: UploadPreviewProps) {
 
     const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
     const selectedColor = useRecoilValue(selectedColorState);
+    const selectedBricks = useRecoilValue(selectedBricksState);
     const images = useRecoilValue(addedImagesState);
     const setStartingBricks = useSetRecoilState(startingBricksState);
 
     const [ selectedPixels, setSelectedPixels ] = useRecoilState(selectedPixelsState);
-    const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
 
     const [ canvas, setCanvas ] = useRecoilState(uploadPreviewCanvasState);
@@ -154,7 +153,7 @@ export function UploadPreview(props: UploadPreviewProps) {
             return;
         }
 
-        for (image of images) {
+        for (const image of images) {
             canvas.remove(image);
         }
 
@@ -162,10 +161,6 @@ export function UploadPreview(props: UploadPreviewProps) {
         for (const canvasObject of itemsOnCanvas) {
             canvas.remove(canvasObject);
         }
-
-        const allBricks = getAllBricks(canvas.width, canvas.height, brickWidth, brickHeight);
-        const deselectedBricks = allBricks.filter(brick => !selectedBricksSet.has(brick.name));
-        const deselectedBrickClusters = groupBricks(deselectedBricks, new Set<string>());
 
         const newItemsOnCanvas: any[] = [];
 
@@ -281,6 +276,8 @@ export function UploadPreview(props: UploadPreviewProps) {
         brickWidth,
         images,
         startingPixelWallImage,
+        canvasHeight,
+        canvasWidth,
     ]);
     
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
