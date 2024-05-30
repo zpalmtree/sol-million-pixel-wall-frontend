@@ -86,6 +86,7 @@ export default function Component() {
                                                 {selectedBricks.length}
                                             </span>
                                         </div>
+
                                         <div className="flex items-center gap-x-3">
                                             <span className="text-white">
                                                 Cost of Selected Bricks:

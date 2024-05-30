@@ -11,17 +11,9 @@ import { PixelWall } from "@/components/pixelwall";
 import { selectedBricksState } from '@/state/bricks';
 import { PRICE_PER_BRICK } from '@/constants';
 import { formatSOL } from '@/lib/utils';
+import { OwnedBricks } from '@/components/owned-bricks';
 
 export default function Component() {
-    const selectedBricks = useRecoilValue(selectedBricksState);
-
-    const costInSol = React.useMemo(() => {
-        const lamports = selectedBricks.length * PRICE_PER_BRICK;
-        return formatSOL(lamports, 1);
-    }, [
-        selectedBricks,
-    ]);
-
     return (
         <>
             <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
@@ -66,6 +58,7 @@ export default function Component() {
             </header>
 
             <main className="flex flex-col md:flex-row min-h-[calc(100vh_-_theme(spacing.16))] bg-[#1a1a1a]">
+                <OwnedBricks/>
             </main>
 
             <footer className="flex flex-col gap-2 sm:flex-row items-center justify-between w-full px-4 md:px-6 py-6 border-t border-primary bg-[#1A1A1A]">
