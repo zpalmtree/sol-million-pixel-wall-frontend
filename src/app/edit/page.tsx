@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { UploadPreview } from '@/components/upload-preview';
 import { ColorPicker } from '@/components/color-picker';
 import { PurchaseTab } from '@/components/purchase-tab';
-import { UploadTab } from '@/components/upload-tab';
+import { UploadModifyTab } from '@/components/upload-modify-tab';
 import { WalletMultiButton } from '@/components/wallet-button';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedPixelsState } from '@/state/pixels';
@@ -51,7 +51,7 @@ export default function Checkout() {
     const selectedBricks = useRecoilValue(selectedOwnedBricksWithArtState);
     const selectedBricksSet = useRecoilValue(selectedOwnedBricksWithArtSetState);
     const uploadTabEnabled = useRecoilValue(uploadTabEnabledState);
-
+    
     const canvasWidth = 1000;
     const canvasHeight = 1000;
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [ canvasWidth ]);
@@ -74,6 +74,22 @@ export default function Checkout() {
         }
     }, [
         currentTab,
+    ]);
+
+    const nextTabEnabled = React.useMemo(() => {
+        if (!nextTab) {
+            return false;
+        }
+
+        if (currentTab === 'purchase' && !uploadTabEnabled) {
+            return false;
+        }
+
+        return true;
+    }, [
+        currentTab,
+        nextTab,
+        uploadTabEnabled,
     ]);
 
     const handleTabClicked = React.useCallback((e: any, tab: string) => {
@@ -333,7 +349,7 @@ export default function Checkout() {
                             className="w-[1280px] h-[800px]"
                             value="upload"
                         >
-                            <UploadTab
+                            <UploadModifyTab
                                 selectedBricks={selectedBricks}
                             />
                         </TabsContent>
@@ -378,7 +394,7 @@ export default function Checkout() {
                             <TabsTrigger
                                 className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                 value={nextTab || ''}
-                                disabled={!nextTab}
+                                disabled={!nextTabEnabled}
                                 onClick={(e) => handleTabClicked(e, nextTab!)}
                             >
                                 <span className="block truncate">

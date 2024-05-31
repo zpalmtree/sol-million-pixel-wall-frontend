@@ -6,6 +6,7 @@ import {
 } from 'recoil';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction } from '@solana/web3.js';
+import { toast } from 'react-toastify';
 
 import {
     CardTitle,
@@ -25,6 +26,9 @@ import {
     uploadTabEnabledState,
     currentTabState,
 } from '@/state/tabs';
+import {
+    purchaseTransactionState,
+} from '@/state/purchase';
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
@@ -66,6 +70,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
     const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
     const setCurrentTab = useSetRecoilState(currentTabState);
     const [imageSrc, setImageSrc] = useRecoilState(uploadPreviewImageState);
+    const setPurchaseTransaction = useSetRecoilState(purchaseTransactionState);
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;
@@ -181,8 +186,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
             setStatusText('Sending transaction(s), please wait...');
 
             if (signedTransactions.length !== transactionObjects.length) {
-                console.log(`Expected ${transactionObjects.length} from adapter, got ${signedTransactions.length}`);
-                // TODO: Abort?
+                toast.error(`Expected ${transactionObjects.length} from adapter, got ${signedTransactions.length} - you may not have enough SOL`);
+                return;
             }
 
             const inProgressTransactions = [];
@@ -249,6 +254,10 @@ export function PurchaseTab(props: PurchaseTabProps) {
             if (errors.length === 0 && timeouts.length === 0) {
                 setSuccess(successMessage);
                 setUploadTabEnabled(true);
+
+                if (successfullyPurchased.length) {
+                    setPurchaseTransaction(successfullyPurchased[0].signature);
+                }
             }
 
             const failed = errors.concat(timeouts);
@@ -270,6 +279,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
         action,
         successMessage,
         endpoint,
+        setPurchaseTransaction,
     ]);
 
     React.useEffect(() => {
