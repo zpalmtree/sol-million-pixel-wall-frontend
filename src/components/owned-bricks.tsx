@@ -113,6 +113,7 @@ export function OwnedBricks() {
         selectedOwnedBricksWithArt,
         selectedOwnedBricksWithoutArt,
         setSelectedOwnedBricksWithoutArt,
+        selectedOwnedBricksWithoutArtSet,
     ]);
 
     const handleBrickWithArtClicked = React.useCallback((b: OwnedBrick) => {
@@ -143,6 +144,7 @@ export function OwnedBricks() {
         selectedOwnedBricksWithoutArt,
         selectedOwnedBricksWithArt,
         setSelectedOwnedBricksWithArt,
+        selectedOwnedBricksWithArtSet,
     ]);
 
     React.useEffect(() => {
@@ -185,9 +187,9 @@ export function OwnedBricks() {
                                     <div
                                         className='relative'
                                         onClick={() => handleBrickWithoutArtClicked(b)}
+                                        key={b.name}
                                     >
                                         <div
-                                            key={b.name}
                                             className={`bg-[#2A2A2A] flex items-center justify-center rounded-md cursor-pointer hover:opacity-80 transition-opacity `}
                                         >
                                             <img
@@ -222,9 +224,9 @@ export function OwnedBricks() {
                                     <div
                                         className='relative'
                                         onClick={() => handleBrickWithArtClicked(b)}
+                                        key={b.name}
                                     >
                                         <div
-                                            key={b.name}
                                             className={`bg-[#2A2A2A] flex items-center justify-center rounded-md cursor-pointer hover:opacity-80 transition-opacity `}
                                         >
                                             <img

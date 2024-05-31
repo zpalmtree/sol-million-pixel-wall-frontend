@@ -36,7 +36,6 @@ import {
     BRICKS_PER_COLUMN,
 } from '@/constants';
 import {
-    uploadTabEnabledState,
     currentTabState,
 } from '@/state/tabs';
 
@@ -48,7 +47,6 @@ export default function Checkout() {
     const setSelectedPixels = useSetRecoilState(selectedPixelsState);
     const selectedBricks = useRecoilValue(selectedOwnedBricksWithoutArtState);
     const selectedBricksSet = useRecoilValue(selectedOwnedBricksWithoutArtSetState);
-    const uploadTabEnabled = useRecoilValue(uploadTabEnabledState);
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;

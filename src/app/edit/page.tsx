@@ -35,6 +35,7 @@ import {
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
+    PRICE_PER_BRICK_UPDATE,
 } from '@/constants';
 import {
     uploadTabEnabledState,
@@ -320,6 +321,11 @@ export default function Checkout() {
                             value="purchase"
                         >
                             <PurchaseTab
+                                selectedBricks={selectedBricks}
+                                endpoint={'/purchase/modify'}
+                                action={'edit'}
+                                lamportsPerAction={PRICE_PER_BRICK_UPDATE}
+                                successMessage={`Payment successfully submitted. Proceed to the next tab to upload your creation.`}
                             />
                         </TabsContent>
 
@@ -352,9 +358,9 @@ export default function Checkout() {
                                     disabled={!nextTab}
                                 >
                                     <span className="block truncate sm:hidden">
-                                        Purchase
+                                        Pay
                                     </span>
-                                    <span className="hidden sm:block">2. Purchase</span>
+                                    <span className="hidden sm:block">2. Pay</span>
                                 </TabsTrigger>
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"

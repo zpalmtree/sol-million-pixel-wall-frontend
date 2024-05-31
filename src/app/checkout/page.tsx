@@ -35,6 +35,7 @@ import {
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
+    PRICE_PER_BRICK,
 } from '@/constants';
 import {
     uploadTabEnabledState,
@@ -320,6 +321,11 @@ export default function Checkout() {
                             value="purchase"
                         >
                             <PurchaseTab
+                                selectedBricks={selectedBricks}
+                                endpoint={'/purchase'}
+                                action={'purchase'}
+                                lamportsPerAction={PRICE_PER_BRICK}
+                                successMessage={`Brick(s) successfully purchased! Proceed to the next tab to upload your creation.`}
                             />
                         </TabsContent>
 

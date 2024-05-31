@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WalletMultiButton } from '@/components/wallet-button';
-import { selectedBricksState } from '@/state/bricks';
 import {
     uploadPreviewCanvasState,
     uploadPreviewImageState,
@@ -29,7 +28,6 @@ import {
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
-    PRICE_PER_BRICK,
     RPC,
 } from '@/constants';
 import { formatSOL, formatError } from '@/lib/utils';
@@ -38,14 +36,33 @@ import {
     Brick,
 } from '@/types/brick';
 
-export function PurchaseTab() {
+export interface PurchaseTabProps {
+    selectedBricks: Brick[];
+
+    endpoint: string;
+
+    action: string;
+
+    lamportsPerAction: number;
+
+    successMessage: string;
+}
+
+export function PurchaseTab(props: PurchaseTabProps) {
+    const {
+        selectedBricks,
+        endpoint,
+        action,
+        lamportsPerAction,
+        successMessage,
+    } = props;
+
     const {
         publicKey,
         signAllTransactions,
     } = useWallet();
 
     const canvas = useRecoilValue(uploadPreviewCanvasState);
-    const selectedBricks = useRecoilValue(selectedBricksState);
     const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
     const setCurrentTab = useSetRecoilState(currentTabState);
     const [imageSrc, setImageSrc] = useRecoilState(uploadPreviewImageState);
@@ -55,7 +72,6 @@ export function PurchaseTab() {
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [canvasWidth]);
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [canvasHeight]);
 
-
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | undefined>();
     const [success, setSuccess] = React.useState<string | undefined>();
@@ -64,9 +80,12 @@ export function PurchaseTab() {
     const [statusText, setStatusText] = React.useState<string>('');
 
     const costInSol = React.useMemo(() => {
-        const lamports = selectedBricks.length * PRICE_PER_BRICK;
+        const lamports = selectedBricks.length * lamportsPerAction;
         return formatSOL(lamports, 1);
-    }, [selectedBricks]);
+    }, [
+        selectedBricks,
+        lamportsPerAction,
+    ]);
 
     const payButtonDisabled = React.useMemo(() => {
         if (loading) {
@@ -107,8 +126,12 @@ export function PurchaseTab() {
         const connection = new Connection(RPC);
         const balance = await connection.getBalance(publicKey);
 
-        return balance >= selectedBricks.length * PRICE_PER_BRICK;
-    }, [publicKey, selectedBricks.length]);
+        return balance >= selectedBricks.length * lamportsPerAction;
+    }, [
+        publicKey,
+        selectedBricks.length,
+        lamportsPerAction,
+    ]);
 
     const handlePurchasePixels = React.useCallback(async (retryBricks: Brick[] = selectedBricks) => {
         if (!publicKey || !signAllTransactions) {
@@ -129,7 +152,7 @@ export function PurchaseTab() {
                 return;
             }
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/purchase`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -151,7 +174,7 @@ export function PurchaseTab() {
             const connection = new Connection(RPC);
             const transactionObjects = transactions.map((txBase64: string) => Transaction.from(Buffer.from(txBase64, 'base64')));
 
-            setStatusText('Sign the transaction(s) in your wallet to proceed with your purchase.');
+            setStatusText(`Sign the transaction(s) in your wallet to proceed with your ${action}.`);
 
             const signedTransactions: Transaction[] = await signAllTransactions(transactionObjects);
 
@@ -224,7 +247,7 @@ export function PurchaseTab() {
             }
 
             if (errors.length === 0 && timeouts.length === 0) {
-                setSuccess('Brick(s) successfully purchased! Proceed to the next tab to upload your creation.');
+                setSuccess(successMessage);
                 setUploadTabEnabled(true);
             }
 
@@ -244,6 +267,9 @@ export function PurchaseTab() {
         signAllTransactions,
         checkBalance,
         setUploadTabEnabled,
+        action,
+        successMessage,
+        endpoint,
     ]);
 
     React.useEffect(() => {
@@ -289,8 +315,8 @@ export function PurchaseTab() {
                         Solana Payment
                     </CardTitle>
                     <CardDescription className="text-white">
-                        Approve the transaction in your wallet
-                        to purchase your brick NFT(s)!
+                        {`Approve the transaction in your wallet
+                        to ${action} your brick NFT(s)!`}
                     </CardDescription>
                 </CardHeader>
 

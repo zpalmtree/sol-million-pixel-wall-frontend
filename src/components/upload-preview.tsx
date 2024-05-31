@@ -32,8 +32,6 @@ import {
     getWallInfo,
 } from '@/lib/wall-utils';
 import {
-    selectedBricksState,
-    selectedBrickNamesSetState,
     startingBricksState,
 } from '@/state/bricks';
 import {
@@ -272,6 +270,7 @@ export function UploadPreview(props: UploadPreviewProps) {
         }
 
         setItemsOnCanvas(newItemsOnCanvas);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         canvas,
         selectedBricks,

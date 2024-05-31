@@ -11,7 +11,6 @@ import {
     uploadPreviewImageState,
     uploadPreviewCanvasState,
 } from '@/state/upload-preview';
-import { selectedBricksState } from '@/state/bricks';
 import { renderBrickToImage, renderSelectedBricksToImage } from '@/lib/wall-utils';
 import { BRICKS_PER_ROW, BRICKS_PER_COLUMN } from '@/constants';
 import {

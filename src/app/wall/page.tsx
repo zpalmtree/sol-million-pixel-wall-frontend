@@ -5,7 +5,6 @@ import * as React from 'react';
 import { useRecoilValue } from 'recoil';
 import { WalletMultiButton } from '@/components/wallet-button';
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
 import { selectedBricksState } from '@/state/bricks';
@@ -177,18 +176,12 @@ export default function Component() {
                             My Bricks
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                            <Button
-                                size="sm"
-                                variant="transparent"
+                            <Link
+                                className="inline-flex h-9 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:text-primary dark:focus-visible:ring-primary"
+                                href="/owned"
                             >
                                 View Owned Bricks
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="transparent"
-                            >
-                                Edit Owned Bricks
-                            </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>
