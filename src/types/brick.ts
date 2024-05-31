@@ -14,4 +14,6 @@ export interface OwnedBrick extends Brick {
     assetId: string;
 
     hasImage: boolean;
+
+    image: string;
 }

@@ -15,15 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UploadPreview } from '@/components/upload-preview';
 import { ColorPicker } from '@/components/color-picker';
-import { PurchaseTab } from '@/components/purchase-tab';
 import { UploadTab } from '@/components/upload-tab';
 import { WalletMultiButton } from '@/components/wallet-button';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedPixelsState } from '@/state/pixels';
 import { addedImagesState } from '@/state/images';
 import {
-    selectedBricksState,
-    selectedBrickNamesSetState,
+    selectedOwnedBricksWithoutArtState,
+    selectedOwnedBricksWithoutArtSetState,
 } from '@/state/bricks';
 import {
     calculateZoomLevel,
@@ -47,8 +46,8 @@ export default function Checkout() {
     const [ images, setImages ] = useRecoilState(addedImagesState);
     const [ currentTab, setCurrentTab ] = useRecoilState(currentTabState);
     const setSelectedPixels = useSetRecoilState(selectedPixelsState);
-    const selectedBricks = useRecoilValue(selectedBricksState);
-    const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
+    const selectedBricks = useRecoilValue(selectedOwnedBricksWithoutArtState);
+    const selectedBricksSet = useRecoilValue(selectedOwnedBricksWithoutArtSetState);
     const uploadTabEnabled = useRecoilValue(uploadTabEnabledState);
 
     const canvasWidth = 1000;
@@ -59,10 +58,7 @@ export default function Checkout() {
     const nextTab = React.useMemo(() => {
         switch (currentTab) {
             case 'create': {
-                return 'purchase';
-            }
-            case 'purchase': {
-                return 'complete';
+                return 'upload';
             }
             case 'upload': {
                 return undefined;
@@ -317,14 +313,6 @@ export default function Checkout() {
 
                         <TabsContent
                             className="w-[1280px] h-[800px]"
-                            value="purchase"
-                        >
-                            <PurchaseTab
-                            />
-                        </TabsContent>
-
-                        <TabsContent
-                            className="w-[1280px] h-[800px]"
                             value="upload"
                         >
                             <UploadTab
@@ -338,7 +326,6 @@ export default function Checkout() {
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                     value="create"
                                     onClick={(e) => handleTabClicked(e, 'create')}
-                                    disabled={!nextTab}
                                 >
                                     <span className="block truncate sm:hidden">
                                         Create
@@ -347,25 +334,13 @@ export default function Checkout() {
                                 </TabsTrigger>
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
-                                    value="purchase"
-                                    onClick={(e) => handleTabClicked(e, 'purchase')}
-                                    disabled={!nextTab}
-                                >
-                                    <span className="block truncate sm:hidden">
-                                        Purchase
-                                    </span>
-                                    <span className="hidden sm:block">2. Purchase</span>
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
                                     value="upload"
                                     onClick={(e) => handleTabClicked(e, 'upload')}
-                                    disabled={!uploadTabEnabled}
                                 >
                                     <span className="block truncate sm:hidden">
                                         Upload
                                     </span>
-                                    <span className="hidden sm:block">3. Upload</span>
+                                    <span className="hidden sm:block">2. Upload</span>
                                 </TabsTrigger>
                             </div>
 

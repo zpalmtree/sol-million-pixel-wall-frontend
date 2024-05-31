@@ -18,6 +18,7 @@ import {
 } from 'fabric';
 
 import { Pixel } from '@/types/pixel';
+import { Brick } from '@/types/brick';
 import {
     calculateZoomLevel,
     calculateBrickCenter,
@@ -60,6 +61,10 @@ export interface UploadPreviewProps {
     height?: number;
 
     visible: boolean;
+
+    selectedBricks: Brick[];
+
+    selectedBricksSet: Set<string>;
 }
 
 export function UploadPreview(props: UploadPreviewProps) {
@@ -67,11 +72,11 @@ export function UploadPreview(props: UploadPreviewProps) {
         width,
         height,
         visible = true,
+        selectedBricks,
+        selectedBricksSet,
     } = props;
 
-    const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
     const selectedColor = useRecoilValue(selectedColorState);
-    const selectedBricks = useRecoilValue(selectedBricksState);
     const images = useRecoilValue(addedImagesState);
     const setStartingBricks = useSetRecoilState(startingBricksState);
 

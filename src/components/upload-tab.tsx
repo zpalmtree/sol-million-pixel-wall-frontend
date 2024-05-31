@@ -1,19 +1,34 @@
 import * as React from 'react';
-import { useRecoilValue } from 'recoil';
+import {
+    useRecoilValue,
+    useRecoilState,
+} from 'recoil';
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { uploadPreviewImageState, uploadPreviewCanvasState } from '@/state/upload-preview';
-import { selectedBricksState } from '@/state/bricks';
-import { renderBrickToImage } from '@/lib/wall-utils';
-import { BRICKS_PER_ROW, BRICKS_PER_COLUMN } from '@/constants';
 import { useWallet } from '@solana/wallet-adapter-react';
 
-export function UploadTab() {
+import { Button } from "@/components/ui/button";
+import {
+    uploadPreviewImageState,
+    uploadPreviewCanvasState,
+} from '@/state/upload-preview';
+import { selectedBricksState } from '@/state/bricks';
+import { renderBrickToImage, renderSelectedBricksToImage } from '@/lib/wall-utils';
+import { BRICKS_PER_ROW, BRICKS_PER_COLUMN } from '@/constants';
+import {
+    Brick,
+} from '@/types/brick';
+
+export interface UploadTabProps {
+    selectedBricks: Brick[];
+}
+
+export function UploadTab(props: UploadTabProps) {
+    const { selectedBricks } = props;
+
     const [complete, setComplete] = React.useState(false);
     const [uploading, setUploading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
-    const imageSrc = useRecoilValue(uploadPreviewImageState);
-    const selectedBricks = useRecoilValue(selectedBricksState);
+    const [ imageSrc, setImageSrc ] = useRecoilState(uploadPreviewImageState);
     const canvas = useRecoilValue(uploadPreviewCanvasState);
     const { publicKey, signMessage } = useWallet();
 
@@ -21,6 +36,34 @@ export function UploadTab() {
     const canvasHeight = 1000;
     const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [canvasWidth]);
     const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [canvasHeight]);
+
+    React.useEffect(() => {
+        const generateImage = async () => {
+            if (!canvas || selectedBricks.length === 0) {
+                setImageSrc(undefined);
+                return;
+            }
+
+            const image = await renderSelectedBricksToImage(
+                selectedBricks,
+                canvas,
+                brickWidth,
+                brickHeight,
+            );
+
+            if (image) {
+                setImageSrc(image);
+            }
+        };
+
+        generateImage();
+    }, [
+        canvas,
+        selectedBricks,
+        brickWidth,
+        brickHeight,
+        setImageSrc,
+    ]);
 
     const handleUpload = React.useCallback(async () => {
         if (!publicKey || !signMessage || !canvas) {
@@ -64,7 +107,7 @@ export function UploadTab() {
                 setComplete(true);
             } else {
                 if (error) {
-                    setError(`Upload failed: ${error}. Please try again.`);
+                    setError(`Upload failed: ${error} Please try again.`);
                 } else {
                     setError('Upload failed. Please try again.');
                 }

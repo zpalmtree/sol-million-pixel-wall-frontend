@@ -22,8 +22,8 @@ import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedPixelsState } from '@/state/pixels';
 import { addedImagesState } from '@/state/images';
 import {
-    selectedBricksState,
-    selectedBrickNamesSetState,
+    selectedOwnedBricksWithArtState,
+    selectedOwnedBricksWithArtSetState,
 } from '@/state/bricks';
 import {
     calculateZoomLevel,
@@ -47,8 +47,8 @@ export default function Checkout() {
     const [ images, setImages ] = useRecoilState(addedImagesState);
     const [ currentTab, setCurrentTab ] = useRecoilState(currentTabState);
     const setSelectedPixels = useSetRecoilState(selectedPixelsState);
-    const selectedBricks = useRecoilValue(selectedBricksState);
-    const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
+    const selectedBricks = useRecoilValue(selectedOwnedBricksWithArtState);
+    const selectedBricksSet = useRecoilValue(selectedOwnedBricksWithArtSetState);
     const uploadTabEnabled = useRecoilValue(uploadTabEnabledState);
 
     const canvasWidth = 1000;

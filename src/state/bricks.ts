@@ -42,3 +42,32 @@ export const ownedBricksWithoutArtState = selector<OwnedBrick[]>({
         return ownedBricks.filter((b) => !b.hasImage);
     },
 });
+
+export const selectedOwnedBricksWithArtState = atom<OwnedBrick[]>({
+    key: 'selectedOwnedBricksWithArt',
+    default: [],
+});
+
+export const selectedOwnedBricksWithoutArtState = atom<OwnedBrick[]>({
+    key: 'selectedOwnedBricksWithoutArt',
+    default: [],
+});
+
+export const selectedOwnedBricksWithArtSetState = selector<Set<string>>({
+    key: 'selectedOwnedBricksWithArtSetState',
+    get: ({ get }) => {
+        const selectedBricks = get(selectedOwnedBricksWithArtState);
+        const nameSet = new Set(selectedBricks.map(brick => brick.name));
+        return nameSet;
+    },
+});
+
+export const selectedOwnedBricksWithoutArtSetState = selector<Set<string>>({
+    key: 'selectedOwnedBricksWithoutArtSetState',
+    get: ({ get }) => {
+        const selectedBricks = get(selectedOwnedBricksWithoutArtState);
+        const nameSet = new Set(selectedBricks.map(brick => brick.name));
+        return nameSet;
+    },
+});
+
