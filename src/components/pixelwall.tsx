@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import {
     useRecoilState,
     useSetRecoilState,
+    useRecoilValue,
 } from 'recoil';
 import {
     Canvas,
@@ -27,6 +28,7 @@ import {
 import {
     selectedBricksState,
     startingBricksState,
+    purchasedBricksSetState,
 } from '@/state/bricks';
 import {
     startingPixelWallImageState,
@@ -77,6 +79,7 @@ export function PixelWall(props: PixelWallProps) {
     const setStartingBricks = useSetRecoilState(startingBricksState);
     const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
+    const purchasedBricksSet = useRecoilValue(purchasedBricksSetState);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         setLastPointerPosition(e.pointer);
@@ -131,6 +134,13 @@ export function PixelWall(props: PixelWallProps) {
             }
         }
 
+        for (const b of rangeBricks) {
+            if (purchasedBricksSet.has(b.name)) {
+                toast.warn(`One or more bricks in the range you selected have already been purchased.`);
+                return;
+            }
+        }
+
         // Add bricks that are in the selected range
         for (const b of selectedBricks) {
             if (
@@ -151,7 +161,11 @@ export function PixelWall(props: PixelWallProps) {
         }
 
         setSelectedBricks(newSelectedBricks);
-    }, [selectedBricks, setSelectedBricks]);
+    }, [
+        selectedBricks,
+        setSelectedBricks,
+        purchasedBricksSet,
+    ]);
 
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         if (!canvas) {
@@ -177,8 +191,13 @@ export function PixelWall(props: PixelWallProps) {
             BRICKS_PER_COLUMN,
         );
 
-        /* TODO: Validate bricks are not owned already */
         if (startBrick.name === endBrick.name) {
+            if (purchasedBricksSet.has(startBrick.name)) {
+                console.log('Brick already purchased, skipping');
+                toast.warn('This brick has already been purchased.');
+                return;
+            }
+
             toggleBrickSelectedState(startBrick);
         } else {
             selectBrickRange(startBrick, endBrick);
@@ -188,6 +207,7 @@ export function PixelWall(props: PixelWallProps) {
         toggleBrickSelectedState,
         selectBrickRange,
         canvas,
+        purchasedBricksSet,
     ]);
 
     const loadInitialInfo = React.useCallback(async () => {

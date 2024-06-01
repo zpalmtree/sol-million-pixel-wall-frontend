@@ -30,7 +30,7 @@ export function UploadModifyTab(props: UploadTabProps) {
     const [error, setError] = React.useState<string | null>(null);
     const [ imageSrc, setImageSrc ] = useRecoilState(uploadPreviewImageState);
     const canvas = useRecoilValue(uploadPreviewCanvasState);
-    const { publicKey, signMessage } = useWallet();
+    const { publicKey } = useWallet();
     const purchaseTransaction = useRecoilValue(purchaseTransactionState);
 
     const canvasWidth = 1000;
@@ -126,7 +126,6 @@ export function UploadModifyTab(props: UploadTabProps) {
         brickWidth,
         canvas,
         selectedBricks,
-        signMessage,
     ]);
 
     if (complete) {
