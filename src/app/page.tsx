@@ -53,13 +53,13 @@ export default function Splash() {
                     <div className="flex flex-col items-center space-y-4 text-center">
                         <div className="space-y-2">
                             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-primary">
-                                The Million Pixel Wall
+                                We're Building The Greatest WALL
                             </h1>
-                            <p className="max-w-[700px] text-[#EEEEEE] md:text-xl dark:text-[#EEEEEE]">
-                                {`Explore the world's largest NFT-powered pixel
-                                wall, where creativity and community collide on
-                                the Solana blockchain.`}
-                            </p>
+                            <div className='flex items-center justify-center w-full'>
+                                <p className="max-w-[700px] text-[#EEEEEE] md:text-xl dark:text-[#EEEEEE]">
+                                    {`Explore the world's largest NFT-powered pixel wall where the dankest crypto communities collide on the blockchain. We're building the Wall - we have no choice.`}
+                                </p>
+                            </div>
                         </div>
                         <div className="space-x-4">
                             <Link
@@ -92,14 +92,10 @@ export default function Splash() {
                                         NFT Powered
                                     </div>
                                     <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary">
-                                        Unleash Your Creativity
+                                        Unleash the Memes
                                     </h2>
-                                    <p className="max-w-[600px] text-[#EEEEEE] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-[#EEEEEE]">
-                                        Mint your own sections of the million
-                                        pixel wall and contribute to the
-                                        ever-evolving Million Pixel Wall.
-                                        Showcase your talent as your creations
-                                        gain popularity.
+                                    <p className="max-w-[600px] text-[#EEEEEE] md:text-lg/relaxed dark:text-[#EEEEEE]">
+                                        Mint your own sections of the million pixel wall and contribute to the greatest WALL ever known! You will own this special digital real estate. Create and upload images to mog outrageously. Be a part of the legend. Become a legend. Nobody builds walls like we do. Nobody.
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
