@@ -2,8 +2,14 @@
 
 import Link from "next/link";
 import * as React from 'react';
-import { useRecoilValue } from 'recoil';
+import {
+    useRecoilValue,
+    useSetRecoilState,
+} from 'recoil';
 import { WalletMultiButton } from '@/components/wallet-button';
+import {
+    currentTabState,
+} from '@/state/tabs';
 
 import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
@@ -14,6 +20,7 @@ import { pricePerBrickState } from '@/state/purchase';
 export default function Component() {
     const selectedBricks = useRecoilValue(selectedBricksState);
     const pricePerBrick = useRecoilValue(pricePerBrickState);
+    const setCurrentTab = useSetRecoilState(currentTabState);
 
     const costInSol = React.useMemo(() => {
         const lamports = selectedBricks.length * pricePerBrick;
@@ -21,6 +28,12 @@ export default function Component() {
     }, [
         selectedBricks,
         pricePerBrick,
+    ]);
+
+    React.useEffect(() => {
+        setCurrentTab('create');
+    }, [
+        setCurrentTab,
     ]);
 
     return (

@@ -1,10 +1,25 @@
+"use client";
+
 import Link from "next/link";
+import * as React from 'react';
+import { useSetRecoilState } from 'recoil';
 
 import { Button } from "@/components/ui/button";
 import { PixelWall } from "@/components/pixelwall";
 import { WalletMultiButton } from '@/components/wallet-button';
+import {
+    currentTabState,
+} from '@/state/tabs';
 
 export default function Splash() {
+    const setCurrentTab = useSetRecoilState(currentTabState);
+
+    React.useEffect(() => {
+        setCurrentTab('create');
+    }, [
+        setCurrentTab,
+    ]);
+
     return (
         <>
             <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
