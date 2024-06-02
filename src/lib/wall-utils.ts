@@ -637,17 +637,27 @@ export async function renderBrickToImage(
 export async function getWallInfo() {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/info`);
-        const { image, bricks } = await response.json();
+
+        const {
+            image,
+            bricks,
+            pricePerBrick,
+            pricePerBrickEdit,
+        } = await response.json();
 
         return {
             image,
             bricks,
             error: undefined,
+            pricePerBrick,
+            pricePerBrickEdit,
         };
     } catch (err: any) {
         return {
             image: undefined,
             bricks: undefined,
+            pricePerBrick: undefined,
+            pricePerBrickEdit: undefined,
             error: err.toString(),
         };
     }

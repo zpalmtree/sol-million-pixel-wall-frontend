@@ -8,17 +8,19 @@ import { WalletMultiButton } from '@/components/wallet-button';
 import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
 import { selectedBricksState } from '@/state/bricks';
-import { PRICE_PER_BRICK } from '@/constants';
 import { formatSOL } from '@/lib/utils';
+import { pricePerBrickState } from '@/state/purchase';
 
 export default function Component() {
     const selectedBricks = useRecoilValue(selectedBricksState);
+    const pricePerBrick = useRecoilValue(pricePerBrickState);
 
     const costInSol = React.useMemo(() => {
-        const lamports = selectedBricks.length * PRICE_PER_BRICK;
+        const lamports = selectedBricks.length * pricePerBrick;
         return formatSOL(lamports, 1);
     }, [
         selectedBricks,
+        pricePerBrick,
     ]);
 
     return (

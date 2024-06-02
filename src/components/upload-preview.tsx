@@ -42,6 +42,10 @@ import {
     addedImagesState,
     startingPixelWallImageState,
 } from '@/state/images';
+import {
+    pricePerBrickState,
+    pricePerBrickEditState,
+} from '@/state/purchase';
 
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import {
@@ -77,6 +81,8 @@ export function UploadPreview(props: UploadPreviewProps) {
     const selectedColor = useRecoilValue(selectedColorState);
     const images = useRecoilValue(addedImagesState);
     const setStartingBricks = useSetRecoilState(startingBricksState);
+    const setPricePerBrick = useSetRecoilState(pricePerBrickState);
+    const setPricePerBrickEdit = useSetRecoilState(pricePerBrickEditState);
 
     const [ selectedPixels, setSelectedPixels ] = useRecoilState(selectedPixelsState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
@@ -135,7 +141,13 @@ export function UploadPreview(props: UploadPreviewProps) {
             return;
         }
 
-        const { image, bricks, error } = await getWallInfo();
+        const {
+            image,
+            bricks,
+            error,
+            pricePerBrick,
+            pricePerBrickEdit,
+        } = await getWallInfo();
 
         if (error) {
             toast.warn(`Failed to load wall info: ${error}`);
@@ -145,10 +157,19 @@ export function UploadPreview(props: UploadPreviewProps) {
         setStartingPixelWallImage(image);
         setStartingBricks(bricks);
 
+        if (pricePerBrick !== undefined) {
+            setPricePerBrick(pricePerBrick);
+        }
+
+        if (pricePerBrickEdit !== undefined) {
+            setPricePerBrickEdit(pricePerBrickEdit);
+        }
     }, [
         startingPixelWallImage,
         setStartingPixelWallImage,
         setStartingBricks,
+        setPricePerBrick,
+        setPricePerBrickEdit,
     ]);
 
     const drawCanvas = React.useCallback(async () => {

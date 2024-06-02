@@ -39,6 +39,10 @@ import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
 } from '@/constants';
+import {
+    pricePerBrickState,
+    pricePerBrickEditState,
+} from '@/state/purchase';
 
 export interface PixelWallProps {
     /* Width of canvas. Defaults to CANVAS_WIDTH. */
@@ -80,6 +84,8 @@ export function PixelWall(props: PixelWallProps) {
     const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
     const purchasedBricksSet = useRecoilValue(purchasedBricksSetState);
+    const setPricePerBrick = useSetRecoilState(pricePerBrickState);
+    const setPricePerBrickEdit = useSetRecoilState(pricePerBrickEditState);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         setLastPointerPosition(e.pointer);
@@ -217,7 +223,13 @@ export function PixelWall(props: PixelWallProps) {
             return;
         }
 
-        const { image, bricks, error } = await getWallInfo();
+        const {
+            image,
+            bricks,
+            error,
+            pricePerBrick,
+            pricePerBrickEdit,
+        } = await getWallInfo();
 
         if (error) {
             toast.warn(`Failed to load wall info: ${error}`);
@@ -227,10 +239,20 @@ export function PixelWall(props: PixelWallProps) {
         setStartingPixelWallImage(image);
         setStartingBricks(bricks);
 
+        if (pricePerBrick !== undefined) {
+            setPricePerBrick(pricePerBrick);
+        }
+
+        if (pricePerBrickEdit !== undefined) {
+            setPricePerBrickEdit(pricePerBrickEdit);
+        }
+
     }, [
         startingPixelWallImage,
         setStartingPixelWallImage,
         setStartingBricks,
+        setPricePerBrick,
+        setPricePerBrickEdit,
     ]);
 
     const drawCanvas = React.useCallback(async () => {

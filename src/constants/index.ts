@@ -3,7 +3,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 //export const PRICE_PER_BRICK = 0.25 * LAMPORTS_PER_SOL;
 
 export const PRICE_PER_BRICK = 0.001 * LAMPORTS_PER_SOL;
-export const PRICE_PER_BRICK_UPDATE = 0.001 * LAMPORTS_PER_SOL;
+export const PRICE_PER_BRICK_EDIT = 0.001 * LAMPORTS_PER_SOL;
 
 export const CANVAS_WIDTH = 600;
 export const CANVAS_HEIGHT = 600;

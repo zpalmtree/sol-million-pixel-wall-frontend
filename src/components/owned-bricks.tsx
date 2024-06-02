@@ -22,11 +22,11 @@ import {
     OwnedBrick,
 } from '@/types/brick';
 import {
-    PRICE_PER_BRICK_UPDATE,
-} from '@/constants';
-import {
     formatSOL,
 } from '@/lib/utils';
+import {
+    pricePerBrickEditState,
+} from '@/state/purchase';
 
 export function OwnedBricks() {
     const {
@@ -40,6 +40,7 @@ export function OwnedBricks() {
     const selectedOwnedBricksWithoutArtSet = useRecoilValue(selectedOwnedBricksWithoutArtSetState);
     const [selectedOwnedBricksWithArt, setSelectedOwnedBricksWithArt] = useRecoilState(selectedOwnedBricksWithArtState);
     const [selectedOwnedBricksWithoutArt, setSelectedOwnedBricksWithoutArt] = useRecoilState(selectedOwnedBricksWithoutArtState);
+    const pricePerBrickEdit = useRecoilValue(pricePerBrickEditState);
 
     const bricksSelected = React.useMemo(() => {
         return selectedOwnedBricksWithArt.length + selectedOwnedBricksWithoutArt.length;
@@ -49,10 +50,11 @@ export function OwnedBricks() {
     ]);
 
     const costInSol = React.useMemo(() => {
-        const lamports = selectedOwnedBricksWithArt.length * PRICE_PER_BRICK_UPDATE;
+        const lamports = selectedOwnedBricksWithArt.length * pricePerBrickEdit;
         return formatSOL(lamports, 1);
     }, [
         selectedOwnedBricksWithArt,
+        pricePerBrickEdit,
     ]);
 
     const fetchOwnedBricks = React.useCallback(async () => {

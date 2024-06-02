@@ -35,12 +35,14 @@ import {
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
-    PRICE_PER_BRICK,
 } from '@/constants';
 import {
     uploadTabEnabledState,
     currentTabState,
 } from '@/state/tabs';
+import {
+    pricePerBrickState,
+} from '@/state/purchase';
 
 export default function Checkout() {
     const canvas = useRecoilValue(uploadPreviewCanvasState);
@@ -51,6 +53,7 @@ export default function Checkout() {
     const selectedBricks = useRecoilValue(selectedBricksState);
     const selectedBricksSet = useRecoilValue(selectedBrickNamesSetState);
     const uploadTabEnabled = useRecoilValue(uploadTabEnabledState);
+    const pricePerBrick = useRecoilValue(pricePerBrickState);
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;
@@ -324,7 +327,7 @@ export default function Checkout() {
                                 selectedBricks={selectedBricks}
                                 endpoint={'/purchase'}
                                 action={'purchase'}
-                                lamportsPerAction={PRICE_PER_BRICK}
+                                lamportsPerAction={pricePerBrick}
                                 successMessage={`Brick(s) successfully purchased! Proceed to the next tab to upload your creation.`}
                             />
                         </TabsContent>
