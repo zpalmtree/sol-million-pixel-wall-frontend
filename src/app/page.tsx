@@ -53,7 +53,7 @@ export default function Splash() {
                     <div className="flex flex-col items-center space-y-4 text-center">
                         <div className="space-y-2">
                             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-primary">
-                                We're Building The Greatest WALL
+                                {`We're Building The Greatest WALL`}
                             </h1>
                             <div className='flex items-center justify-center w-full'>
                                 <p className="max-w-[700px] text-[#EEEEEE] md:text-xl dark:text-[#EEEEEE]">
