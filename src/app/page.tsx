@@ -138,7 +138,7 @@ export default function Splash() {
 
                             <div className='flex items-center justify-center w-full'>
                                 <p className="text-center max-w-[600px] text-[#EEEEEE] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-[#EEEEEE]">
-                                    They'll try to tell you the Wall divides us... but if you really think about it... the Wall unites us.
+                                    {`They'll try to tell you the Wall divides us... but if you really think about it... the Wall unites us.`}
                                 </p>
                             </div>
                             <a href="https://twitter.com/WallOnSolana">
