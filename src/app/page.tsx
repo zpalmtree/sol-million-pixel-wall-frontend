@@ -71,7 +71,7 @@ export default function Splash() {
                                 {`We're Building The Greatest WALL`}
                             </h1>
                             <div className='flex items-center justify-center w-full'>
-                                <p className="max-w-[700px] text-[#EEEEEE] md:text-xl dark:text-[#EEEEEE]">
+                                <p className="max-w-[700px] text-[#EEEEEE] md:text-xl dark:text-[#EEEEEE] text-center">
                                     {`Explore the world's largest NFT-powered pixel wall where the dankest crypto communities collide on the blockchain. We're building the Wall - we have no choice.`}
                                 </p>
                             </div>
@@ -133,13 +133,14 @@ export default function Splash() {
                     <div className="flex flex-col items-center justify-center w-full px-4 md:px-6 py-12 md:py-24 lg:py-32 bg-[#1A1A1A] border-t border-primary">
                         <div className="flex flex-col items-center justify-center space-y-3 w-full">
                             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight text-primary">
-                                Join the Million Pixel Wall Community
+                                Join the $WALL community!
                             </h2>
-                            <p className="max-w-[600px] text-[#EEEEEE] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-[#EEEEEE]">
-                                Become a part of the vibrant community of pixel
-                                artists and collectors shaping the future of the
-                                Million Pixel Wall.
-                            </p>
+
+                            <div className='flex items-center justify-center w-full'>
+                                <p className="text-center max-w-[600px] text-[#EEEEEE] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-[#EEEEEE]">
+                                    They'll try to tell you the Wall divides us... but if you really think about it... the Wall unites us.
+                                </p>
+                            </div>
                             <a href="https://twitter.com/WallOnSolana">
                                 <Button
                                     className="bg-primary text-[#1A1A1A]"
