@@ -9,6 +9,7 @@ import {
 import { WalletMultiButton } from '@/components/wallet-button';
 import {
     currentTabState,
+    uploadTabEnabledState,
 } from '@/state/tabs';
 
 import { Separator } from "@/components/ui/separator";
@@ -21,6 +22,7 @@ export default function Component() {
     const selectedBricks = useRecoilValue(selectedBricksState);
     const pricePerBrick = useRecoilValue(pricePerBrickState);
     const setCurrentTab = useSetRecoilState(currentTabState);
+    const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
 
     const costInSol = React.useMemo(() => {
         const lamports = selectedBricks.length * pricePerBrick;
@@ -32,8 +34,10 @@ export default function Component() {
 
     React.useEffect(() => {
         setCurrentTab('create');
+        setUploadTabEnabled(false);
     }, [
         setCurrentTab,
+        setUploadTabEnabled,
     ]);
 
     return (

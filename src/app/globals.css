@@ -39,3 +39,11 @@ canvas {
   image-rendering: -o-crisp-edges;
   image-rendering: pixelated;
 }
+
+.gradient-text {
+    background: linear-gradient(90deg, #9945FF, #00A3FF, #14F195, #00A3FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2; /* Adjust line height */
+    padding: 0.2em 0; /* Add padding */
+}

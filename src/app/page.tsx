@@ -9,15 +9,19 @@ import { PixelWall } from "@/components/pixelwall";
 import { WalletMultiButton } from '@/components/wallet-button';
 import {
     currentTabState,
+    uploadTabEnabledState,
 } from '@/state/tabs';
 
 export default function Splash() {
     const setCurrentTab = useSetRecoilState(currentTabState);
+    const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
 
     React.useEffect(() => {
         setCurrentTab('create');
+        setUploadTabEnabled(false);
     }, [
         setCurrentTab,
+        setUploadTabEnabled,
     ]);
 
     return (
