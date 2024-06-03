@@ -15,6 +15,7 @@ import {
     TPointerEvent,
     TPointerEventInfo,
     Image,
+    Point,
 } from 'fabric';
 
 import { Coordinate } from '@/types/coordinate';
@@ -140,6 +141,7 @@ export function PixelWall(props: PixelWallProps) {
             }
         }
 
+
         for (const b of rangeBricks) {
             if (purchasedBricksSet.has(b.name)) {
                 toast.warn(`One or more bricks in the range you selected have already been purchased.`);
@@ -214,6 +216,36 @@ export function PixelWall(props: PixelWallProps) {
         selectBrickRange,
         canvas,
         purchasedBricksSet,
+    ]);
+
+    const handleMouseWheel = React.useCallback((opt: any) => {
+        if (!canvas) {
+            return;
+        }
+
+        const delta = opt.e.deltaY;
+        let zoom = canvas.getZoom();
+
+        zoom *= 0.999 ** delta;
+
+        if (zoom > 40) {
+            zoom = 40;
+        }
+
+        if (zoom < 1) {
+            zoom = 1;
+            canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+        }
+
+
+        const point = new Point(opt.e.offsetX, opt.e.offsetY);
+
+        canvas.zoomToPoint(point, zoom);
+
+        opt.e.preventDefault();
+        opt.e.stopPropagation();
+    }, [
+        canvas,
     ]);
 
     const loadInitialInfo = React.useCallback(async () => {
@@ -341,16 +373,19 @@ export function PixelWall(props: PixelWallProps) {
 
         canvas.on('mouse:down', handleMouseDown);
         canvas.on('mouse:up', handleMouseUp);
+        canvas.on('mouse:wheel', handleMouseWheel);
 
         return () => {
             canvas.off('mouse:down', handleMouseDown);
             canvas.off('mouse:up', handleMouseUp);
+            canvas.off('mouse:wheel', handleMouseWheel);
         }
     }, [
         canvas,
         lastPointerPosition,
         handleMouseDown,
         handleMouseUp,
+        handleMouseWheel,
         interactable,
     ]);
 
