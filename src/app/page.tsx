@@ -102,6 +102,9 @@ export default function Splash() {
                                     interactable={false}
                                     width={350}
                                     height={350}
+                                    selectedBricks={[]}
+                                    setSelectedBricks={() => {}}
+                                    purchasedBricksSet={new Set()}
                                 />
                             </div>
                             

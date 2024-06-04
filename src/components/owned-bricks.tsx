@@ -15,18 +15,14 @@ import {
     ownedBricksState,
     selectedOwnedBricksWithArtState,
     selectedOwnedBricksWithoutArtState,
-    selectedOwnedBricksWithArtSetState,
-    selectedOwnedBricksWithoutArtSetState,
 } from '@/state/bricks';
-import {
-    OwnedBrick,
-} from '@/types/brick';
 import {
     formatSOL,
 } from '@/lib/utils';
 import {
     pricePerBrickEditState,
 } from '@/state/purchase';
+import { PixelWall } from '@/components/pixelwall';
 
 export function OwnedBricks() {
     const {
@@ -36,8 +32,6 @@ export function OwnedBricks() {
     const ownedBricksWithArt = useRecoilValue(ownedBricksWithArtState);
     const ownedBricksWithoutArt = useRecoilValue(ownedBricksWithoutArtState);
     const setOwnedBricks = useSetRecoilState(ownedBricksState);
-    const selectedOwnedBricksWithArtSet = useRecoilValue(selectedOwnedBricksWithArtSetState);
-    const selectedOwnedBricksWithoutArtSet = useRecoilValue(selectedOwnedBricksWithoutArtSetState);
     const [selectedOwnedBricksWithArt, setSelectedOwnedBricksWithArt] = useRecoilState(selectedOwnedBricksWithArtState);
     const [selectedOwnedBricksWithoutArt, setSelectedOwnedBricksWithoutArt] = useRecoilState(selectedOwnedBricksWithoutArtState);
     const pricePerBrickEdit = useRecoilValue(pricePerBrickEditState);
@@ -49,13 +43,22 @@ export function OwnedBricks() {
         selectedOwnedBricksWithoutArt,
     ]);
 
-    const costInSol = React.useMemo(() => {
+    const noArtCostInSol = React.useMemo(() => {
+        const lamports = selectedOwnedBricksWithoutArt.length * pricePerBrickEdit;
+        return formatSOL(lamports, 1);
+    }, [
+        selectedOwnedBricksWithArt,
+        pricePerBrickEdit,
+    ]);
+
+    const artCostInSol = React.useMemo(() => {
         const lamports = selectedOwnedBricksWithArt.length * pricePerBrickEdit;
         return formatSOL(lamports, 1);
     }, [
         selectedOwnedBricksWithArt,
         pricePerBrickEdit,
     ]);
+
 
     const fetchOwnedBricks = React.useCallback(async () => {
         if (!publicKey) {
@@ -86,67 +89,6 @@ export function OwnedBricks() {
     }, [
         publicKey,
         setOwnedBricks,
-    ]);
-
-    const handleBrickWithoutArtClicked = React.useCallback((b: OwnedBrick) => {
-        const selected = selectedOwnedBricksWithoutArtSet.has(b.name);
-
-        if (!selected && selectedOwnedBricksWithArt.length > 0) {
-            toast.warn('Cannot update bricks without art and bricks with art at the same time. Please de-select bricks with art to continue.');
-            return;
-        }
-
-        const newSelectedBricks = [];
-
-        for (const brick of selectedOwnedBricksWithoutArt) {
-            if (brick.name === b.name) {
-                continue;
-            }
-
-            newSelectedBricks.push(brick);
-        }
-
-        if (!selected) {
-            newSelectedBricks.push(b);
-        }
-
-        setSelectedOwnedBricksWithoutArt(newSelectedBricks);
-    }, [
-        selectedOwnedBricksWithArt,
-        selectedOwnedBricksWithoutArt,
-        setSelectedOwnedBricksWithoutArt,
-        selectedOwnedBricksWithoutArtSet,
-    ]);
-
-    const handleBrickWithArtClicked = React.useCallback((b: OwnedBrick) => {
-        const selected = selectedOwnedBricksWithArtSet.has(b.name);
-
-        if (!selected && selectedOwnedBricksWithoutArt.length > 0) {
-            toast.warn('Cannot update bricks without art and bricks with art at the same time. Please de-select bricks with art to continue.');
-            return;
-        }
-
-        const newSelectedBricks = [];
-
-        for (const brick of selectedOwnedBricksWithArt) {
-            if (brick.name === b.name) {
-                continue;
-            }
-
-            newSelectedBricks.push(brick);
-        }
-
-        if (!selected) {
-            newSelectedBricks.push(b);
-        }
-
-        setSelectedOwnedBricksWithArt(newSelectedBricks);
-
-    }, [
-        selectedOwnedBricksWithoutArt,
-        selectedOwnedBricksWithArt,
-        setSelectedOwnedBricksWithArt,
-        selectedOwnedBricksWithArtSet,
     ]);
 
     React.useEffect(() => {
@@ -180,112 +122,110 @@ export function OwnedBricks() {
                     </h1>
 
                     <div className="flex flex-col gap-y-6">
-                        <div className="mb-6 md:mr-6">
-                            <h2 className="text-xl font-bold mb-3">
+                        <div className="mb-6 flex flex-col items-start justify-start gap-y-5">
+                            <h2 className="text-xl font-bold">
                                 {`Missing art - upload for free (${ownedBricksWithoutArt.length})`}
                             </h2>
-                            <div className="flex flex-wrap max-w-[900px] gap-x-6 gap-y-5">
-                                {ownedBricksWithoutArt.map((b) => (
-                                    <div
-                                        className='relative'
-                                        onClick={() => handleBrickWithoutArtClicked(b)}
-                                        key={b.name}
-                                    >
-                                        <div
-                                            className={`bg-[#2A2A2A] flex items-center justify-center rounded-md cursor-pointer hover:opacity-80 transition-opacity `}
-                                        >
-                                            <img
-                                                alt={`Brick (${b.name})`}
-                                                className="object-cover rounded-md"
-                                                height={170}
-                                                src={b.image}
-                                                style={{
-                                                    aspectRatio: "170/170",
-                                                    objectFit: "cover",
-                                                }}
-                                                width={170}
-                                            />
-                                        </div>
-                                        <div
-                                            className={`opacity-80 absolute z-10 bottom-0 justify-center items-start bg-primary w-full h-full rounded-md cursor-pointer ${selectedOwnedBricksWithoutArtSet.has(b.name) ? 'flex' : 'hidden'}`}
-                                        >
-                                            <span className='text-white mt-4 text-xl'>
-                                                Selected
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
+
+                            <div className="flex justify-center rounded-xl border-2 border-primary object-center overflow-hidden w-min">
+                                <PixelWall
+                                    interactable={true}
+                                    selectedBricks={selectedOwnedBricksWithoutArt}
+                                    setSelectedBricks={setSelectedOwnedBricksWithoutArt}
+                                    purchasedBricksSet={new Set()}
+                                    availableBricks={ownedBricksWithoutArt}
+                                    highlightAvailableBricks={true}
+                                    zoomToAvailableBricks={true}
+                                />
                             </div>
+
+                            <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] border-l-4 border-primary">
+                                <div className="flex items-center gap-x-3">
+                                    <span className="text-white">
+                                        Selected Bricks:
+                                    </span>{" "}
+                                    <span className="text-primary text-xl font-bold">
+                                        {selectedOwnedBricksWithoutArt.length}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-x-3">
+                                    <span className="text-white">
+                                        Cost To Update Bricks:
+                                    </span>{" "}
+                                    <span className="text-primary text-xl font-bold">
+                                        Free!
+                                    </span>
+                                </div>
+
+                                <Link
+                                    className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
+                                    href={'/upload'}
+                                    style={{
+                                        pointerEvents: selectedOwnedBricksWithoutArt.length === 0 ? 'none' : 'auto',
+                                        opacity: selectedOwnedBricksWithoutArt.length === 0 ? '50%' : '100%',
+                                    }}
+                                >
+                                    Continue
+                                </Link>
+                            </div>
+
+                            <span className='text-white text-wrap max-w-[600px]'>
+                                Note: Bricks you own are highlighted in blue. Select the bricks you wish to update.
+                            </span>
                         </div>
-                        <div>
+                        <div className="mb-6 flex flex-col items-start justify-start gap-y-5">
                             <h2 className="text-xl font-bold mb-3">
                                 {`Already designed - update for a fee (${ownedBricksWithArt.length})`}
                             </h2>
-                            <div className="flex flex-wrap max-w-[900px] gap-x-6 gap-y-5">
-                                {ownedBricksWithArt.map((b) => (
-                                    <div
-                                        className='relative'
-                                        onClick={() => handleBrickWithArtClicked(b)}
-                                        key={b.name}
-                                    >
-                                        <div
-                                            className={`bg-[#2A2A2A] flex items-center justify-center rounded-md cursor-pointer hover:opacity-80 transition-opacity `}
-                                        >
-                                            <img
-                                                alt={`Brick (${b.name})`}
-                                                className="object-cover rounded-md"
-                                                height={170}
-                                                src={b.image}
-                                                style={{
-                                                    aspectRatio: "170/170",
-                                                    objectFit: "cover",
-                                                }}
-                                                width={170}
-                                            />
-                                        </div>
-                                        <div
-                                            className={`opacity-80 absolute z-10 bottom-0 justify-center items-start bg-primary w-full h-full rounded-md cursor-pointer ${selectedOwnedBricksWithArtSet.has(b.name) ? 'flex' : 'hidden'}`}
-                                        >
-                                            <span className='text-white mt-4 text-xl'>
-                                                Selected
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="flex justify-center rounded-xl border-2 border-primary object-center overflow-hidden w-min">
+                                <PixelWall
+                                    interactable={true}
+                                    selectedBricks={selectedOwnedBricksWithArt}
+                                    setSelectedBricks={setSelectedOwnedBricksWithArt}
+                                    purchasedBricksSet={new Set()}
+                                    availableBricks={ownedBricksWithArt}
+                                    highlightAvailableBricks={true}
+                                    zoomToAvailableBricks={true}
+                                />
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="ml-auto flex flex-col items-center mt-6 md:mt-0">
-                    <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] mx-auto relative border-l-4 border-primary">
-                        <div className="flex items-center gap-x-3">
-                            <span className="text-white">
-                                Selected Bricks:
-                            </span>{" "}
-                            <span className="text-primary text-xl font-bold">
-                                {bricksSelected}
+
+                            <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] border-l-4 border-primary">
+                                <div className="flex items-center gap-x-3">
+                                    <span className="text-white">
+                                        Selected Bricks:
+                                    </span>{" "}
+                                    <span className="text-primary text-xl font-bold">
+                                        {selectedOwnedBricksWithArt.length}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-x-3">
+                                    <span className="text-white">
+                                        Cost To Update Bricks:
+                                    </span>{" "}
+                                    <span className="text-primary text-xl font-bold">
+                                        {`${artCostInSol} SOL`}
+                                    </span>
+                                </div>
+
+                                <Link
+                                    className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
+                                    href={'/edit'}
+                                    style={{
+                                        pointerEvents: selectedOwnedBricksWithArt.length === 0 ? 'none' : 'auto',
+                                        opacity: selectedOwnedBricksWithArt.length === 0 ? '50%' : '100%',
+                                    }}
+                                >
+                                    Continue
+                                </Link>
+                            </div>
+
+
+                            <span className='text-white text-wrap mt-4 max-w-[600px]'>
+                                Note: Bricks you own are highlighted in blue. Select the bricks you wish to update.
                             </span>
                         </div>
-
-                        <div className="flex items-center gap-x-3">
-                            <span className="text-white">
-                                Cost To Update Bricks:
-                            </span>{" "}
-                            <span className="text-primary text-xl font-bold">
-                                {`${costInSol} SOL`}
-                            </span>
-                        </div>
-
-                        <Link
-                            className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
-                            href={selectedOwnedBricksWithArt.length > 0 ? '/edit' : '/upload'}
-                            style={{
-                                pointerEvents: bricksSelected === 0 ? 'none' : 'auto',
-                                opacity: bricksSelected === 0 ? '50%' : '100%',
-                            }}
-                        >
-                            Continue
-                        </Link>
                     </div>
                 </div>
             </div>

@@ -51,12 +51,12 @@ export const ownedBricksWithoutArtState = selector<OwnedBrick[]>({
     },
 });
 
-export const selectedOwnedBricksWithArtState = atom<OwnedBrick[]>({
+export const selectedOwnedBricksWithArtState = atom<SelectedBrick[]>({
     key: 'selectedOwnedBricksWithArt',
     default: [],
 });
 
-export const selectedOwnedBricksWithoutArtState = atom<OwnedBrick[]>({
+export const selectedOwnedBricksWithoutArtState = atom<SelectedBrick[]>({
     key: 'selectedOwnedBricksWithoutArt',
     default: [],
 });
@@ -78,4 +78,3 @@ export const selectedOwnedBricksWithoutArtSetState = selector<Set<string>>({
         return nameSet;
     },
 });
-

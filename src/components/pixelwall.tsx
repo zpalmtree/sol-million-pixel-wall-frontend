@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import {
     useRecoilState,
     useSetRecoilState,
-    useRecoilValue,
 } from 'recoil';
 import {
     Canvas,
@@ -20,16 +19,18 @@ import {
 
 import { Coordinate } from '@/types/coordinate';
 import { Brick } from '@/types/brick';
+import { SelectedBrick } from '@/types/selected-brick';
 import {
     getBrickFromPointerPosition,
     groupBricks,
     createRectanglesFromCluster,
     getWallInfo,
+    zoomToCoordinate,
+    calculateBrickCenter,
+    calculateZoomLevel,
 } from '@/lib/wall-utils';
 import {
-    selectedBricksState,
     startingBricksState,
-    purchasedBricksSetState,
 } from '@/state/bricks';
 import {
     startingPixelWallImageState,
@@ -57,6 +58,20 @@ export interface PixelWallProps {
 
     /* Whether we should draw the 'block' lines. Defaults to true */
     displayGridLines?: boolean;
+
+    selectedBricks: SelectedBrick[];
+
+    setSelectedBricks: (bricks: SelectedBrick[]) => void;
+
+    purchasedBricksSet: Set<string>;
+
+    /* Bricks that can be selected */
+    availableBricks?: Brick[];
+
+    /* Color bricks that can be selected */
+    highlightAvailableBricks?: boolean;
+
+    zoomToAvailableBricks?: boolean;
 }
 
 
@@ -66,6 +81,12 @@ export function PixelWall(props: PixelWallProps) {
         height,
         interactable = false,
         displayGridLines = true,
+        selectedBricks,
+        setSelectedBricks,
+        purchasedBricksSet,
+        availableBricks,
+        highlightAvailableBricks = false,
+        zoomToAvailableBricks = false,
     } = props;
 
     const canvasWidth = React.useMemo(() => width || CANVAS_WIDTH, [ width ]);
@@ -82,11 +103,19 @@ export function PixelWall(props: PixelWallProps) {
     const [ backgroundImage, setBackgroundImage ] = React.useState<Image | undefined>(undefined);
 
     const setStartingBricks = useSetRecoilState(startingBricksState);
-    const [ selectedBricks, setSelectedBricks ] = useRecoilState(selectedBricksState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
-    const purchasedBricksSet = useRecoilValue(purchasedBricksSetState);
     const setPricePerBrick = useSetRecoilState(pricePerBrickState);
     const setPricePerBrickEdit = useSetRecoilState(pricePerBrickEditState);
+
+    const availableBricksSet = React.useMemo(() => {
+        if (!availableBricks) {
+            return new Set();
+        }
+
+        return new Set(availableBricks.map((a) => a.name));
+    }, [
+        availableBricks,
+    ]);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         setLastPointerPosition(e.pointer);
@@ -141,15 +170,25 @@ export function PixelWall(props: PixelWallProps) {
             }
         }
 
+        // Filter out purchased bricks and check if any bricks remain
+        const filteredBricks = rangeBricks.filter(b => !purchasedBricksSet.has(b.name));
+        const finalBricks = availableBricks ? filteredBricks.filter(b => availableBricksSet.has(b.name)) : filteredBricks;
 
-        for (const b of rangeBricks) {
-            if (purchasedBricksSet.has(b.name)) {
-                toast.warn(`One or more bricks in the range you selected have already been purchased.`);
+        if (!availableBricks && filteredBricks.length !== rangeBricks.length) {
+            toast.warn(`One or more bricks in the range you selected have already been purchased, and thus have not been selected.`);
+        }
+
+        if (finalBricks.length === 0) {
+            if (availableBricks) {
+                toast.warn(`None of these bricks are valid for your current operation.`);
+                return;
+            } else {
+                toast.warn(`All of these bricks have been purchased already.`);
                 return;
             }
         }
 
-        // Add bricks that are in the selected range
+        // Add bricks that are in the selected range and not in the finalBricks set
         for (const b of selectedBricks) {
             if (
                 b.x >= minX &&
@@ -163,8 +202,8 @@ export function PixelWall(props: PixelWallProps) {
             newSelectedBricks.push(b);
         }
 
-        // Add all the new bricks in the range
-        for (const b of rangeBricks) {
+        // Add all the new bricks in the range that are available
+        for (const b of finalBricks) {
             newSelectedBricks.push(b);
         }
 
@@ -173,6 +212,7 @@ export function PixelWall(props: PixelWallProps) {
         selectedBricks,
         setSelectedBricks,
         purchasedBricksSet,
+        availableBricksSet,
     ]);
 
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
@@ -203,6 +243,12 @@ export function PixelWall(props: PixelWallProps) {
             if (purchasedBricksSet.has(startBrick.name)) {
                 console.log('Brick already purchased, skipping');
                 toast.warn('This brick has already been purchased.');
+                return;
+            }
+
+            if (availableBricks && !availableBricksSet.has(startBrick.name)) {
+                console.log('Brick not owned, skipping');
+                toast.warn('This brick is not valid for your current operation.');
                 return;
             }
 
@@ -249,11 +295,11 @@ export function PixelWall(props: PixelWallProps) {
     ]);
 
     const loadInitialInfo = React.useCallback(async () => {
-        console.log('Loading initial info');
-
         if (startingPixelWallImage) {
             return;
         }
+
+        console.log('Loading initial info');
 
         const {
             image,
@@ -300,6 +346,36 @@ export function PixelWall(props: PixelWallProps) {
         const newItemsOnCanvas: any[] = [];
 
         if (interactable) {
+            if (highlightAvailableBricks && availableBricks) {
+                const visitedBricks = new Set<string>();
+
+                // Detect and merge overlapping bricks
+                const brickClusters = groupBricks(availableBricks, visitedBricks);
+
+                // Create rectangles for each cluster of bricks
+                for (const cluster of brickClusters) {
+                    const rectangles = createRectanglesFromCluster(cluster);
+
+                    for (const { minX, minY, maxX, maxY } of rectangles) {
+                        const rectangle = new Rect({
+                            width: (maxX - minX + 1) * brickWidth,
+                            height: (maxY - minY + 1) * brickHeight,
+                            fill: '#1E90FF',
+                            opacity: 0.3,
+                            selectable: false,
+                            evented: false,
+                            left: minX * brickWidth,
+                            top: minY * brickHeight,
+                            strokeWidth: 0,
+                            hasBorders: false,
+                        });
+
+                        newItemsOnCanvas.push(rectangle);
+                        canvas.add(rectangle);
+                    }
+                }
+            }
+
             const visitedBricks = new Set<string>();
 
             // Detect and merge overlapping bricks
@@ -314,7 +390,7 @@ export function PixelWall(props: PixelWallProps) {
                         width: (maxX - minX + 1) * brickWidth,
                         height: (maxY - minY + 1) * brickHeight,
                         fill: '#C19A6B',
-                        opacity: 0.3,
+                        opacity: highlightAvailableBricks ? 0.6 : 0.3,
                         selectable: false,
                         evented: false,
                         left: minX * brickWidth,
@@ -353,6 +429,8 @@ export function PixelWall(props: PixelWallProps) {
         interactable,
         itemsOnCanvas,
         backgroundImage,
+        availableBricks,
+        highlightAvailableBricks,
     ]);
 
     useEffect(() => {
@@ -361,9 +439,47 @@ export function PixelWall(props: PixelWallProps) {
     }, [
         canvas,
         selectedBricks,
+        availableBricks,
         brickHeight,
         brickWidth,
         startingPixelWallImage,
+    ]);
+
+    useEffect(() => {
+        if (!canvas || !zoomToAvailableBricks || !availableBricks) {
+            return;
+        }
+
+        const zoom = calculateZoomLevel(
+            availableBricks,
+            canvasWidth,
+            canvasHeight,
+        );
+
+        const center = calculateBrickCenter(
+            availableBricks,
+            brickWidth,
+            brickHeight,
+        );
+
+        if (zoom !== 1) {
+            zoomToCoordinate(
+                canvas as Canvas,
+                center,
+                zoom,
+            );
+        } else {
+            canvas.setZoom(1);
+            canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+        }
+    }, [
+        canvas,
+        availableBricks,
+        brickHeight,
+        brickWidth,
+        canvasHeight,
+        canvasWidth,
+        zoomToAvailableBricks,
     ]);
 
     useEffect(() => {

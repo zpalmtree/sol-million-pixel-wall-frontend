@@ -5,6 +5,7 @@ import * as React from 'react';
 import {
     useRecoilValue,
     useSetRecoilState,
+    useRecoilState,
 } from 'recoil';
 import { WalletMultiButton } from '@/components/wallet-button';
 import {
@@ -14,12 +15,16 @@ import {
 
 import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
-import { selectedBricksState } from '@/state/bricks';
+import {
+    selectedBricksState,
+    purchasedBricksSetState,
+} from '@/state/bricks';
 import { formatSOL } from '@/lib/utils';
 import { pricePerBrickState } from '@/state/purchase';
 
 export default function Component() {
-    const selectedBricks = useRecoilValue(selectedBricksState);
+    const [selectedBricks, setSelectedBricks] = useRecoilState(selectedBricksState);
+    const purchasedBricksSet = useRecoilValue(purchasedBricksSetState);
     const pricePerBrick = useRecoilValue(pricePerBrickState);
     const setCurrentTab = useSetRecoilState(currentTabState);
     const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
@@ -91,6 +96,9 @@ export default function Component() {
                                 <div className="flex justify-center border-2 border-primary">
                                     <PixelWall
                                         interactable={true}
+                                        selectedBricks={selectedBricks}
+                                        setSelectedBricks={setSelectedBricks}
+                                        purchasedBricksSet={purchasedBricksSet}
                                     />
                                 </div>
 
