@@ -36,29 +36,13 @@ export function OwnedBricks() {
     const [selectedOwnedBricksWithoutArt, setSelectedOwnedBricksWithoutArt] = useRecoilState(selectedOwnedBricksWithoutArtState);
     const pricePerBrickEdit = useRecoilValue(pricePerBrickEditState);
 
-    const bricksSelected = React.useMemo(() => {
-        return selectedOwnedBricksWithArt.length + selectedOwnedBricksWithoutArt.length;
-    }, [
-        selectedOwnedBricksWithArt,
-        selectedOwnedBricksWithoutArt,
-    ]);
-
-    const noArtCostInSol = React.useMemo(() => {
-        const lamports = selectedOwnedBricksWithoutArt.length * pricePerBrickEdit;
-        return formatSOL(lamports, 1);
-    }, [
-        selectedOwnedBricksWithArt,
-        pricePerBrickEdit,
-    ]);
-
     const artCostInSol = React.useMemo(() => {
         const lamports = selectedOwnedBricksWithArt.length * pricePerBrickEdit;
         return formatSOL(lamports, 1);
     }, [
-        selectedOwnedBricksWithArt,
+        selectedOwnedBricksWithArt.length,
         pricePerBrickEdit,
     ]);
-
 
     const fetchOwnedBricks = React.useCallback(async () => {
         if (!publicKey) {

@@ -213,6 +213,7 @@ export function PixelWall(props: PixelWallProps) {
         setSelectedBricks,
         purchasedBricksSet,
         availableBricksSet,
+        availableBricks,
     ]);
 
     const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
@@ -262,6 +263,8 @@ export function PixelWall(props: PixelWallProps) {
         selectBrickRange,
         canvas,
         purchasedBricksSet,
+        availableBricksSet,
+        availableBricks,
     ]);
 
     const handleMouseWheel = React.useCallback((opt: any) => {
