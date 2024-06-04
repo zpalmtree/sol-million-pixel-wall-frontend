@@ -123,7 +123,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
         setCurrentTab,
     ]);
 
-    const checkBalance = React.useCallback(async () => {
+    const checkBalance = React.useCallback(async (brickCount: number) => {
         if (!publicKey) {
             return false;
         }
@@ -131,10 +131,9 @@ export function PurchaseTab(props: PurchaseTabProps) {
         const connection = new Connection(RPC);
         const balance = await connection.getBalance(publicKey);
 
-        return balance >= selectedBricks.length * lamportsPerAction;
+        return balance >= (brickCount * lamportsPerAction);
     }, [
         publicKey,
-        selectedBricks.length,
         lamportsPerAction,
     ]);
 
@@ -149,14 +148,6 @@ export function PurchaseTab(props: PurchaseTabProps) {
         setStatusText('Forming transactions, please wait...');
 
         try {
-            const hasEnoughBalance = await checkBalance();
-
-            if (!hasEnoughBalance) {
-                setError('Insufficient SOL to buy these bricks!');
-                setLoading(false);
-                return;
-            }
-
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -176,79 +167,88 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 return;
             }
 
-            const connection = new Connection(RPC);
-            const transactionObjects = transactions.map((txBase64: string) => Transaction.from(Buffer.from(txBase64, 'base64')));
-
-            setStatusText(`Sign the transaction(s) in your wallet to proceed with your ${action}.`);
-
-            const signedTransactions: Transaction[] = await signAllTransactions(transactionObjects);
-
-            setStatusText('Sending transaction(s), please wait...');
-
-            if (signedTransactions.length !== transactionObjects.length) {
-                toast.error(`Expected ${transactionObjects.length} from adapter, got ${signedTransactions.length} - you may not have enough SOL`);
-                return;
-            }
-
-            const inProgressTransactions = [];
-            let minTransactionSlot;
-
             const timeouts: Brick[] = [];
             const errors: Brick[] = [];
             const errorMessages: string[] = [];
-
             const successfullyPurchased = [];
 
-            for (const signedTransaction of signedTransactions) {
-                const sender = new TransactionSender(
-                    connection,
-                    signedTransaction,
-                    Math.floor(120 / 20),
-                    4_000,
-                    true,
-                );
+            if (transactions.length > 0) {
+                const hasEnoughBalance = await checkBalance(transactions.length);
 
-                inProgressTransactions.push(sender.sendAndConfirmTransaction());
-            }
-
-            let i = 0;
-            const itemsSplitByTransaction = retryBricks;
-
-            for (const transaction of inProgressTransactions) {
-                const brick = itemsSplitByTransaction[i++];
-
-                console.log(`Waiting for transaction to complete...`);
-
-                const {
-                    error,
-                    timeout,
-                    slot,
-                    signature,
-                } = await transaction;
-
-                if (!minTransactionSlot || slot < minTransactionSlot) {
-                    minTransactionSlot = slot;
+                if (!hasEnoughBalance) {
+                    setError('Insufficient SOL to buy these bricks!');
+                    setLoading(false);
+                    return;
                 }
 
-                if (timeout) {
-                    timeouts.push(brick);
-                } else if (error) {
-                    errors.push(brick);
-                    errorMessages.push(formatError(error));
-                } else {
-                    successfullyPurchased.push({
-                        brick,
+                const connection = new Connection(RPC);
+                const transactionObjects = transactions.map((txBase64: string) => Transaction.from(Buffer.from(txBase64, 'base64')));
+
+                setStatusText(`Sign the transaction(s) in your wallet to proceed with your ${action}.`);
+
+                const signedTransactions: Transaction[] = await signAllTransactions(transactionObjects);
+
+                setStatusText('Sending transaction(s), please wait...');
+
+                if (signedTransactions.length !== transactionObjects.length) {
+                    toast.error(`Expected ${transactionObjects.length} from adapter, got ${signedTransactions.length} - you may not have enough SOL`);
+                    return;
+                }
+
+                const inProgressTransactions = [];
+                let minTransactionSlot;
+
+                for (const signedTransaction of signedTransactions) {
+                    const sender = new TransactionSender(
+                        connection,
+                        signedTransaction,
+                        Math.floor(120 / 20),
+                        4_000,
+                        true,
+                    );
+
+                    inProgressTransactions.push(sender.sendAndConfirmTransaction());
+                }
+
+                let i = 0;
+                const itemsSplitByTransaction = retryBricks;
+
+                for (const transaction of inProgressTransactions) {
+                    const brick = itemsSplitByTransaction[i++];
+
+                    console.log(`Waiting for transaction to complete...`);
+
+                    const {
+                        error,
+                        timeout,
+                        slot,
                         signature,
-                    });
+                    } = await transaction;
+
+                    if (!minTransactionSlot || slot < minTransactionSlot) {
+                        minTransactionSlot = slot;
+                    }
+
+                    if (timeout) {
+                        timeouts.push(brick);
+                    } else if (error) {
+                        errors.push(brick);
+                        errorMessages.push(formatError(error));
+                    } else {
+                        successfullyPurchased.push({
+                            brick,
+                            signature,
+                        });
+                    }
                 }
-            }
 
-            if (timeouts.length > 0) {
-                setError(`Timeout occurred for ${timeouts.length} transaction(s).`);
-            }
+                if (timeouts.length > 0) {
+                    setError(`Timeout occurred for ${timeouts.length} transaction(s).`);
+                }
 
-            if (errors.length > 0) {
-                setError(`Error occurred for ${errors.length} transaction(s): ${errorMessages.join(', ')}`);
+                if (errors.length > 0) {
+                    setError(`Error occurred for ${errors.length} transaction(s): ${errorMessages.join(', ')}`);
+                }
             }
 
             if (errors.length === 0 && timeouts.length === 0) {
