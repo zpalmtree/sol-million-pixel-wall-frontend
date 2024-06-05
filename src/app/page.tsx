@@ -104,7 +104,6 @@ export default function Splash() {
                                     height={350}
                                     selectedBricks={[]}
                                     setSelectedBricks={() => {}}
-                                    purchasedBricksSet={new Set()}
                                 />
                             </div>
                             

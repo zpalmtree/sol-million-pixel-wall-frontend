@@ -22,11 +22,19 @@ export const startingBricksState = atom<BrickInfo[]>({
     default: [],
 });
 
-export const purchasedBricksSetState = selector<Set<string>>({
+export const purchasedBricksState = selector<BrickInfo[]>({
     key: 'purchasedBricks',
     get: ({ get }) => {
         const startingBricks = get(startingBricksState);
-        return new Set(startingBricks.filter((b) => b.purchased).map((b) => b.name));
+        return startingBricks.filter((b) => b.purchased);
+    },
+});
+
+export const purchasedBricksSetState = selector<Set<string>>({
+    key: 'purchasedBricksSet',
+    get: ({ get }) => {
+        const purchasedBricks = get(purchasedBricksState);
+        return new Set(purchasedBricks.map((b) => b.name));
     },
 });
 

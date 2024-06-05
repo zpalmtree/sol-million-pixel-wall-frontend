@@ -17,14 +17,14 @@ import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
 import {
     selectedBricksState,
-    purchasedBricksSetState,
+    purchasedBricksState,
 } from '@/state/bricks';
 import { formatSOL } from '@/lib/utils';
 import { pricePerBrickState } from '@/state/purchase';
 
 export default function Component() {
     const [selectedBricks, setSelectedBricks] = useRecoilState(selectedBricksState);
-    const purchasedBricksSet = useRecoilValue(purchasedBricksSetState);
+    const purchasedBricks = useRecoilValue(purchasedBricksState);
     const pricePerBrick = useRecoilValue(pricePerBrickState);
     const setCurrentTab = useSetRecoilState(currentTabState);
     const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
@@ -98,7 +98,8 @@ export default function Component() {
                                         interactable={true}
                                         selectedBricks={selectedBricks}
                                         setSelectedBricks={setSelectedBricks}
-                                        purchasedBricksSet={purchasedBricksSet}
+                                        purchasedBricks={purchasedBricks}
+                                        highlightPurchasedBricks={true}
                                     />
                                 </div>
 

@@ -116,7 +116,6 @@ export function OwnedBricks() {
                                     interactable={true}
                                     selectedBricks={selectedOwnedBricksWithoutArt}
                                     setSelectedBricks={setSelectedOwnedBricksWithoutArt}
-                                    purchasedBricksSet={new Set()}
                                     availableBricks={ownedBricksWithoutArt}
                                     highlightAvailableBricks={true}
                                     zoomToAvailableBricks={true}
@@ -167,7 +166,6 @@ export function OwnedBricks() {
                                     interactable={true}
                                     selectedBricks={selectedOwnedBricksWithArt}
                                     setSelectedBricks={setSelectedOwnedBricksWithArt}
-                                    purchasedBricksSet={new Set()}
                                     availableBricks={ownedBricksWithArt}
                                     highlightAvailableBricks={true}
                                     zoomToAvailableBricks={true}

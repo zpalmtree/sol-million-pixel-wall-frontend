@@ -63,7 +63,8 @@ export interface PixelWallProps {
 
     setSelectedBricks: (bricks: SelectedBrick[]) => void;
 
-    purchasedBricksSet: Set<string>;
+    /* Bricks that have already been purchased */
+    purchasedBricks?: Brick[];
 
     /* Bricks that can be selected */
     availableBricks?: Brick[];
@@ -71,7 +72,11 @@ export interface PixelWallProps {
     /* Color bricks that can be selected */
     highlightAvailableBricks?: boolean;
 
+    /* Make the bricks selected the area of focus of the canvas */
     zoomToAvailableBricks?: boolean;
+
+    /* Color bricks that are already purchased */
+    highlightPurchasedBricks?: boolean;
 }
 
 
@@ -83,10 +88,11 @@ export function PixelWall(props: PixelWallProps) {
         displayGridLines = true,
         selectedBricks,
         setSelectedBricks,
-        purchasedBricksSet,
+        purchasedBricks,
         availableBricks,
         highlightAvailableBricks = false,
         zoomToAvailableBricks = false,
+        highlightPurchasedBricks = false,
     } = props;
 
     const canvasWidth = React.useMemo(() => width || CANVAS_WIDTH, [ width ]);
@@ -115,6 +121,16 @@ export function PixelWall(props: PixelWallProps) {
         return new Set(availableBricks.map((a) => a.name));
     }, [
         availableBricks,
+    ]);
+
+    const purchasedBricksSet = React.useMemo(() => {
+        if (!purchasedBricks) {
+            return new Set();
+        }
+
+        return new Set(purchasedBricks.map((a) => a.name));
+    }, [
+        purchasedBricks,
     ]);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
@@ -379,6 +395,36 @@ export function PixelWall(props: PixelWallProps) {
                 }
             }
 
+            if (highlightPurchasedBricks && purchasedBricks) {
+                const visitedBricks = new Set<string>();
+
+                // Detect and merge overlapping bricks
+                const brickClusters = groupBricks(purchasedBricks, visitedBricks);
+
+                // Create rectangles for each cluster of bricks
+                for (const cluster of brickClusters) {
+                    const rectangles = createRectanglesFromCluster(cluster);
+
+                    for (const { minX, minY, maxX, maxY } of rectangles) {
+                        const rectangle = new Rect({
+                            width: (maxX - minX + 1) * brickWidth,
+                            height: (maxY - minY + 1) * brickHeight,
+                            fill: 'red',
+                            opacity: 0.25,
+                            selectable: false,
+                            evented: false,
+                            left: minX * brickWidth,
+                            top: minY * brickHeight,
+                            strokeWidth: 0,
+                            hasBorders: false,
+                        });
+
+                        newItemsOnCanvas.push(rectangle);
+                        canvas.add(rectangle);
+                    }
+                }
+            }
+
             const visitedBricks = new Set<string>();
 
             // Detect and merge overlapping bricks
@@ -433,7 +479,9 @@ export function PixelWall(props: PixelWallProps) {
         itemsOnCanvas,
         backgroundImage,
         availableBricks,
+        purchasedBricks,
         highlightAvailableBricks,
+        highlightPurchasedBricks,
     ]);
 
     useEffect(() => {
