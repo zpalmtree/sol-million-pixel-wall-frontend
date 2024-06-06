@@ -107,6 +107,7 @@ export function PixelWall(props: PixelWallProps) {
     const [ lastPointerPosition, setLastPointerPosition ] = React.useState<Coordinate | undefined>();
     const [ itemsOnCanvas, setItemsOnCanvas ] = React.useState<any[]>([]);
     const [ backgroundImage, setBackgroundImage ] = React.useState<Image | undefined>(undefined);
+    const [ isPanning, setIsPanning ] = React.useState(false);
 
     const setStartingBricks = useSetRecoilState(startingBricksState);
     const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
@@ -134,7 +135,16 @@ export function PixelWall(props: PixelWallProps) {
     ]);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
-        setLastPointerPosition(e.pointer);
+        if (e.e.button === 2) {
+            setIsPanning(true);
+
+            setLastPointerPosition({
+                x: e.e.clientX,
+                y: e.e.clientY,
+            });
+        } else {
+            setLastPointerPosition(e.pointer);
+        }
     }, [
         setLastPointerPosition,
     ]);
@@ -237,6 +247,13 @@ export function PixelWall(props: PixelWallProps) {
             return;
         }
 
+        setIsPanning(false);
+
+        if (e.e.button === 2) {
+            setLastPointerPosition(undefined);
+            return;
+        }
+
         if (!lastPointerPosition) {
             console.log(`No last pointer position??`);
             return;
@@ -311,6 +328,28 @@ export function PixelWall(props: PixelWallProps) {
         opt.e.stopPropagation();
     }, [
         canvas,
+    ]);
+
+    const handleMouseMove = React.useCallback((e) => {
+        if (!canvas || !isPanning || !lastPointerPosition) {
+            return;
+        }
+
+        const vpt = canvas.viewportTransform;
+
+        vpt[4] += e.e.clientX - lastPointerPosition.x;
+        vpt[5] += e.e.clientY - lastPointerPosition.y;
+
+        canvas.setViewportTransform(vpt);
+
+        setLastPointerPosition({
+            x: e.e.clientX,
+            y: e.e.clientY,
+        });
+    }, [
+        canvas,
+        isPanning,
+        lastPointerPosition,
     ]);
 
     const loadInitialInfo = React.useCallback(async () => {
@@ -540,11 +579,13 @@ export function PixelWall(props: PixelWallProps) {
 
         canvas.on('mouse:down', handleMouseDown);
         canvas.on('mouse:up', handleMouseUp);
+        canvas.on('mouse:move', handleMouseMove);
         canvas.on('mouse:wheel', handleMouseWheel);
 
         return () => {
             canvas.off('mouse:down', handleMouseDown);
             canvas.off('mouse:up', handleMouseUp);
+            canvas.off('mouse:move', handleMouseMove);
             canvas.off('mouse:wheel', handleMouseWheel);
         }
     }, [
@@ -558,7 +599,10 @@ export function PixelWall(props: PixelWallProps) {
 
     useEffect(() => {
         const c = interactable
-            ? new Canvas(canvasRef.current!)
+            ? new Canvas(canvasRef.current!, {
+                fireRightClick: true,
+                stopContextMenu: true,
+            })
             : new StaticCanvas(canvasRef.current!);
 
         setCanvas(c);
