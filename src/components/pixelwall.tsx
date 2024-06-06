@@ -135,12 +135,12 @@ export function PixelWall(props: PixelWallProps) {
     ]);
 
     const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
-        if (e.e.button === 2) {
+        if ((e.e as any).button === 2) {
             setIsPanning(true);
 
             setLastPointerPosition({
-                x: e.e.clientX,
-                y: e.e.clientY,
+                x: (e.e as any).clientX,
+                y: (e.e as any).clientY,
             });
         } else {
             setLastPointerPosition(e.pointer);
@@ -249,7 +249,7 @@ export function PixelWall(props: PixelWallProps) {
 
         setIsPanning(false);
 
-        if (e.e.button === 2) {
+        if ((e.e as any).button === 2) {
             setLastPointerPosition(undefined);
             return;
         }
@@ -330,21 +330,21 @@ export function PixelWall(props: PixelWallProps) {
         canvas,
     ]);
 
-    const handleMouseMove = React.useCallback((e) => {
+    const handleMouseMove = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
         if (!canvas || !isPanning || !lastPointerPosition) {
             return;
         }
 
         const vpt = canvas.viewportTransform;
 
-        vpt[4] += e.e.clientX - lastPointerPosition.x;
-        vpt[5] += e.e.clientY - lastPointerPosition.y;
+        vpt[4] += (e.e as any).clientX - lastPointerPosition.x;
+        vpt[5] += (e.e as any).clientY - lastPointerPosition.y;
 
         canvas.setViewportTransform(vpt);
 
         setLastPointerPosition({
-            x: e.e.clientX,
-            y: e.e.clientY,
+            x: (e.e as any).clientX,
+            y: (e.e as any).clientY,
         });
     }, [
         canvas,
@@ -594,6 +594,7 @@ export function PixelWall(props: PixelWallProps) {
         handleMouseDown,
         handleMouseUp,
         handleMouseWheel,
+        handleMouseMove,
         interactable,
     ]);
 
