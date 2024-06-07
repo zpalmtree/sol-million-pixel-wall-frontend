@@ -30,9 +30,7 @@ export class TransactionSender {
     }
 
     public async sendAndConfirmTransaction() {
-        const simulation = await this.connection.simulateTransaction(
-            this.transaction,
-        );
+        const simulation = await this.connection.simulateTransaction(this.transaction);
 
         let simulationAttempts = 0;
 
@@ -66,14 +64,25 @@ export class TransactionSender {
         let signature;
         let resultPromise: any;
 
+        const checkInterval = 100; // Check `this.retry` every 100ms
+        const iterations = this.sleepDuration / checkInterval;
+
         while (this.retry && this.sendAttempts < this.maxAttempts) {
             signature = await this.attemptSendTransaction(serialized);
 
             if (!this.confirmInProgress && signature) {
                 resultPromise = this.waitForTransactionToConfirm(signature);
+                this.confirmInProgress = true;
             }
 
-            await sleep(this.sleepDuration);
+            // Wait for `this.sleepDuration`, checking `this.retry` every `checkInterval`
+            for (let i = 0; i < iterations; i++) {
+                if (!this.retry) {
+                    break;
+                }
+
+                await sleep(checkInterval);
+            }
         }
 
         if (this.confirmed && signature) {
@@ -135,6 +144,8 @@ export class TransactionSender {
 
             return signature;
         } catch (err) {
+            this.sendAttempts++;
+
             console.log(`Error executing transaction: ${err}`);
         }
     }

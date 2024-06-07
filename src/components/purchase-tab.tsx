@@ -181,7 +181,11 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     return;
                 }
 
-                const connection = new Connection(RPC);
+                const connection = new Connection(RPC, {
+                    confirmTransactionInitialTimeout: 90 * 1000,
+                    commitment: 'confirmed',
+                });
+
                 const transactionObjects = transactions.map((txBase64: string) => Transaction.from(Buffer.from(txBase64, 'base64')));
 
                 setStatusText(`Sign the transaction(s) in your wallet to proceed with your ${action}.`);
@@ -202,8 +206,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     const sender = new TransactionSender(
                         connection,
                         signedTransaction,
-                        Math.floor(120 / 20),
-                        4_000,
+                        9,
+                        10_000,
                         true,
                     );
 
