@@ -100,16 +100,22 @@ export function UploadTab(props: UploadTabProps) {
                 }),
             });
 
-            const { success, error } = await response.json();
+            const raw = await response.text();
 
-            if (success) {
-                setComplete(true);
-            } else {
-                if (error) {
-                    setError(`Upload failed: ${error} Please try again.`);
+            try {
+                const { success, error } = await JSON.parse(raw);
+
+                if (success) {
+                    setComplete(true);
                 } else {
-                    setError('Upload failed. Please try again.');
+                    if (error) {
+                        setError(`Upload failed: ${error} Please try again.`);
+                    } else {
+                        setError('Upload failed. Please try again.');
+                    }
                 }
+            } catch (err) {
+                setError(`Upload failed: ${raw}. Please try again.`);
             }
         } catch (err: any) {
             setError(`Upload failed: ${err.message}. Please try again.`);
