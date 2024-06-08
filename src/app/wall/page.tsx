@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from 'next/image/';
+import Image from 'next/image';
 import * as React from 'react';
 import {
     useSetRecoilState,
@@ -88,6 +88,7 @@ export default function Component() {
 
                 <div className='flex-col flex gap-y-4 gap-x-4'>
                     <Image
+                        alt={'trump pepe'}
                         src={'/trump.jpg'}
                         className={'rounded border-2 border-primary'}
                         width={600}
