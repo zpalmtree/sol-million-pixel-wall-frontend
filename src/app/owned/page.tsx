@@ -32,7 +32,7 @@ export default function Component() {
                         </Link>
                         <Link
                             className="text-primary hover:text-white"
-                            href="/wall"
+                            href="/purchase"
                         >
                             Buy Bricks
                         </Link>

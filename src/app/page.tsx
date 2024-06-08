@@ -49,7 +49,7 @@ export default function Splash() {
                         </Link>
                         <Link
                             className="text-primary hover:text-white"
-                            href="/wall"
+                            href="/purchase"
                         >
                             Buy Bricks
                         </Link>
@@ -122,7 +122,7 @@ export default function Splash() {
                                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                                     <Link
                                         className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:bg-primary dark:text-[#1A1A1A] dark:hover:bg-primary/90 dark:focus-visible:ring-primary"
-                                        href="#"
+                                        href="/purchase"
                                     >
                                         Mint an NFT
                                     </Link>

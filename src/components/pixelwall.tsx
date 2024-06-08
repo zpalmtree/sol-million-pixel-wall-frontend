@@ -77,6 +77,10 @@ export interface PixelWallProps {
 
     /* Color bricks that are already purchased */
     highlightPurchasedBricks?: boolean;
+
+    /* Interactable must be set to true for this parameter to do anything. Defaults
+     * to true */
+    permitBrickSelection?: boolean;
 }
 
 
@@ -93,6 +97,7 @@ export function PixelWall(props: PixelWallProps) {
         highlightAvailableBricks = false,
         zoomToAvailableBricks = false,
         highlightPurchasedBricks = false,
+        permitBrickSelection = true,
     } = props;
 
     const canvasWidth = React.useMemo(() => width || CANVAS_WIDTH, [ width ]);
@@ -259,6 +264,10 @@ export function PixelWall(props: PixelWallProps) {
             return;
         }
 
+        if (!permitBrickSelection) {
+            return;
+        }
+
         const startBrick = getBrickFromPointerPosition(
             lastPointerPosition,
             canvas,
@@ -298,6 +307,7 @@ export function PixelWall(props: PixelWallProps) {
         purchasedBricksSet,
         availableBricksSet,
         availableBricks,
+        permitBrickSelection,
     ]);
 
     const handleMouseWheel = React.useCallback((opt: any) => {
@@ -382,7 +392,6 @@ export function PixelWall(props: PixelWallProps) {
         if (pricePerBrickEdit !== undefined) {
             setPricePerBrickEdit(pricePerBrickEdit);
         }
-
     }, [
         startingPixelWallImage,
         setStartingPixelWallImage,
