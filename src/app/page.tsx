@@ -4,9 +4,9 @@ import Link from "next/link";
 import * as React from 'react';
 import { useSetRecoilState } from 'recoil';
 
+import { Header } from '@/components/header';
 import { Button } from "@/components/ui/button";
 import { PixelWall } from "@/components/pixelwall";
-import { WalletMultiButton } from '@/components/wallet-button';
 import {
     currentTabState,
     uploadTabEnabledState,
@@ -26,46 +26,7 @@ export default function Splash() {
 
     return (
         <>
-            <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
-                <div className="flex items-center gap-8">
-                    <Link
-                        className="text-2xl font-bold tracking-tighter text-primary"
-                        href="/"
-                    >
-                        The Million Pixel Wall
-                    </Link>
-                    <nav className="hidden md:flex items-center gap-8">
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/wall"
-                        >
-                            Explore the Wall
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/purchase"
-                        >
-                            Buy Bricks
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/owned"
-                        >
-                            My Bricks
-                        </Link>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <WalletMultiButton
-                    />
-                </div>
-            </header>
+            <Header/>
 
             <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-[#1A1A1A] text-white">
                 <main className="flex flex-col items-center justify-center flex-1 w-full mt-12">

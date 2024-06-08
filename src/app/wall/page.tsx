@@ -7,7 +7,6 @@ import {
     useSetRecoilState,
     useRecoilState,
 } from 'recoil';
-import { WalletMultiButton } from '@/components/wallet-button';
 import {
     currentTabState,
     uploadTabEnabledState,
@@ -17,6 +16,7 @@ import { PixelWall } from "@/components/pixelwall";
 import {
     selectedBricksState,
 } from '@/state/bricks';
+import { Header } from '@/components/header';
 
 export default function Component() {
     const [selectedBricks, setSelectedBricks] = useRecoilState(selectedBricksState);
@@ -33,46 +33,7 @@ export default function Component() {
 
     return (
         <>
-            <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
-                <div className="flex items-center gap-8">
-                    <Link
-                        className="text-2xl font-bold tracking-tighter text-primary"
-                        href="/"
-                    >
-                        The Million Pixel Wall
-                    </Link>
-                    <nav className="hidden md:flex items-center gap-8">
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/wall"
-                        >
-                            Explore the Wall
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/purchase"
-                        >
-                            Buy Bricks
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/owned"
-                        >
-                            My Bricks
-                        </Link>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <WalletMultiButton
-                    />
-                </div>
-            </header>
+            <Header/>
 
             <main className="flex items-start justify-center min-h-[calc(100vh_-_theme(spacing.16))] bg-[#1a1a1a] py-8 px-8 gap-x-4 gap-y-4 flex-row flex-wrap">
                 <div className="flex justify-center border-2 border-primary">

@@ -7,12 +7,12 @@ import {
     useSetRecoilState,
     useRecoilState,
 } from 'recoil';
-import { WalletMultiButton } from '@/components/wallet-button';
 import {
     currentTabState,
     uploadTabEnabledState,
 } from '@/state/tabs';
 
+import { Header } from '@/components/header';
 import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
 import {
@@ -47,46 +47,7 @@ export default function Component() {
 
     return (
         <>
-            <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
-                <div className="flex items-center gap-8">
-                    <Link
-                        className="text-2xl font-bold tracking-tighter text-primary"
-                        href="/"
-                    >
-                        The Million Pixel Wall
-                    </Link>
-                    <nav className="hidden md:flex items-center gap-8">
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/wall"
-                        >
-                            Explore the Wall
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/purchase"
-                        >
-                            Buy Bricks
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/owned"
-                        >
-                            My Bricks
-                        </Link>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <WalletMultiButton
-                    />
-                </div>
-            </header>
+            <Header/>
 
             <main className="flex flex-col md:flex-row min-h-[calc(100vh_-_theme(spacing.16))] bg-[#1a1a1a]">
                 <div className="flex-1 flex flex-col items-center justify-center gap-6 px-3 sm:px-4 md:px-0">

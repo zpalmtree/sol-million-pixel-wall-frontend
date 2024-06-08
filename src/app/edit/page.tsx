@@ -17,7 +17,6 @@ import { UploadPreview } from '@/components/upload-preview';
 import { ColorPicker } from '@/components/color-picker';
 import { PurchaseTab } from '@/components/purchase-tab';
 import { UploadModifyTab } from '@/components/upload-modify-tab';
-import { WalletMultiButton } from '@/components/wallet-button';
 import { uploadPreviewCanvasState } from '@/state/upload-preview';
 import { selectedPixelsState } from '@/state/pixels';
 import { addedImagesState } from '@/state/images';
@@ -41,6 +40,7 @@ import {
     currentTabState,
 } from '@/state/tabs';
 import { pricePerBrickEditState } from '@/state/purchase';
+import { Header } from '@/components/header';
 
 export default function Checkout() {
     const canvas = useRecoilValue(uploadPreviewCanvasState);
@@ -221,46 +221,7 @@ export default function Checkout() {
 
     return (
         <>
-            <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
-                <div className="flex items-center gap-8">
-                    <Link
-                        className="text-2xl font-bold tracking-tighter text-primary"
-                        href="/"
-                    >
-                        The Million Pixel Wall
-                    </Link>
-                    <nav className="hidden md:flex items-center gap-8">
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/wall"
-                        >
-                            Explore the Wall
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/purchase"
-                        >
-                            Buy Bricks
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/owned"
-                        >
-                            My Bricks
-                        </Link>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <WalletMultiButton
-                    />
-                </div>
-            </header>
+            <Header/>
 
             <div className="flex flex-col items-center min-h-[100dvh] bg-[#1A1A1A] text-white">
                 <main className="flex flex-col items-center mt-4 w-full px-8">

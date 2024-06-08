@@ -2,53 +2,14 @@
 
 import Link from "next/link";
 import * as React from 'react';
-import { WalletMultiButton } from '@/components/wallet-button';
 
 import { OwnedBricks } from '@/components/owned-bricks';
+import { Header } from '@/components/header';
 
 export default function Component() {
     return (
         <>
-            <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
-                <div className="flex items-center gap-8">
-                    <Link
-                        className="text-2xl font-bold tracking-tighter text-primary"
-                        href="/"
-                    >
-                        The Million Pixel Wall
-                    </Link>
-                    <nav className="hidden md:flex items-center gap-8">
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/wall"
-                        >
-                            Explore the Wall
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/purchase"
-                        >
-                            Buy Bricks
-                        </Link>
-                        <Link
-                            className="text-primary hover:text-white"
-                            href="/owned"
-                        >
-                            My Bricks
-                        </Link>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <WalletMultiButton
-                    />
-                </div>
-            </header>
+            <Header/>
 
             <main className="flex flex-col md:flex-row min-h-[calc(100vh_-_theme(spacing.16))] bg-[#1a1a1a]">
                 <OwnedBricks/>
