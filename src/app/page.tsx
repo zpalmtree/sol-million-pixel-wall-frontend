@@ -29,32 +29,32 @@ export default function Splash() {
             <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
                 <div className="flex items-center gap-8">
                     <Link
-                        className="text-2xl font-bold tracking-tighter gradient-text"
+                        className="text-2xl font-bold tracking-tighter text-primary"
                         href="/"
                     >
                         The Million Pixel Wall
                     </Link>
                     <nav className="hidden md:flex items-center gap-8">
                         <Link
-                            className="gradient-text hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/"
                         >
                             Home
                         </Link>
                         <Link
-                            className="gradient-text hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/wall"
                         >
                             Explore the Wall
                         </Link>
                         <Link
-                            className="gradient-text hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/purchase"
                         >
                             Buy Bricks
                         </Link>
                         <Link
-                            className="gradient-text hover:text-white"
+                            className="text-primary hover:text-white"
                             href="/owned"
                         >
                             My Bricks
@@ -71,7 +71,7 @@ export default function Splash() {
                 <main className="flex flex-col items-center justify-center flex-1 w-full mt-12">
                     <div className="flex flex-col items-center space-y-4 text-center">
                         <div className="space-y-2">
-                            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none gradient-text">
+                            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-primary">
                                 {`We're Building The Greatest WALL`}
                             </h1>
                             <div className='flex items-center justify-center w-full'>
@@ -88,7 +88,7 @@ export default function Splash() {
                                 Explore the Wall
                             </Link>
                             <Link
-                                className="inline-flex h-9 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:gradient-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:gradient-text dark:focus-visible:ring-primary"
+                                className="inline-flex h-9 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:text-primary dark:focus-visible:ring-primary"
                                 href=""
                             >
                                 Learn More
@@ -112,7 +112,7 @@ export default function Splash() {
                                     <div className="inline-block rounded-lg bg-primary px-3 py-1 text-sm text-[#1A1A1A]">
                                         NFT Powered
                                     </div>
-                                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl gradient-text">
+                                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary">
                                         Unleash the Memes
                                     </h2>
                                     <p className="max-w-[600px] text-[#EEEEEE] md:text-lg/relaxed dark:text-[#EEEEEE]">
@@ -127,7 +127,7 @@ export default function Splash() {
                                         Mint an NFT
                                     </Link>
                                     <Link
-                                        className="inline-flex h-10 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-8 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:gradient-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:gradient-text dark:focus-visible:ring-primary"
+                                        className="inline-flex h-10 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-8 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:text-primary dark:focus-visible:ring-primary"
                                         href="#"
                                     >
                                         Learn More
@@ -138,7 +138,7 @@ export default function Splash() {
                     </div>
                     <div className="flex flex-col items-center justify-center w-full px-4 md:px-6 py-12 md:py-24 lg:py-32 bg-[#1A1A1A] border-t border-primary">
                         <div className="flex flex-col items-center justify-center space-y-3 w-full">
-                            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight gradient-text">
+                            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight text-primary">
                                 Join the $WALL community!
                             </h2>
 
@@ -164,13 +164,13 @@ export default function Splash() {
                     </p>
                     <nav className="flex gap-4 sm:gap-6">
                         <Link
-                            className="text-xs hover:underline underline-offset-4 gradient-text"
+                            className="text-xs hover:underline underline-offset-4 text-primary"
                             href="https://twitter.com/WallOnSolana"
                         >
                             Twitter
                         </Link>
                         <Link
-                            className="text-xs hover:underline underline-offset-4 gradient-text"
+                            className="text-xs hover:underline underline-offset-4 text-primary"
                             href="http://wallonsolana.com/"
                         >
                             Website
