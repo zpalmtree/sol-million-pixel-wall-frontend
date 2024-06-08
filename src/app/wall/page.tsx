@@ -3,7 +3,6 @@
 import Link from "next/link";
 import * as React from 'react';
 import {
-    useRecoilValue,
     useSetRecoilState,
     useRecoilState,
 } from 'recoil';
@@ -13,19 +12,13 @@ import {
     uploadTabEnabledState,
 } from '@/state/tabs';
 
-import { Separator } from "@/components/ui/separator";
 import { PixelWall } from "@/components/pixelwall";
 import {
     selectedBricksState,
-    purchasedBricksState,
 } from '@/state/bricks';
-import { formatSOL } from '@/lib/utils';
-import { pricePerBrickState } from '@/state/purchase';
 
 export default function Component() {
     const [selectedBricks, setSelectedBricks] = useRecoilState(selectedBricksState);
-    const purchasedBricks = useRecoilValue(purchasedBricksState);
-    const pricePerBrick = useRecoilValue(pricePerBrickState);
     const setCurrentTab = useSetRecoilState(currentTabState);
     const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
 
@@ -98,7 +91,7 @@ export default function Component() {
                     </span>
 
                     <span className='text-white'>
-                        Want to buy a brick? Head to the 'Buy Bricks' page.
+                        {`Want to buy a brick? Head to the 'Buy Bricks' page.`}
                     </span>
                 </div>
             </main>
