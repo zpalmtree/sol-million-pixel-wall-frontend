@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from 'next/image/';
 import * as React from 'react';
 import {
     useSetRecoilState,
@@ -86,6 +87,17 @@ export default function Component() {
                 </div>
 
                 <div className='flex-col flex gap-y-4 gap-x-4'>
+                    <Image
+                        src={'/trump.jpg'}
+                        className={'rounded border-2 border-primary'}
+                        width={600}
+                        height={592}
+                    />
+
+                    <span className='text-xl text-primary font-bold tracking-tighter'>
+                        We're building the f^*king WALL!
+                    </span>
+
                     <span className='text-white'>
                         Note: You can scroll with mouse wheel, and pan by holding down right mouse.
                     </span>
