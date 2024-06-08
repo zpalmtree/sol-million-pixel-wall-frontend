@@ -96,7 +96,7 @@ export default function Component() {
                     />
 
                     <span className='text-xl text-primary font-bold tracking-tighter'>
-                        We're building the f^*king WALL!
+                        {`We're building the f^*king WALL!`}
                     </span>
 
                     <span className='text-white'>
