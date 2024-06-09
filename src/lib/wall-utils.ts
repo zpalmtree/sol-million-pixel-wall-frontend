@@ -1,11 +1,15 @@
+import { PublicKey } from '@solana/web3.js';
+import { StaticCanvas, Canvas } from 'fabric';
+import * as fabric from 'fabric';
+
 import { Coordinate } from '@/types/coordinate';
 import { Brick } from '@/types/brick';
 import { Pixel } from '@/types/pixel';
-import { StaticCanvas, Canvas } from 'fabric';
-import * as fabric from 'fabric';
+import { CompressedNFT } from '@/types/compressed-nft';
 import {
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
+    RPC,
 } from '@/constants';
 
 export function getBrickFromPointerPosition(
@@ -661,4 +665,72 @@ export async function getWallInfo() {
             error: err.toString(),
         };
     }
+}
+
+export async function getDigitalStandardItems(address: PublicKey): Promise<CompressedNFT[]> {
+    let compressedNFTs: any[] = [];
+
+    try {
+        let page = 1;
+
+        while (true) {
+            const response = await fetch(RPC, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: '1',
+                    method: 'getAssetsByOwner',
+                    params: {
+                        ownerAddress: address.toString(),
+                        page,
+                        limit: 1000,
+                        displayOptions: {
+                        },
+                    },
+                }),
+            });
+
+            if (!response.ok) {
+                console.log(`Failed to fetch compressed NFTs: ${response.status}`);
+                break;
+            }
+
+            const rawData = await response.json();
+
+            if (rawData.error) {
+                console.log(`Error fetching compressed NFTs: ${rawData.error.message}`);
+                break;
+            }
+
+            const unburnt = rawData?.result?.items?.filter((i: any) => !i.burnt);
+
+            compressedNFTs = compressedNFTs.concat(unburnt.filter((c: any) => c.compression?.compressed));
+
+            /* Are there more pages to fetch? */
+            if (rawData.result.total < rawData.result.limit) {
+                break;
+            }
+
+            page++;
+        }
+    } catch (err) {
+        console.log(`Error fetching compressed NFTs: ${err}`);
+    }
+
+    return compressedNFTs.map((c) => {
+        const metadata = c.content?.metadata;
+
+        const image = c.content?.files.length
+            ? c.content.files[0].uri
+            : undefined;
+
+        return {
+            assetId: c.id,
+            image,
+            name: metadata?.name,
+        }
+    });
 }

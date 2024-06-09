@@ -21,7 +21,10 @@ import {
     uploadPreviewCanvasState,
     uploadPreviewImageState,
 } from '@/state/upload-preview';
-import { renderSelectedBricksToImage } from '@/lib/wall-utils';
+import {
+    renderSelectedBricksToImage,
+    getDigitalStandardItems,
+} from '@/lib/wall-utils';
 import {
     uploadTabEnabledState,
     currentTabState,
@@ -148,13 +151,40 @@ export function PurchaseTab(props: PurchaseTabProps) {
         setStatusText('Forming transactions, please wait...');
 
         try {
+            // Fetch user's assets to determine already owned bricks
+            const userAssets = await getDigitalStandardItems(publicKey);
+
+            const ownedCoordinates = userAssets.map(asset => {
+                const match = asset.name.match(/Brick #(\d+)/);
+                if (match) {
+                    const number = parseInt(match[1], 10);
+                    const x = Math.floor(number / 100);
+                    const y = number % 100;
+                    return { x, y };
+                }
+                return null;
+            }).filter(coord => coord !== null);
+
+            // Filter out already owned bricks from retryBricks
+            const bricksToPurchase = retryBricks.filter(brick => 
+                !ownedCoordinates.some(coord => coord!.x === brick.x && coord!.y === brick.y)
+            );
+
+            if (bricksToPurchase.length === 0) {
+                setSuccess(successMessage);
+                setUploadTabEnabled(true);
+                setLoading(false);
+                setSuccessfulTransactions(0);
+                return;
+            }
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    coordinates: retryBricks.map((b) => ({ x: b.x, y: b.y })),
+                    coordinates: bricksToPurchase.map(b => ({ x: b.x, y: b.y })),
                     solAddress: publicKey.toString(),
                 }),
             });
@@ -215,7 +245,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 }
 
                 let i = 0;
-                const itemsSplitByTransaction = retryBricks;
+                const itemsSplitByTransaction = bricksToPurchase;
 
                 for (const transaction of inProgressTransactions) {
                     const brick = itemsSplitByTransaction[i++];

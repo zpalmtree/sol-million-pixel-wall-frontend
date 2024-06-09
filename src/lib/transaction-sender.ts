@@ -97,6 +97,8 @@ export class TransactionSender {
                 };
             }
 
+            console.log(`Successfully confirmed transaction ${signature}, attempts: ${this.sendAttempts}.`);
+
             return {
                 error: undefined,
                 timeout: false,
