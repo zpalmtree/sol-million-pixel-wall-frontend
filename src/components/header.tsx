@@ -10,7 +10,7 @@ export function Header() {
         <header className="flex items-center justify-between bg-[#1a1a1a] px-6 py-4 shadow-md">
             <div className="flex items-center gap-8">
                 <Link
-                    className="text-lg md:text-2xl font-bold tracking-tighter text-primary"
+                    className="text-lg md:text-2xl font-bold tracking-tighter gradient-text"
                     href="/"
                 >
                     The Million Pixel Wall
@@ -26,25 +26,25 @@ export function Header() {
 
                 <nav className="hidden md:flex items-center gap-8">
                     <Link
-                        className="text-primary hover:text-white"
+                        className="gradient-text hover:text-white"
                         href="/"
                     >
                         Home
                     </Link>
                     <Link
-                        className="text-primary hover:text-white"
+                        className="gradient-text hover:text-white"
                         href="/wall"
                     >
                         Explore the Wall
                     </Link>
                     <Link
-                        className="text-primary hover:text-white"
+                        className="gradient-text hover:text-white"
                         href="/purchase"
                     >
                         Buy Bricks
                     </Link>
                     <Link
-                        className="text-primary hover:text-white"
+                        className="gradient-text hover:text-white"
                         href="/owned"
                     >
                         My Bricks
