@@ -10,8 +10,8 @@ import { WalletWrapper } from '@/wrappers/wallet-wrapper';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "The Million Pixel Wall",
-    description: "The Million Pixel Wall by Wall On Solana",
+    title: "The Meme Wall",
+    description: "The Meme Wall by Wall On Solana",
 };
 
 export default function RootLayout({

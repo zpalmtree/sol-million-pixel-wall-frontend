@@ -13,7 +13,7 @@ export function Header() {
                     className="text-lg md:text-2xl font-bold tracking-tighter gradient-text"
                     href="/"
                 >
-                    The Million Pixel Wall
+                    The Meme Wall
                 </Link>
 
                 <Image

@@ -158,7 +158,7 @@ export function UploadModifyTab(props: UploadTabProps) {
                         Upload your creation
                     </CardTitle>
                     <CardDescription className="text-white">
-                        Hit upload to store your creation on the million pixel wall!
+                        Hit upload to store your creation on the meme wall!
                     </CardDescription>
                 </CardHeader>
 

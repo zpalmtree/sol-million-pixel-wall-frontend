@@ -101,7 +101,7 @@ export default function Component() {
                                                 Elevate Your Digital Presence on the Ultimate Canvas
                                             </p>
                                             <p className="text-gray-300">
-                                                The Million Pixel Wall - a groundbreaking NFT spectacle set on the Solana blockchain.
+                                                The Meme Wall - a groundbreaking NFT spectacle set on the Solana blockchain.
                                             </p>
                                             <p className="text-gray-300">
                                                 With each brick spanning a 10x10 pixel area, you have the opportunity to own a piece of this monumental project. Navigate through the expanse, select your territory, and purchase the corresponding NFTs to stake your claim.
@@ -130,7 +130,7 @@ export default function Component() {
                                     </p>
 
                                     <p className="text-gray-300">
-                                        In the realm of the Solana Million Pixel Wall, location is everything.
+                                        In the realm of the Solana Meme Wall, location is everything.
                                     </p>
                                     <p className="text-gray-300">
                                         {`Secure the most sought-after sections before they're claimed. The early bird doesn't just get the worm; it gets to dictate the aesthetic and cultural heart of this digital masterpiece.`}
@@ -143,7 +143,7 @@ export default function Component() {
                                     </p>
 
                                     <p className="text-gray-300">
-                                        As each collaborator adds their unique flair, the Million Pixel Wall evolves - a living, breathing mosaic of digital art.
+                                        As each collaborator adds their unique flair, the Meme Wall evolves - a living, breathing mosaic of digital art.
                                     </p>
 
                                     <p className="text-gray-300">

@@ -77,7 +77,7 @@ export default function Splash() {
                                         Unleash the Memes
                                     </h2>
                                     <p className="max-w-[600px] text-[#EEEEEE] md:text-lg/relaxed dark:text-[#EEEEEE]">
-                                        Mint your own sections of the million pixel wall and contribute to the greatest WALL ever known! You will own this special digital real estate. Create and upload images to mog outrageously. Be a part of the legend. Become a legend. Nobody builds walls like we do. Nobody.
+                                        Mint your own sections of the meme wall and contribute to the greatest WALL ever known! You will own this special digital real estate. Create and upload images to mog outrageously. Be a part of the legend. Become a legend. Nobody builds walls like we do. Nobody.
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-2 min-[400px]:flex-row">

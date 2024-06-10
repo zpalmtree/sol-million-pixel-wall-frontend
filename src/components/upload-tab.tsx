@@ -74,7 +74,7 @@ export function UploadTab(props: UploadTabProps) {
         setError(null);
 
         try {
-            const message = `I am signing this message to confirm that ${publicKey.toString()} can upload images to the million pixel wall`;
+            const message = `I am signing this message to confirm that ${publicKey.toString()} can upload images to the meme wall`;
             const encodedMessage = new TextEncoder().encode(message);
             const signedMessage = await signMessage(encodedMessage);
 
@@ -161,7 +161,7 @@ export function UploadTab(props: UploadTabProps) {
                         Upload your creation
                     </CardTitle>
                     <CardDescription className="text-white">
-                        Hit upload to store your creation on the million pixel wall! You will need to sign a message to confirm your upload.
+                        Hit upload to store your creation on the meme wall! You will need to sign a message to confirm your upload.
                     </CardDescription>
                 </CardHeader>
 
