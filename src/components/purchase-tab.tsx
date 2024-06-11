@@ -151,24 +151,29 @@ export function PurchaseTab(props: PurchaseTabProps) {
         setStatusText('Forming transactions, please wait...');
 
         try {
-            // Fetch user's assets to determine already owned bricks
-            const userAssets = await getDigitalStandardItems(publicKey);
+            let bricksToPurchase = retryBricks;
 
-            const ownedCoordinates = userAssets.map(asset => {
-                const match = asset.name.match(/Brick #(\d+)/);
-                if (match) {
-                    const number = parseInt(match[1], 10);
-                    const x = Math.floor(number / 100);
-                    const y = number % 100;
-                    return { x, y };
-                }
-                return null;
-            }).filter(coord => coord !== null);
+            // Only exclude already owned bricks if the action is not 'edit'
+            if (action !== 'edit') {
+                // Fetch user's assets to determine already owned bricks
+                const userAssets = await getDigitalStandardItems(publicKey);
 
-            // Filter out already owned bricks from retryBricks
-            const bricksToPurchase = retryBricks.filter(brick => 
-                !ownedCoordinates.some(coord => coord!.x === brick.x && coord!.y === brick.y)
-            );
+                const ownedCoordinates = userAssets.map(asset => {
+                    const match = asset.name.match(/Brick #(\d+)/);
+                    if (match) {
+                        const number = parseInt(match[1], 10);
+                        const x = Math.floor(number / 100);
+                        const y = number % 100;
+                        return { x, y };
+                    }
+                    return null;
+                }).filter(coord => coord !== null);
+
+                // Filter out already owned bricks from retryBricks
+                bricksToPurchase = retryBricks.filter(brick => 
+                    !ownedCoordinates.some(coord => coord!.x === brick.x && coord!.y === brick.y)
+                );
+            }
 
             if (bricksToPurchase.length === 0) {
                 setSuccess(successMessage);
