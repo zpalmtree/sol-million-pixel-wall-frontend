@@ -145,6 +145,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
             return;
         }
 
+        console.log(`Attempting to purchase ${retryBricks.length} bricks...`);
+
         setLoading(true);
         setError(undefined);
         setSuccess(undefined);
@@ -175,6 +177,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 );
             }
 
+            console.log(`After filtering owned bricks, bricks to purchase: ${bricksToPurchase.length} bricks...`);
+
             if (bricksToPurchase.length === 0) {
                 setSuccess(successMessage);
                 setUploadTabEnabled(true);
@@ -201,6 +205,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 setLoading(false);
                 return;
             }
+
+            console.log(`Recieved ${transactions.length} from backend to sign...`);
 
             const timeouts: Brick[] = [];
             const errors: Brick[] = [];
@@ -235,7 +241,6 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 }
 
                 const inProgressTransactions = [];
-                let minTransactionSlot;
 
                 for (const signedTransaction of signedTransactions) {
                     const sender = new TransactionSender(
@@ -243,7 +248,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
                         signedTransaction,
                         9,
                         10_000,
-                        true,
+                        false,
                     );
 
                     inProgressTransactions.push(sender.sendAndConfirmTransaction());
@@ -260,13 +265,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     const {
                         error,
                         timeout,
-                        slot,
                         signature,
                     } = await transaction;
-
-                    if (!minTransactionSlot || slot < minTransactionSlot) {
-                        minTransactionSlot = slot;
-                    }
 
                     if (timeout) {
                         timeouts.push(brick);
@@ -298,6 +298,9 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     setPurchaseTransaction(successfullyPurchased[0].signature);
                 }
             }
+
+            console.log(`Timed out: ${timeouts.length}`);
+            console.log(`Errors: ${errors.length}`);
 
             const failed = errors.concat(timeouts);
 

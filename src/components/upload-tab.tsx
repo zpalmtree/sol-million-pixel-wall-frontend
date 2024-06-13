@@ -27,9 +27,10 @@ export function UploadTab(props: UploadTabProps) {
     const [complete, setComplete] = React.useState(false);
     const [uploading, setUploading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
-    const [ imageSrc, setImageSrc ] = useRecoilState(uploadPreviewImageState);
+    const [imageSrc, setImageSrc] = useRecoilState(uploadPreviewImageState);
     const canvas = useRecoilValue(uploadPreviewCanvasState);
     const { publicKey, signMessage } = useWallet();
+    const [url, setUrl] = React.useState<string>('');
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;
@@ -97,6 +98,7 @@ export function UploadTab(props: UploadTabProps) {
                     images,
                     solAddress: publicKey.toString(),
                     signedMessage: Array.from(signedMessage),
+                    url,  // Include the optional URL
                 }),
             });
 
@@ -129,6 +131,7 @@ export function UploadTab(props: UploadTabProps) {
         canvas,
         selectedBricks,
         signMessage,
+        url,
     ]);
 
     if (complete) {
@@ -179,7 +182,15 @@ export function UploadTab(props: UploadTabProps) {
                             />
                         </div>
                     )}
-                    
+
+                    <input
+                        type="text"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="Optional URL"
+                        className="bg-[#444444] text-white rounded-md px-4 py-2 mt-2"
+                    />
+
                     <Button
                         onClick={handleUpload}
                         disabled={uploading}
@@ -222,4 +233,3 @@ function CircleCheckIcon(props: any) {
         </svg>
     );
 }
-

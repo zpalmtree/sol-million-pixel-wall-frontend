@@ -81,8 +81,10 @@ export interface PixelWallProps {
     /* Interactable must be set to true for this parameter to do anything. Defaults
      * to true */
     permitBrickSelection?: boolean;
-}
 
+    /* Can we open URLs that are clicked on? */
+    permitURLInteractions?: boolean;
+}
 
 export function PixelWall(props: PixelWallProps) {
     const {
@@ -98,326 +100,422 @@ export function PixelWall(props: PixelWallProps) {
         zoomToAvailableBricks = false,
         highlightPurchasedBricks = false,
         permitBrickSelection = true,
+        permitURLInteractions = true,
     } = props;
 
-    const canvasWidth = React.useMemo(() => width || CANVAS_WIDTH, [ width ]);
-    const canvasHeight = React.useMemo(() => height || CANVAS_HEIGHT, [ height ]);
+    const canvasWidth = React.useMemo(
+        () => width || CANVAS_WIDTH,
+        [width]
+    );
+    const canvasHeight = React.useMemo(
+        () => height || CANVAS_HEIGHT,
+        [height]
+    );
 
-    const brickWidth = React.useMemo(() => canvasWidth / BRICKS_PER_ROW, [ canvasWidth ]);
-    const brickHeight = React.useMemo(() => canvasHeight / BRICKS_PER_COLUMN, [ canvasHeight ]);
+    const brickWidth = React.useMemo(
+        () => canvasWidth / BRICKS_PER_ROW,
+        [canvasWidth]
+    );
+    const brickHeight = React.useMemo(
+        () => canvasHeight / BRICKS_PER_COLUMN,
+        [canvasHeight]
+    );
 
     const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
-    const [ canvas, setCanvas ] = React.useState<Canvas | StaticCanvas | undefined>();
-    const [ lastPointerPosition, setLastPointerPosition ] = React.useState<Coordinate | undefined>();
-    const [ itemsOnCanvas, setItemsOnCanvas ] = React.useState<any[]>([]);
-    const [ backgroundImage, setBackgroundImage ] = React.useState<Image | undefined>(undefined);
-    const [ isPanning, setIsPanning ] = React.useState(false);
+    const [canvas, setCanvas] = React.useState<Canvas | StaticCanvas | undefined>();
+    const [lastPointerPosition, setLastPointerPosition] = React.useState<Coordinate | undefined>();
+    const [itemsOnCanvas, setItemsOnCanvas] = React.useState<any[]>([]);
+    const [backgroundImage, setBackgroundImage] = React.useState<Image | undefined>(undefined);
+    const [isPanning, setIsPanning] = React.useState(false);
 
-    const setStartingBricks = useSetRecoilState(startingBricksState);
-    const [ startingPixelWallImage, setStartingPixelWallImage ] = useRecoilState(startingPixelWallImageState);
+    const [startingBricks, setStartingBricks] = useRecoilState(startingBricksState);
+    const [startingPixelWallImage, setStartingPixelWallImage] = useRecoilState(startingPixelWallImageState);
     const setPricePerBrick = useSetRecoilState(pricePerBrickState);
     const setPricePerBrickEdit = useSetRecoilState(pricePerBrickEditState);
 
-    const availableBricksSet = React.useMemo(() => {
-        if (!availableBricks) {
-            return new Set();
-        }
+    const availableBricksSet = React.useMemo(
+        () => {
+            if (!availableBricks) {
+                return new Set();
+            }
 
-        return new Set(availableBricks.map((a) => a.name));
-    }, [
-        availableBricks,
-    ]);
+            return new Set(availableBricks.map((a) => a.name));
+        },
+        [availableBricks]
+    );
 
-    const purchasedBricksSet = React.useMemo(() => {
-        if (!purchasedBricks) {
-            return new Set();
-        }
+    const purchasedBricksSet = React.useMemo(
+        () => {
+            if (!purchasedBricks) {
+                return new Set();
+            }
 
-        return new Set(purchasedBricks.map((a) => a.name));
-    }, [
-        purchasedBricks,
-    ]);
+            return new Set(purchasedBricks.map((a) => a.name));
+        },
+        [purchasedBricks]
+    );
 
-    const handleMouseDown = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
-        if ((e.e as any).button === 2) {
-            setIsPanning(true);
+    const handleMouseDown = React.useCallback(
+        (e: TPointerEventInfo<TPointerEvent>) => {
+            if ((e.e as any).button === 2) {
+                setIsPanning(true);
+
+                setLastPointerPosition({
+                    x: (e.e as any).clientX,
+                    y: (e.e as any).clientY,
+                });
+            } else {
+                setLastPointerPosition(e.pointer);
+            }
+        },
+        [setLastPointerPosition]
+    );
+
+    const toggleBrickSelectedState = React.useCallback(
+        (brick: Brick) => {
+            const newSelectedBricks = [];
+
+            let found = false;
+
+            for (const b of selectedBricks) {
+                if (b.name === brick.name) {
+                    found = true;
+                    continue;
+                }
+
+                newSelectedBricks.push(b);
+            }
+
+            if (!found) {
+                newSelectedBricks.push(brick);
+            }
+
+            setSelectedBricks(newSelectedBricks);
+        },
+        [selectedBricks, setSelectedBricks]
+    );
+
+    const selectBrickRange = React.useCallback(
+        (startBrick: Brick, endBrick: Brick) => {
+            // Create a new set for selected bricks
+            const newSelectedBricks = [];
+
+            // Calculate the min/max for x and y
+            const minX = Math.min(startBrick.x, endBrick.x);
+            const maxX = Math.max(startBrick.x, endBrick.x);
+            const minY = Math.min(startBrick.y, endBrick.y);
+            const maxY = Math.max(startBrick.y, endBrick.y);
+
+            // Create a new array with all the bricks within the range
+            const rangeBricks = [];
+
+            for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                    rangeBricks.push({
+                        x,
+                        y,
+                        name: `${x},${y}`,
+                    });
+                }
+            }
+
+            // Filter out purchased bricks and check if any bricks remain
+            const filteredBricks = rangeBricks.filter(b => !purchasedBricksSet.has(b.name));
+            const finalBricks = availableBricks ? filteredBricks.filter(b => availableBricksSet.has(b.name)) : filteredBricks;
+
+            if (!availableBricks && filteredBricks.length !== rangeBricks.length) {
+                toast.warn(`One or more bricks in the range you selected have already been purchased, and thus have not been selected.`);
+            }
+
+            if (finalBricks.length === 0) {
+                if (availableBricks) {
+                    toast.warn(`None of these bricks are valid for your current operation.`);
+                    return;
+                } else {
+                    toast.warn(`All of these bricks have been purchased already.`);
+                    return;
+                }
+            }
+
+            // Add bricks that are in the selected range and not in the finalBricks set
+            for (const b of selectedBricks) {
+                if (
+                    b.x >= minX &&
+                    b.x <= maxX &&
+                    b.y >= minY &&
+                    b.y <= maxY
+                ) {
+                    continue; // Skip bricks that are within the new range
+                }
+
+                newSelectedBricks.push(b);
+            }
+
+            // Add all the new bricks in the range that are available
+            for (const b of finalBricks) {
+                newSelectedBricks.push(b);
+            }
+
+            setSelectedBricks(newSelectedBricks);
+        },
+        [
+            selectedBricks,
+            setSelectedBricks,
+            purchasedBricksSet,
+            availableBricksSet,
+            availableBricks,
+        ]
+    );
+
+    const handleMouseUp = React.useCallback(
+        (e: TPointerEventInfo<TPointerEvent>) => {
+            if (!canvas) {
+                return;
+            }
+
+            setIsPanning(false);
+
+            if ((e.e as any).button === 2) {
+                setLastPointerPosition(undefined);
+                return;
+            }
+
+            if (!lastPointerPosition) {
+                console.log(`No last pointer position??`);
+                return;
+            }
+
+            const startBrick = getBrickFromPointerPosition(
+                lastPointerPosition,
+                canvas,
+                BRICKS_PER_ROW,
+                BRICKS_PER_COLUMN,
+            );
+
+            const endBrick = getBrickFromPointerPosition(
+                e.pointer,
+                canvas,
+                BRICKS_PER_ROW,
+                BRICKS_PER_COLUMN,
+            );
+
+            const clickedBrick = startingBricks.find(brick => brick.x === startBrick.x && brick.y === startBrick.y);
+
+            if (startBrick.name === endBrick.name) {
+                if (clickedBrick?.url && permitURLInteractions) {
+                    window.open(clickedBrick.url, '_blank');
+                }
+
+                if (permitBrickSelection) {
+                    if (purchasedBricksSet.has(startBrick.name)) {
+                        console.log('Brick already purchased, skipping');
+                        toast.warn('This brick has already been purchased.');
+                        return;
+                    }
+
+                    if (availableBricks && !availableBricksSet.has(startBrick.name)) {
+                        console.log('Brick not owned, skipping');
+                        toast.warn('This brick is not valid for your current operation.');
+                        return;
+                    }
+
+                    toggleBrickSelectedState(startBrick);
+                }
+            } else {
+                if (permitBrickSelection) {
+                    selectBrickRange(startBrick, endBrick);
+                }
+            }
+        },
+        [
+            canvas,
+            lastPointerPosition,
+            permitBrickSelection,
+            purchasedBricksSet,
+            availableBricksSet,
+            availableBricks,
+            toggleBrickSelectedState,
+            selectBrickRange,
+            startingBricks,
+            permitURLInteractions,
+        ]
+    );
+
+    const handleMouseWheel = React.useCallback(
+        (opt: any) => {
+            if (!canvas) {
+                return;
+            }
+
+            const delta = opt.e.deltaY;
+            let zoom = canvas.getZoom();
+
+            zoom *= 0.999 ** delta;
+
+            if (zoom > 40) {
+                zoom = 40;
+            }
+
+            if (zoom < 1) {
+                zoom = 1;
+                canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+            }
+
+            const point = new Point(opt.e.offsetX, opt.e.offsetY);
+
+            canvas.zoomToPoint(point, zoom);
+
+            opt.e.preventDefault();
+            opt.e.stopPropagation();
+        },
+        [canvas]
+    );
+
+    const handleMouseMove = React.useCallback(
+        (e: TPointerEventInfo<TPointerEvent>) => {
+            if (!canvas || !isPanning || !lastPointerPosition) {
+                return;
+            }
+
+            const vpt = canvas.viewportTransform;
+
+            vpt[4] += (e.e as any).clientX - lastPointerPosition.x;
+            vpt[5] += (e.e as any).clientY - lastPointerPosition.y;
+
+            canvas.setViewportTransform(vpt);
 
             setLastPointerPosition({
                 x: (e.e as any).clientX,
                 y: (e.e as any).clientY,
             });
-        } else {
-            setLastPointerPosition(e.pointer);
-        }
-    }, [
-        setLastPointerPosition,
-    ]);
-
-    const toggleBrickSelectedState = React.useCallback((brick: Brick) => {
-        const newSelectedBricks = [];
-
-        let found = false;
-
-        for (const b of selectedBricks) {
-            if (b.name === brick.name) {
-                found = true;
-                continue;
-            }
-
-            newSelectedBricks.push(b);
-        }
-
-        if (!found) {
-            newSelectedBricks.push(brick);
-        }
-
-        setSelectedBricks(newSelectedBricks);
-    }, [
-        selectedBricks,
-        setSelectedBricks,
-    ]);
-
-    const selectBrickRange = React.useCallback((startBrick: Brick, endBrick: Brick) => {
-        // Create a new set for selected bricks
-        const newSelectedBricks = [];
-
-        // Calculate the min/max for x and y
-        const minX = Math.min(startBrick.x, endBrick.x);
-        const maxX = Math.max(startBrick.x, endBrick.x);
-        const minY = Math.min(startBrick.y, endBrick.y);
-        const maxY = Math.max(startBrick.y, endBrick.y);
-
-        // Create a new array with all the bricks within the range
-        const rangeBricks = [];
-
-        for (let x = minX; x <= maxX; x++) {
-            for (let y = minY; y <= maxY; y++) {
-                rangeBricks.push({
-                    x,
-                    y,
-                    name: `${x},${y}`,
-                });
-            }
-        }
-
-        // Filter out purchased bricks and check if any bricks remain
-        const filteredBricks = rangeBricks.filter(b => !purchasedBricksSet.has(b.name));
-        const finalBricks = availableBricks ? filteredBricks.filter(b => availableBricksSet.has(b.name)) : filteredBricks;
-
-        if (!availableBricks && filteredBricks.length !== rangeBricks.length) {
-            toast.warn(`One or more bricks in the range you selected have already been purchased, and thus have not been selected.`);
-        }
-
-        if (finalBricks.length === 0) {
-            if (availableBricks) {
-                toast.warn(`None of these bricks are valid for your current operation.`);
-                return;
-            } else {
-                toast.warn(`All of these bricks have been purchased already.`);
-                return;
-            }
-        }
-
-        // Add bricks that are in the selected range and not in the finalBricks set
-        for (const b of selectedBricks) {
-            if (
-                b.x >= minX &&
-                b.x <= maxX &&
-                b.y >= minY &&
-                b.y <= maxY
-            ) {
-                continue; // Skip bricks that are within the new range
-            }
-
-            newSelectedBricks.push(b);
-        }
-
-        // Add all the new bricks in the range that are available
-        for (const b of finalBricks) {
-            newSelectedBricks.push(b);
-        }
-
-        setSelectedBricks(newSelectedBricks);
-    }, [
-        selectedBricks,
-        setSelectedBricks,
-        purchasedBricksSet,
-        availableBricksSet,
-        availableBricks,
-    ]);
-
-    const handleMouseUp = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
-        if (!canvas) {
-            return;
-        }
-
-        setIsPanning(false);
-
-        if ((e.e as any).button === 2) {
-            setLastPointerPosition(undefined);
-            return;
-        }
-
-        if (!lastPointerPosition) {
-            console.log(`No last pointer position??`);
-            return;
-        }
-
-        if (!permitBrickSelection) {
-            return;
-        }
-
-        const startBrick = getBrickFromPointerPosition(
+        },
+        [
+            canvas,
+            isPanning,
             lastPointerPosition,
-            canvas,
-            BRICKS_PER_ROW,
-            BRICKS_PER_COLUMN,
-        );
+        ]
+    );
 
-        const endBrick = getBrickFromPointerPosition(
-            e.pointer,
-            canvas,
-            BRICKS_PER_ROW,
-            BRICKS_PER_COLUMN,
-        );
-
-        if (startBrick.name === endBrick.name) {
-            if (purchasedBricksSet.has(startBrick.name)) {
-                console.log('Brick already purchased, skipping');
-                toast.warn('This brick has already been purchased.');
+    const loadInitialInfo = React.useCallback(
+        async () => {
+            if (startingPixelWallImage) {
                 return;
             }
 
-            if (availableBricks && !availableBricksSet.has(startBrick.name)) {
-                console.log('Brick not owned, skipping');
-                toast.warn('This brick is not valid for your current operation.');
+            console.log('Loading initial info');
+
+            const {
+                image,
+                bricks,
+                error,
+                pricePerBrick,
+                pricePerBrickEdit,
+            } = await getWallInfo();
+
+            if (error) {
+                toast.warn(`Failed to load wall info: ${error}`);
                 return;
             }
 
-            toggleBrickSelectedState(startBrick);
-        } else {
-            selectBrickRange(startBrick, endBrick);
-        }
-    }, [
-        lastPointerPosition,
-        toggleBrickSelectedState,
-        selectBrickRange,
-        canvas,
-        purchasedBricksSet,
-        availableBricksSet,
-        availableBricks,
-        permitBrickSelection,
-    ]);
+            setStartingPixelWallImage(image);
+            setStartingBricks(bricks);
 
-    const handleMouseWheel = React.useCallback((opt: any) => {
-        if (!canvas) {
-            return;
-        }
+            if (pricePerBrick !== undefined) {
+                setPricePerBrick(pricePerBrick);
+            }
 
-        const delta = opt.e.deltaY;
-        let zoom = canvas.getZoom();
+            if (pricePerBrickEdit !== undefined) {
+                setPricePerBrickEdit(pricePerBrickEdit);
+            }
+        },
+        [
+            startingPixelWallImage,
+            setStartingPixelWallImage,
+            setStartingBricks,
+            setPricePerBrick,
+            setPricePerBrickEdit,
+        ]
+    );
 
-        zoom *= 0.999 ** delta;
+    const drawCanvas = React.useCallback(
+        async () => {
+            if (!canvas) {
+                return;
+            }
 
-        if (zoom > 40) {
-            zoom = 40;
-        }
+            /* Remove previously drawn items */
+            for (const canvasObject of itemsOnCanvas) {
+                canvas.remove(canvasObject);
+            }
 
-        if (zoom < 1) {
-            zoom = 1;
-            canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-        }
+            const newItemsOnCanvas: any[] = [];
 
+            if (interactable) {
+                if (highlightAvailableBricks && availableBricks) {
+                    const visitedBricks = new Set<string>();
 
-        const point = new Point(opt.e.offsetX, opt.e.offsetY);
+                    // Detect and merge overlapping bricks
+                    const brickClusters = groupBricks(availableBricks, visitedBricks);
 
-        canvas.zoomToPoint(point, zoom);
+                    // Create rectangles for each cluster of bricks
+                    for (const cluster of brickClusters) {
+                        const rectangles = createRectanglesFromCluster(cluster);
 
-        opt.e.preventDefault();
-        opt.e.stopPropagation();
-    }, [
-        canvas,
-    ]);
+                        for (const { minX, minY, maxX, maxY } of rectangles) {
+                            const rectangle = new Rect({
+                                width: (maxX - minX + 1) * brickWidth,
+                                height: (maxY - minY + 1) * brickHeight,
+                                fill: '#1E90FF',
+                                opacity: 0.3,
+                                selectable: false,
+                                evented: false,
+                                left: minX * brickWidth,
+                                top: minY * brickHeight,
+                                strokeWidth: 0,
+                                hasBorders: false,
+                            });
 
-    const handleMouseMove = React.useCallback((e: TPointerEventInfo<TPointerEvent>) => {
-        if (!canvas || !isPanning || !lastPointerPosition) {
-            return;
-        }
+                            newItemsOnCanvas.push(rectangle);
+                            canvas.add(rectangle);
+                        }
+                    }
+                }
 
-        const vpt = canvas.viewportTransform;
+                if (highlightPurchasedBricks && purchasedBricks) {
+                    const visitedBricks = new Set<string>();
 
-        vpt[4] += (e.e as any).clientX - lastPointerPosition.x;
-        vpt[5] += (e.e as any).clientY - lastPointerPosition.y;
+                    // Detect and merge overlapping bricks
+                    const brickClusters = groupBricks(purchasedBricks, visitedBricks);
 
-        canvas.setViewportTransform(vpt);
+                    // Create rectangles for each cluster of bricks
+                    for (const cluster of brickClusters) {
+                        const rectangles = createRectanglesFromCluster(cluster);
 
-        setLastPointerPosition({
-            x: (e.e as any).clientX,
-            y: (e.e as any).clientY,
-        });
-    }, [
-        canvas,
-        isPanning,
-        lastPointerPosition,
-    ]);
+                        for (const { minX, minY, maxX, maxY } of rectangles) {
+                            const rectangle = new Rect({
+                                width: (maxX - minX + 1) * brickWidth,
+                                height: (maxY - minY + 1) * brickHeight,
+                                fill: 'red',
+                                opacity: 0.25,
+                                selectable: false,
+                                evented: false,
+                                left: minX * brickWidth,
+                                top: minY * brickHeight,
+                                strokeWidth: 0,
+                                hasBorders: false,
+                            });
 
-    const loadInitialInfo = React.useCallback(async () => {
-        if (startingPixelWallImage) {
-            return;
-        }
+                            newItemsOnCanvas.push(rectangle);
+                            canvas.add(rectangle);
+                        }
+                    }
+                }
 
-        console.log('Loading initial info');
-
-        const {
-            image,
-            bricks,
-            error,
-            pricePerBrick,
-            pricePerBrickEdit,
-        } = await getWallInfo();
-
-        if (error) {
-            toast.warn(`Failed to load wall info: ${error}`);
-            return;
-        }
-
-        setStartingPixelWallImage(image);
-        setStartingBricks(bricks);
-
-        if (pricePerBrick !== undefined) {
-            setPricePerBrick(pricePerBrick);
-        }
-
-        if (pricePerBrickEdit !== undefined) {
-            setPricePerBrickEdit(pricePerBrickEdit);
-        }
-    }, [
-        startingPixelWallImage,
-        setStartingPixelWallImage,
-        setStartingBricks,
-        setPricePerBrick,
-        setPricePerBrickEdit,
-    ]);
-
-    const drawCanvas = React.useCallback(async () => {
-        if (!canvas) {
-            return;
-        }
-
-        /* Remove previously drawn items */
-        for (const canvasObject of itemsOnCanvas) {
-            canvas.remove(canvasObject);
-        }
-
-        const newItemsOnCanvas: any[] = [];
-
-        if (interactable) {
-            if (highlightAvailableBricks && availableBricks) {
                 const visitedBricks = new Set<string>();
 
                 // Detect and merge overlapping bricks
-                const brickClusters = groupBricks(availableBricks, visitedBricks);
+                const brickClusters = groupBricks(selectedBricks, visitedBricks);
 
                 // Create rectangles for each cluster of bricks
                 for (const cluster of brickClusters) {
@@ -427,8 +525,8 @@ export function PixelWall(props: PixelWallProps) {
                         const rectangle = new Rect({
                             width: (maxX - minX + 1) * brickWidth,
                             height: (maxY - minY + 1) * brickHeight,
-                            fill: '#1E90FF',
-                            opacity: 0.3,
+                            fill: '#C19A6B',
+                            opacity: highlightAvailableBricks ? 0.6 : 0.3,
                             selectable: false,
                             evented: false,
                             left: minX * brickWidth,
@@ -443,94 +541,37 @@ export function PixelWall(props: PixelWallProps) {
                 }
             }
 
-            if (highlightPurchasedBricks && purchasedBricks) {
-                const visitedBricks = new Set<string>();
+            if (startingPixelWallImage && !backgroundImage) {
+                const backgroundImage = await Image.fromURL(startingPixelWallImage);
 
-                // Detect and merge overlapping bricks
-                const brickClusters = groupBricks(purchasedBricks, visitedBricks);
+                backgroundImage.scaleToWidth(canvasWidth);
+                backgroundImage.scaleToHeight(canvasHeight);
+                backgroundImage.selectable = false;
+                backgroundImage.evented = false;
 
-                // Create rectangles for each cluster of bricks
-                for (const cluster of brickClusters) {
-                    const rectangles = createRectanglesFromCluster(cluster);
-
-                    for (const { minX, minY, maxX, maxY } of rectangles) {
-                        const rectangle = new Rect({
-                            width: (maxX - minX + 1) * brickWidth,
-                            height: (maxY - minY + 1) * brickHeight,
-                            fill: 'red',
-                            opacity: 0.25,
-                            selectable: false,
-                            evented: false,
-                            left: minX * brickWidth,
-                            top: minY * brickHeight,
-                            strokeWidth: 0,
-                            hasBorders: false,
-                        });
-
-                        newItemsOnCanvas.push(rectangle);
-                        canvas.add(rectangle);
-                    }
-                }
+                canvas.add(backgroundImage);
+                setBackgroundImage(backgroundImage);
             }
 
-            const visitedBricks = new Set<string>();
-
-            // Detect and merge overlapping bricks
-            const brickClusters = groupBricks(selectedBricks, visitedBricks);
-
-            // Create rectangles for each cluster of bricks
-            for (const cluster of brickClusters) {
-                const rectangles = createRectanglesFromCluster(cluster);
-
-                for (const { minX, minY, maxX, maxY } of rectangles) {
-                    const rectangle = new Rect({
-                        width: (maxX - minX + 1) * brickWidth,
-                        height: (maxY - minY + 1) * brickHeight,
-                        fill: '#C19A6B',
-                        opacity: highlightAvailableBricks ? 0.6 : 0.3,
-                        selectable: false,
-                        evented: false,
-                        left: minX * brickWidth,
-                        top: minY * brickHeight,
-                        strokeWidth: 0,
-                        hasBorders: false,
-                    });
-
-                    newItemsOnCanvas.push(rectangle);
-                    canvas.add(rectangle);
-                }
-            }
-        }
-
-        if (startingPixelWallImage && !backgroundImage) {
-            const backgroundImage = await Image.fromURL(startingPixelWallImage);
-
-            backgroundImage.scaleToWidth(canvasWidth);
-            backgroundImage.scaleToHeight(canvasHeight);
-            backgroundImage.selectable = false;
-            backgroundImage.evented = false;
-
-            canvas.add(backgroundImage);
-            setBackgroundImage(backgroundImage);
-        }
-
-        setItemsOnCanvas(newItemsOnCanvas);
-    }, [
-        canvas,
-        selectedBricks,
-        brickHeight,
-        brickWidth,
-        startingPixelWallImage,
-        canvasHeight,
-        canvasWidth,
-        interactable,
-        itemsOnCanvas,
-        backgroundImage,
-        availableBricks,
-        purchasedBricks,
-        highlightAvailableBricks,
-        highlightPurchasedBricks,
-    ]);
+            setItemsOnCanvas(newItemsOnCanvas);
+        },
+        [
+            canvas,
+            selectedBricks,
+            brickHeight,
+            brickWidth,
+            startingPixelWallImage,
+            canvasHeight,
+            canvasWidth,
+            interactable,
+            itemsOnCanvas,
+            backgroundImage,
+            availableBricks,
+            purchasedBricks,
+            highlightAvailableBricks,
+            highlightPurchasedBricks,
+        ]
+    );
 
     useEffect(() => {
         drawCanvas();

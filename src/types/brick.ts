@@ -8,6 +8,8 @@ export interface Brick {
 
 export interface BrickInfo extends Brick {
     purchased: boolean;
+
+    url?: string;
 }
 
 export interface OwnedBrick extends Brick {

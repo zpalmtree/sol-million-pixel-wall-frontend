@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import {
     useRecoilValue,
@@ -28,10 +29,11 @@ export function UploadModifyTab(props: UploadTabProps) {
     const [complete, setComplete] = React.useState(false);
     const [uploading, setUploading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
-    const [ imageSrc, setImageSrc ] = useRecoilState(uploadPreviewImageState);
+    const [imageSrc, setImageSrc] = useRecoilState(uploadPreviewImageState);
     const canvas = useRecoilValue(uploadPreviewCanvasState);
     const { publicKey } = useWallet();
     const purchaseTransaction = useRecoilValue(purchaseTransactionState);
+    const [url, setUrl] = React.useState<string>('');
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;
@@ -100,6 +102,7 @@ export function UploadModifyTab(props: UploadTabProps) {
                     images,
                     solAddress: publicKey.toString(),
                     signature: purchaseTransaction,
+                    url,  // Include the optional URL
                 }),
             });
 
@@ -126,6 +129,7 @@ export function UploadModifyTab(props: UploadTabProps) {
         brickWidth,
         canvas,
         selectedBricks,
+        url,
     ]);
 
     if (complete) {
@@ -176,7 +180,15 @@ export function UploadModifyTab(props: UploadTabProps) {
                             />
                         </div>
                     )}
-                    
+
+                    <input
+                        type="text"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="Optional URL"
+                        className="bg-[#444444] text-white rounded-md px-4 py-2 mt-2"
+                    />
+
                     <Button
                         onClick={handleUpload}
                         disabled={uploading}
@@ -215,4 +227,3 @@ function CircleCheckIcon(props: any) {
         </svg>
     );
 }
-

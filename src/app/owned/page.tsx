@@ -2,11 +2,29 @@
 
 import Link from "next/link";
 import * as React from 'react';
+import {
+    useSetRecoilState,
+} from 'recoil';
 
 import { OwnedBricks } from '@/components/owned-bricks';
 import { Header } from '@/components/header';
+import {
+    currentTabState,
+    uploadTabEnabledState,
+} from '@/state/tabs';
 
 export default function Component() {
+    const setCurrentTab = useSetRecoilState(currentTabState);
+    const setUploadTabEnabled = useSetRecoilState(uploadTabEnabledState);
+
+    React.useEffect(() => {
+        setCurrentTab('create');
+        setUploadTabEnabled(false);
+    }, [
+        setCurrentTab,
+        setUploadTabEnabled,
+    ]);
+
     return (
         <>
             <Header/>
