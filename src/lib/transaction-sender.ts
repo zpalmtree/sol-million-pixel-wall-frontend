@@ -25,7 +25,7 @@ export class TransactionSender {
         private transaction: Transaction,
         private maxAttempts: number = 30,
         private sleepDuration: number = 3000,
-        private useJito: boolean = true,
+        private useJito: boolean = false,
     ) {
     }
 

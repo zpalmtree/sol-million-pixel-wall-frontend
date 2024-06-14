@@ -250,7 +250,6 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     const sender = new TransactionSender(
                         connection,
                         signedTransaction,
-                        false,
                     );
 
                     inProgressTransactions.push(sender.sendAndConfirmTransaction());
