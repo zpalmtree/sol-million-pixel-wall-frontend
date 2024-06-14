@@ -146,6 +146,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
         }
 
         console.log(`Attempting to purchase ${retryBricks.length} bricks...`);
+        console.log('Initial bricks to purchase:', retryBricks);
 
         setLoading(true);
         setError(undefined);
@@ -171,6 +172,8 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     return null;
                 }).filter(coord => coord !== null);
 
+                console.log('User owned coordinates:', ownedCoordinates);
+
                 // Filter out already owned bricks from retryBricks
                 bricksToPurchase = retryBricks.filter(brick => 
                     !ownedCoordinates.some(coord => coord!.x === brick.x && coord!.y === brick.y)
@@ -178,6 +181,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
             }
 
             console.log(`After filtering owned bricks, bricks to purchase: ${bricksToPurchase.length} bricks...`);
+            console.log('Bricks to purchase after filtering:', bricksToPurchase);
 
             if (bricksToPurchase.length === 0) {
                 setSuccess(successMessage);
@@ -206,7 +210,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 return;
             }
 
-            console.log(`Recieved ${transactions.length} from backend to sign...`);
+            console.log(`Received ${transactions.length} transactions from backend to sign...`);
 
             const timeouts: Brick[] = [];
             const errors: Brick[] = [];
@@ -246,8 +250,6 @@ export function PurchaseTab(props: PurchaseTabProps) {
                     const sender = new TransactionSender(
                         connection,
                         signedTransaction,
-                        9,
-                        10_000,
                         false,
                     );
 
@@ -260,7 +262,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
                 for (const transaction of inProgressTransactions) {
                     const brick = itemsSplitByTransaction[i++];
 
-                    console.log(`Waiting for transaction to complete...`);
+                    console.log(`Waiting for transaction to complete for brick:`, brick);
 
                     const {
                         error,
@@ -270,14 +272,17 @@ export function PurchaseTab(props: PurchaseTabProps) {
 
                     if (timeout) {
                         timeouts.push(brick);
+                        console.log(`Transaction timeout for brick:`, brick);
                     } else if (error) {
                         errors.push(brick);
                         errorMessages.push(formatError(error));
+                        console.log(`Transaction error for brick:`, brick, error);
                     } else {
                         successfullyPurchased.push({
                             brick,
                             signature,
                         });
+                        console.log(`Transaction successful for brick:`, brick, signature);
                     }
                 }
 

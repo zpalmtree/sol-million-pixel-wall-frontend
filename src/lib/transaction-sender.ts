@@ -23,8 +23,8 @@ export class TransactionSender {
     constructor(
         private connection: Connection,
         private transaction: Transaction,
-        private maxAttempts: number = 60,
-        private sleepDuration: number = 2000,
+        private maxAttempts: number = 30,
+        private sleepDuration: number = 3000,
         private useJito: boolean = true,
     ) {
     }

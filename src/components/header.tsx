@@ -15,7 +15,13 @@ export function Header() {
     React.useEffect(() => {
         const handleUserInteraction = () => {
             if (audio && !isPlaying) {
-                audio.play();
+                try {
+                    audio.play();
+                } catch (err) {
+                    console.log(err);
+                    return;
+                }
+
                 setIsPlaying(true);
 
                 // Remove event listeners after the first interaction
