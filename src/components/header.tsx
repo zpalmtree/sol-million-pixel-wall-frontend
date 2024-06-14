@@ -3,13 +3,13 @@
 import Link from "next/link";
 import Image from 'next/image';
 import * as React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { audioElementState, isPlayingState } from '@/state/audio';
 
 import { WalletMultiButton } from '@/components/wallet-button';
 
 export function Header() {
-    const audio = useRecoilValue(audioElementState);
+    const [audio, setAudio] = useRecoilState(audioElementState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
 
     React.useEffect(() => {
@@ -33,20 +33,24 @@ export function Header() {
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
+        audio,
     ]);
+
+    React.useEffect(() => {
+        if (!audio) {
+            const newAudio = new Audio('/music.mp3');
+            setAudio(newAudio);
+        }
+    }, [audio, setAudio]);
 
     const toggleMusic = React.useCallback(() => {
         if (audio) {
             if (isPlaying) {
-                console.log('Pausing music');
                 audio.pause();
             } else {
-                console.log('Playing music');
                 audio.play();
             }
             setIsPlaying(!isPlaying);
-        } else {
-            console.log('audio is null');
         }
     }, [audio, isPlaying, setIsPlaying]);
 

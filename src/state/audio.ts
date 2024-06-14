@@ -8,7 +8,7 @@ interface AudioState {
 export const audioState = atom<AudioState>({
     key: "audioState",
     default: {
-        audio: new Audio('/music.mp3'),
+        audio: null,
         isPlaying: false,
     },
 });
