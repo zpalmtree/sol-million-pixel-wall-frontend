@@ -158,7 +158,7 @@ export function PixelWall(props: PixelWallProps) {
 
     const handleMouseDown = React.useCallback(
         (e: TPointerEventInfo<TPointerEvent>) => {
-            if ((e.e as any).button === 2) {
+            if ((e.e as any).button === 2 || !permitBrickSelection) {
                 setIsPanning(true);
 
                 setLastPointerPosition({
