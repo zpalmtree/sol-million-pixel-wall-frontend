@@ -375,7 +375,7 @@ export function PixelWall(props: PixelWallProps) {
 
     const handleMouseMove = React.useCallback(
         (e: TPointerEventInfo<TPointerEvent>) => {
-            if (!canvas || !isPanning || !lastPointerPosition) {
+            if (!canvas || !isPanning || !lastPanningPosition) {
                 return;
             }
 
@@ -394,7 +394,7 @@ export function PixelWall(props: PixelWallProps) {
         [
             canvas,
             isPanning,
-            lastPointerPosition,
+            lastPanningPosition,
         ]
     );
 
