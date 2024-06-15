@@ -14,6 +14,7 @@ import {
 
 import { Header } from '@/components/header';
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { PixelWall } from "@/components/pixelwall";
 import {
     selectedBricksState,
@@ -35,6 +36,12 @@ export default function Component() {
     }, [
         selectedBricks,
         pricePerBrick,
+    ]);
+
+    const handleClearSelectedBricks = React.useCallback(() => {
+        setSelectedBricks([]);
+    }, [
+        setSelectedBricks,
     ]);
 
     React.useEffect(() => {
@@ -84,8 +91,16 @@ export default function Component() {
                                             </span>
                                         </div>
 
+                                        <Button
+                                            className="w-full h-9"
+                                            onClick={handleClearSelectedBricks}
+                                            disabled={selectedBricks.length === 0}
+                                        >
+                                            Clear Selected Bricks
+                                        </Button>
+
                                         <Link
-                                            className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
+                                            className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 disabled:text-gray-400"
                                             href="/checkout"
                                             style={{
                                                 pointerEvents: selectedBricks.length === 0 ? 'none' : 'auto',

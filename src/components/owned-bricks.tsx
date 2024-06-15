@@ -8,6 +8,7 @@ import {
     useRecoilState,
 } from 'recoil';
 
+import { Button } from "@/components/ui/button";
 import { WalletMultiButton } from '@/components/wallet-button';
 import {
     ownedBricksWithArtState,
@@ -42,6 +43,18 @@ export function OwnedBricks() {
     }, [
         selectedOwnedBricksWithArt.length,
         pricePerBrickEdit,
+    ]);
+
+    const handleClearSelectedOwnedBricksWithArt = React.useCallback(() => {
+        setSelectedOwnedBricksWithArt([]);
+    }, [
+        setSelectedOwnedBricksWithArt,
+    ]);
+
+    const handleClearSelectedOwnedBricksWithoutArt = React.useCallback(() => {
+        setSelectedOwnedBricksWithoutArt([]);
+    }, [
+        setSelectedOwnedBricksWithoutArt,
     ]);
 
     const fetchOwnedBricks = React.useCallback(async () => {
@@ -141,6 +154,14 @@ export function OwnedBricks() {
                                     </span>
                                 </div>
 
+                                <Button
+                                    className="w-full h-9"
+                                    onClick={handleClearSelectedOwnedBricksWithoutArt}
+                                    disabled={selectedOwnedBricksWithoutArt.length === 0}
+                                >
+                                    Clear Selected Bricks
+                                </Button>
+
                                 <Link
                                     className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
                                     href={'/upload'}
@@ -190,6 +211,14 @@ export function OwnedBricks() {
                                         {`${artCostInSol} SOL`}
                                     </span>
                                 </div>
+
+                                <Button
+                                    className="w-full h-9"
+                                    onClick={handleClearSelectedOwnedBricksWithArt}
+                                    disabled={selectedOwnedBricksWithArt.length === 0}
+                                >
+                                    Clear Selected Bricks
+                                </Button>
 
                                 <Link
                                     className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:text-primary border border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
