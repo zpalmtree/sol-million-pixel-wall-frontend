@@ -108,14 +108,14 @@ export default function Splash() {
                                     {`They'll try to tell you the Wall divides us... but if you really think about it... the Wall unites us.`}
                                 </p>
                             </div>
-                            <a href="https://twitter.com/WallOnSolana">
+                            <Link href="https://twitter.com/WallOnSolana">
                                 <Button
                                     className="bg-primary text-[#1A1A1A]"
                                     type="submit"
                                 >
                                     Join us on Twitter
                                 </Button>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </main>

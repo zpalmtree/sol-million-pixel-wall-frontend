@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import {
     useRecoilValue,
@@ -6,6 +5,7 @@ import {
 } from 'recoil';
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card";
 import { useWallet } from '@solana/wallet-adapter-react';
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -143,12 +143,12 @@ export function UploadModifyTab(props: UploadTabProps) {
                     <p className="mt-2 text-gray-400">
                         Your masterpiece has been immortalized on our digital canvas.
                     </p>
-                    <a
+                    <Link
                         href='/wall'
                         className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:bg-primary dark:text-[#1A1A1A] dark:hover:bg-primary/90 dark:focus-visible:ring-primary mt-6"
                     >
                         View Wall
-                    </a>
+                    </Link>
                 </div>
             </div>
         );

@@ -41,3 +41,8 @@ export const isPlayingState = selector<boolean>({
     },
 });
 
+
+export const audioTriggeredState = atom<boolean>({
+    key: 'audioTriggeredState',
+    default: false,
+});

@@ -4,17 +4,22 @@ import Link from "next/link";
 import Image from 'next/image';
 import * as React from 'react';
 import { useRecoilState } from 'recoil';
-import { audioElementState, isPlayingState } from '@/state/audio';
+import {
+    audioElementState,
+    isPlayingState,
+    audioTriggeredState,
+} from '@/state/audio';
 
 import { WalletMultiButton } from '@/components/wallet-button';
 
 export function Header() {
     const [audio, setAudio] = useRecoilState(audioElementState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
+    const [audioTriggered, setAudioTriggered] = useRecoilState(audioTriggeredState);
 
     React.useEffect(() => {
         const handleUserInteraction = () => {
-            if (audio && !isPlaying) {
+            if (audio && !isPlaying && !audioTriggered) {
                 try {
                     audio.play();
                 } catch (err) {
@@ -23,6 +28,7 @@ export function Header() {
                 }
 
                 setIsPlaying(true);
+                setAudioTriggered(true);
 
                 // Remove event listeners after the first interaction
                 window.removeEventListener('click', handleUserInteraction);
