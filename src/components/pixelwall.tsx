@@ -125,6 +125,7 @@ export function PixelWall(props: PixelWallProps) {
 
     const [canvas, setCanvas] = React.useState<Canvas | StaticCanvas | undefined>();
     const [lastPointerPosition, setLastPointerPosition] = React.useState<Coordinate | undefined>();
+    const [lastPanningPosition, setLastPanningPosition] = React.useState<Coordinate | undefined>();
     const [itemsOnCanvas, setItemsOnCanvas] = React.useState<any[]>([]);
     const [backgroundImage, setBackgroundImage] = React.useState<Image | undefined>(undefined);
     const [isPanning, setIsPanning] = React.useState(false);
@@ -158,15 +159,15 @@ export function PixelWall(props: PixelWallProps) {
 
     const handleMouseDown = React.useCallback(
         (e: TPointerEventInfo<TPointerEvent>) => {
+            setLastPanningPosition({
+                x: (e.e as any).clientX,
+                y: (e.e as any).clientY,
+            });
+
+            setLastPointerPosition(e.pointer);
+
             if ((e.e as any).button === 2 || !permitBrickSelection) {
                 setIsPanning(true);
-
-                setLastPointerPosition({
-                    x: (e.e as any).clientX,
-                    y: (e.e as any).clientY,
-                });
-            } else {
-                setLastPointerPosition(e.pointer);
             }
         },
         [setLastPointerPosition, permitBrickSelection]
@@ -275,9 +276,9 @@ export function PixelWall(props: PixelWallProps) {
             }
 
             setIsPanning(false);
+            setLastPanningPosition(undefined);
 
             if ((e.e as any).button === 2) {
-                setLastPointerPosition(undefined);
                 return;
             }
 
@@ -380,12 +381,12 @@ export function PixelWall(props: PixelWallProps) {
 
             const vpt = canvas.viewportTransform;
 
-            vpt[4] += (e.e as any).clientX - lastPointerPosition.x;
-            vpt[5] += (e.e as any).clientY - lastPointerPosition.y;
+            vpt[4] += (e.e as any).clientX - lastPanningPosition.x;
+            vpt[5] += (e.e as any).clientY - lastPanningPosition.y;
 
             canvas.setViewportTransform(vpt);
 
-            setLastPointerPosition({
+            setLastPanningPosition({
                 x: (e.e as any).clientX,
                 y: (e.e as any).clientY,
             });
