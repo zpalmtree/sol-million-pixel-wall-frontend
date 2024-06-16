@@ -169,7 +169,7 @@ export function PixelWall(props: PixelWallProps) {
 
             setLastPointerPosition(e.pointer);
 
-            if ((e.e as any).button === 2 || !permitBrickSelection) {
+            if ((e.e as any).button === 2) {
                 setIsPanning(true);
             }
         },
