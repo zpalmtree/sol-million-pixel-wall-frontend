@@ -1,7 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 
-export const TransparentLink = ({ href, content }) => {
+interface TransparentLinkProps {
+  href: string;
+  content: string;
+}
+
+export const TransparentLink: React.FC<TransparentLinkProps> = ({ href, content }) => {
   return (
       <Link
           href={href}

@@ -174,7 +174,7 @@ export function PixelWall(props: PixelWallProps) {
                 setIsPanning(true);
             }
         },
-        [setLastPointerPosition, permitBrickSelection]
+        [setLastPointerPosition]
     );
 
     const toggleBrickSelectedState = React.useCallback(

@@ -1,7 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 
-export const GradientLink = ({ href, content }) => {
+interface GradientLinkProps {
+  href: string;
+  content: string;
+}
+
+export const GradientLink: React.FC<GradientLinkProps> = ({ href, content }) => {
   return (
       <Link
           href={href}
