@@ -49,7 +49,7 @@ export default function Splash() {
                                 content="Explore the Wall"
                             />
                             <TransparentLink
-                                href='#'
+                                href='/learn'
                                 content='Learn More'
                             />
                         </div>
@@ -84,7 +84,7 @@ export default function Splash() {
                                         content={'Mint an NFT'}
                                     />
                                     <TransparentLink
-                                        href="#"
+                                        href="/learn"
                                         content={'Learn More'}
                                     />
                                 </div>

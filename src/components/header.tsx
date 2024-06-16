@@ -93,6 +93,12 @@ export function Header() {
                     </Link>
                     <Link
                         className="gradient-text hover:text-white"
+                        href="/learn"
+                    >
+                        About
+                    </Link>
+                    <Link
+                        className="gradient-text hover:text-white"
                         href="/wall"
                     >
                         Explore the Wall
