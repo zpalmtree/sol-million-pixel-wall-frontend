@@ -71,7 +71,7 @@ export default function Component() {
                                     />
                                 </div>
 
-                                <div className="flex flex-col gap-4 xl:gap-6 h-[600px]">
+                                <div className="flex flex-col gap-4 xl:gap-6 h-[630px]">
                                     <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] mx-auto relative border-l-4 border-primary">
                                         <div className="flex items-center gap-x-3">
                                             <span className="text-white">
