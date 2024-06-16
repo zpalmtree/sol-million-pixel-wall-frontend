@@ -20,7 +20,7 @@ export default function Component() {
                                     How the Meme Wall Works
                                 </h2>
                                 <p className="max-w-[900px] text-white md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                                    Explore the world's largest NFT-powered
+                                    {`Explore the world's largest NFT-powered
                                     pixel wall where the dankest crypto
                                     communities collide on the blockchain.
                                     You own this special piece of digital
@@ -31,7 +31,7 @@ export default function Component() {
                                     and burn $WALL. Funds are also used to
                                     provide liquidity in the Solana pairs,
                                     cover admin expenses, giveaways and
-                                    community marketing.
+                                    community marketing.`}
                                 </p>
                             </div>
                             <div className="grid gap-8 lg:grid-cols-2">
@@ -285,7 +285,7 @@ export default function Component() {
     );
 }
 
-function ActivityIcon(props) {
+function ActivityIcon(props: any) {
     return (
         <svg
             {...props}
@@ -304,7 +304,7 @@ function ActivityIcon(props) {
     );
 }
 
-function CurrencyIcon(props) {
+function CurrencyIcon(props: any) {
     return (
         <svg
             {...props}
@@ -327,7 +327,7 @@ function CurrencyIcon(props) {
     );
 }
 
-function DiscIcon(props) {
+function DiscIcon(props: any) {
     return (
         <svg
             {...props}
@@ -347,7 +347,7 @@ function DiscIcon(props) {
     );
 }
 
-function HotelIcon(props) {
+function HotelIcon(props: any) {
     return (
         <svg
             {...props}
@@ -375,7 +375,7 @@ function HotelIcon(props) {
     );
 }
 
-function StoreIcon(props) {
+function StoreIcon(props: any) {
     return (
         <svg
             {...props}
@@ -398,7 +398,7 @@ function StoreIcon(props) {
     );
 }
 
-function SubscriptIcon(props) {
+function SubscriptIcon(props: any) {
     return (
         <svg
             {...props}
@@ -419,28 +419,7 @@ function SubscriptIcon(props) {
     );
 }
 
-function TextIcon(props) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M17 6.1H3" />
-            <path d="M21 12.1H3" />
-            <path d="M15.1 18H3" />
-        </svg>
-    );
-}
-
-function TicketIcon(props) {
+function TicketIcon(props: any) {
     return (
         <svg
             {...props}
@@ -462,26 +441,7 @@ function TicketIcon(props) {
     );
 }
 
-function TwitterIcon(props) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
-        </svg>
-    );
-}
-
-function UploadIcon(props) {
+function UploadIcon(props: any) {
     return (
         <svg
             {...props}
@@ -502,7 +462,7 @@ function UploadIcon(props) {
     );
 }
 
-function WalletIcon(props) {
+function WalletIcon(props: any) {
     return (
         <svg
             {...props}
