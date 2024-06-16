@@ -140,7 +140,7 @@ export default function Component() {
                                 <div className="flex items-center justify-center gap-2 bg-primary px-4 py-2 rounded-lg">
                                     <WalletIcon className="h-6 w-6 text-[#1A1A1A]" />
                                     <span className="text-lg font-mono text-[#1A1A1A]">
-                                        0x1234567890abcdef
+                                        7whFaozy13ofwa5N3NzCdJrNYcuZ2zTUyMX2M3DrUvjS
                                     </span>
                                 </div>
                             </div>
