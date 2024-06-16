@@ -84,6 +84,8 @@ export interface PixelWallProps {
 
     /* Can we open URLs that are clicked on? */
     permitURLInteractions?: boolean;
+
+    className?: string;
 }
 
 export function PixelWall(props: PixelWallProps) {
@@ -101,6 +103,7 @@ export function PixelWall(props: PixelWallProps) {
         highlightPurchasedBricks = false,
         permitBrickSelection = true,
         permitURLInteractions = true,
+        className = '',
     } = props;
 
     const canvasWidth = React.useMemo(
@@ -713,6 +716,7 @@ export function PixelWall(props: PixelWallProps) {
     return (
         <canvas
             ref={canvasRef}
+            className={className}
             style={{
                 width: canvasWidth,
                 height: canvasHeight,

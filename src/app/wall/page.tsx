@@ -36,7 +36,18 @@ export default function Component() {
             <Header/>
 
             <main className="flex items-start justify-center min-h-[calc(100vh_-_theme(spacing.16))] bg-[#1a1a1a] py-8 px-8 gap-x-4 gap-y-4 flex-row flex-wrap">
-                <div className="flex justify-center border-2 border-primary">
+                <div className="justify-center border-2 border-primary flex md:hidden">
+                    <PixelWall
+                        interactable={true}
+                        selectedBricks={selectedBricks}
+                        setSelectedBricks={setSelectedBricks}
+                        height={380}
+                        width={380}
+                        permitBrickSelection={false}
+                    />
+                </div>
+
+                <div className="justify-center border-2 border-primary hidden md:flex">
                     <PixelWall
                         interactable={true}
                         selectedBricks={selectedBricks}
