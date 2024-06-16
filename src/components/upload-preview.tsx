@@ -53,6 +53,7 @@ import {
     CANVAS_HEIGHT,
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
+    STROKE_COLOR,
 } from '@/constants';
 
 export interface UploadPreviewProps {
@@ -215,7 +216,7 @@ export function UploadPreview(props: UploadPreviewProps) {
             const line = new Line([i * brickWidth, 0, i * brickWidth, canvasHeight], {
                 evented: false,
                 selectable: false,
-                stroke: '#C19A6B',
+                stroke: STROKE_COLOR,
                 strokeWidth: 0.1,
                 opacity: 0.3,
             });
@@ -228,7 +229,7 @@ export function UploadPreview(props: UploadPreviewProps) {
             const line = new Line([0, i * brickHeight, canvasWidth, i * brickHeight], {
                 evented: false,
                 selectable: false,
-                stroke: '#C19A6B',
+                stroke: STROKE_COLOR,
                 strokeWidth: 0.1,
                 opacity: 0.3,
             });

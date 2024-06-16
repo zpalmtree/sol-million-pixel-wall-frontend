@@ -114,7 +114,7 @@ export function OwnedBricks() {
         <div className="bg-[#1a1a1a] text-white rounded-lg flex flex-wrap w-full mt-16 justify-center gap-4 sm:px-4 md:px-6 xl:gap-12">
             <div className="mx-auto gap-x-28 px-4 py-8 flex flex-col md:flex-row">
                 <div>
-                    <h1 className="text-3xl font-bold mb-6 text-[#C19A6B]">
+                    <h1 className="text-3xl font-bold mb-6 text-primary">
                         My Bricks
                     </h1>
 

@@ -7,6 +7,8 @@ import { useSetRecoilState } from 'recoil';
 import { Header } from '@/components/header';
 import { Button } from "@/components/ui/button";
 import { PixelWall } from "@/components/pixelwall";
+import { GradientLink } from '@/components/gradient-link';
+import { TransparentLink } from '@/components/transparent-link';
 import {
     currentTabState,
     uploadTabEnabledState,
@@ -42,18 +44,14 @@ export default function Splash() {
                             </div>
                         </div>
                         <div className="space-x-4">
-                            <Link
-                                className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:bg-primary dark:text-[#1A1A1A] dark:hover:bg-primary/90 dark:focus-visible:ring-primary"
+                            <GradientLink
                                 href="/wall"
-                            >
-                                Explore the Wall
-                            </Link>
-                            <Link
-                                className="inline-flex h-9 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:text-primary dark:focus-visible:ring-primary"
-                                href=""
-                            >
-                                Learn More
-                            </Link>
+                                content="Explore the Wall"
+                            />
+                            <TransparentLink
+                                href='#'
+                                content='Learn More'
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col items-center justify-center w-full px-6 md:px-24 py-12 md:py-24 lg:py-32 bg-[#1A1A1A]">
@@ -81,18 +79,14 @@ export default function Splash() {
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                                    <Link
-                                        className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-[#1A1A1A] shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:bg-primary dark:text-[#1A1A1A] dark:hover:bg-primary/90 dark:focus-visible:ring-primary"
-                                        href="/purchase"
-                                    >
-                                        Mint an NFT
-                                    </Link>
-                                    <Link
-                                        className="inline-flex h-10 items-center justify-center rounded-md border border-primary bg-[#1A1A1A] px-8 text-sm font-medium shadow-sm transition-colors hover:bg-[#1A1A1A]/90 hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-primary dark:bg-[#1A1A1A] dark:hover:bg-[#1A1A1A]/90 dark:hover:text-primary dark:focus-visible:ring-primary"
+                                    <GradientLink
+                                        href='/purchase'
+                                        content={'Mint an NFT'}
+                                    />
+                                    <TransparentLink
                                         href="#"
-                                    >
-                                        Learn More
-                                    </Link>
+                                        content={'Learn More'}
+                                    />
                                 </div>
                             </div>
                         </div>

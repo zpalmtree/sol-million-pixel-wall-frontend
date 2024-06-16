@@ -40,6 +40,7 @@ import {
     CANVAS_HEIGHT,
     BRICKS_PER_ROW,
     BRICKS_PER_COLUMN,
+    STROKE_COLOR,
 } from '@/constants';
 import {
     pricePerBrickState,
@@ -529,7 +530,7 @@ export function PixelWall(props: PixelWallProps) {
                         const rectangle = new Rect({
                             width: (maxX - minX + 1) * brickWidth,
                             height: (maxY - minY + 1) * brickHeight,
-                            fill: '#C19A6B',
+                            fill: STROKE_COLOR,
                             opacity: highlightAvailableBricks ? 0.6 : 0.3,
                             selectable: false,
                             evented: false,
@@ -672,7 +673,7 @@ export function PixelWall(props: PixelWallProps) {
                 const line = new Line([i * brickWidth, 0, i * brickWidth, canvasHeight], {
                     evented: false,
                     selectable: false,
-                    stroke: '#C19A6B',
+                    stroke: STROKE_COLOR,
                     strokeWidth: 1,
                     opacity: 0.3,
                 });
@@ -684,7 +685,7 @@ export function PixelWall(props: PixelWallProps) {
                 const line = new Line([0, i * brickHeight, canvasWidth, i * brickHeight], {
                     evented: false,
                     selectable: false,
-                    stroke: '#C19A6B',
+                    stroke: STROKE_COLOR,
                     strokeWidth: 1,
                     opacity: 0.3,
                 });

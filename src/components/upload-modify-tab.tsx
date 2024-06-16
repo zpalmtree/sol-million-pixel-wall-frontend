@@ -136,7 +136,7 @@ export function UploadModifyTab(props: UploadTabProps) {
         return (
             <div className="flex items-center justify-center h-full">
                 <div className="text-center">
-                    <CircleCheckIcon className="mx-auto mb-4 h-16 w-16 text-[#C19A6B]" />
+                    <CircleCheckIcon className="mx-auto mb-4 h-16 w-16 text-primary" />
                     <h3 className="text-2xl font-semibold tracking-tighter">
                         Congratulations!
                     </h3>
@@ -156,7 +156,7 @@ export function UploadModifyTab(props: UploadTabProps) {
 
     return (
         <div className="">
-            <Card className="bg-[#333333] p-6 border border-[#C19A6B]">
+            <Card className="bg-[#333333] p-6 border border-primary">
                 <CardHeader>
                     <CardTitle className="text-white">
                         Upload your creation
@@ -192,7 +192,7 @@ export function UploadModifyTab(props: UploadTabProps) {
                     <Button
                         onClick={handleUpload}
                         disabled={uploading}
-                        className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[220px]"
+                        className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-primary transition-colors duration-200 w-[220px]"
                     >
                         {uploading ? 'Uploading...' : 'Upload'}
                     </Button>

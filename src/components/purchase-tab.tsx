@@ -365,7 +365,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
 
     return (
         <div className="">
-            <Card className="bg-[#333333] p-6 border border-[#C19A6B]">
+            <Card className="bg-[#333333] p-6 border border-primary">
                 <CardHeader>
                     <CardTitle className="text-white">
                         Solana Payment
@@ -421,7 +421,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
 
                     {retryTransactions.length > 0 && (
                         <Button
-                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[220px]"
+                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-primary transition-colors duration-200 w-[220px]"
                             onClick={() => handlePurchasePixels(retryTransactions)}
                         >
                             Retry Failed Transactions
@@ -434,7 +434,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
 
                     {publicKey && !success && (
                         <Button
-                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[220px]"
+                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-primary transition-colors duration-200 w-[220px]"
                             onClick={() => handlePurchasePixels()}
                             disabled={payButtonDisabled}
                         >
@@ -444,7 +444,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
 
                     {success && (
                         <Button
-                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-[#C19A6B] transition-colors duration-200 w-[220px]"
+                            className="rounded-md bg-white px-12 py-2 text-black hover:bg-white hover:text-primary transition-colors duration-200 w-[220px]"
                             onClick={handleNextTab}
                         >
                             Continue

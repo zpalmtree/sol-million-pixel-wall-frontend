@@ -70,7 +70,7 @@ export default function Checkout() {
                 return undefined;
             }
             default: {
-                throw new Error('Unknown tab!');
+                throw new Error(`Unknown tab ${currentTab}!`);
             }
         }
     }, [
@@ -238,7 +238,7 @@ export default function Checkout() {
                         >
                             <div className="flex flex-col md:flex-row gap-6">
                                 <div className="flex-1">
-                                    <div className="flex items-center justify-center w-full bg-[#333333] border border-[#C19A6B] aspect-square">
+                                    <div className="flex items-center justify-center w-full bg-[#333333] border border-primary aspect-square">
                                         <UploadPreview
                                             width={1000}
                                             height={1000}
@@ -248,7 +248,7 @@ export default function Checkout() {
                                         />
                                     </div>
                                 </div>
-                                <div className="w-full h-min items-center md:w-[250px] p-4 gap-y-2 border border-[#C19A6B] rounded-md flex flex-col justify-between">
+                                <div className="w-full h-min items-center md:w-[250px] p-4 gap-y-2 border border-primary rounded-md flex flex-col justify-between">
                                     <div className="flex flex-col gap-y-2">
                                         <div className="mb-2 flex flex-col gap-y-4 items-center justify-between">
                                             <Label
@@ -259,7 +259,7 @@ export default function Checkout() {
                                             </Label>
                                             <Input
                                                 accept="image/*"
-                                                className="rounded-md bg-[#333333] px-3 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-[#C19A6B] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:bg-[#444444] transition-colors duration-200 h-full"
+                                                className="rounded-md bg-[#333333] px-3 py-2 text-white file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:bg-[#444444] transition-colors duration-200 h-full"
                                                 id="image"
                                                 type="file"
                                                 onChange={handleImageUpload}
@@ -316,7 +316,7 @@ export default function Checkout() {
                             />
                         </TabsContent>
 
-                        <TabsList className="flex flex-col justify-between rounded-md bg-[#1A1A1A] p-4 gap-y-4 border border-[#C19A6B] md:w-[250px] h-[400px]">
+                        <TabsList className="flex flex-col justify-between rounded-md bg-[#1A1A1A] p-4 gap-y-4 border border-primary md:w-[250px] h-[400px]">
                             <div className='flex flex-col gap-y-4'>
                                 <TabsTrigger
                                     className="rounded-md py-2 hover:bg-[#444444] transition-colors duration-200 bg-[#333333] text-gray-400 text-xs sm:text-sm"
