@@ -20,18 +20,7 @@ export default function Component() {
                                     How the Meme Wall Works
                                 </h2>
                                 <p className="max-w-[900px] text-white md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                                    {`Explore the world's largest NFT-powered
-                                    pixel wall where the dankest crypto
-                                    communities collide on the blockchain.
-                                    You own this special piece of digital
-                                    real estate represented by a brick in
-                                    the section of the Wall and are issued a
-                                    respective NFT. When a brick is
-                                    purchased, Solana is used to buy back
-                                    and burn $WALL. Funds are also used to
-                                    provide liquidity in the Solana pairs,
-                                    cover admin expenses, giveaways and
-                                    community marketing.`}
+                                    {`Explore the world's largest NFT-powered pixel wall where the dankest crypto communities collide on the blockchain. Every  buyer of a brick owns the special piece of digital real estate on the Wall, as each brick is an NFT. When a brick is purchased, 50% of the SOL is used to buy back and burn $WALL. SOL is also used to add liquidity to the WALL/SOL pair on Raydium along with community marketing, giveaways, and expenditures.`}
                                 </p>
                             </div>
                             <div className="grid gap-8 lg:grid-cols-2">
