@@ -289,7 +289,7 @@ export default function Checkout() {
                             </div>
                             <div className="mt-6 flex flex-row items-center justify-between w-full gap-x-4">
                                 <span>
-                                    Hint: You can scroll in and out on the canvas!
+                                    Hint: You can zoom in and out on the canvas!
                                 </span>
                             </div>
                         </TabsContent>

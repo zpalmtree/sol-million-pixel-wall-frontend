@@ -72,7 +72,7 @@ export default function Component() {
                     </span>
 
                     <span className='text-white'>
-                        Note: You can scroll with mouse wheel, and pan by holding down right mouse.
+                        Note: You can zoom with mouse wheel, and pan by holding down right mouse.
                     </span>
 
                     <span className='text-white'>
