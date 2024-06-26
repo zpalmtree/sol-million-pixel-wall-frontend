@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
-export function formatSOL(lamports: number, significantDigits: number = 3) {
+export function formatSOL(lamports: number, significantDigits: number = 5) {
     return (lamports / LAMPORTS_PER_SOL).toFixed(significantDigits);
 }
 
