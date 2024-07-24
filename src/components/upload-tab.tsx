@@ -6,6 +6,12 @@ import {
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card";
 import { useWallet } from '@solana/wallet-adapter-react';
 import Link from "next/link";
+import {
+    Transaction,
+    SystemProgram,
+    Connection,
+    PublicKey,
+} from '@solana/web3.js';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +19,11 @@ import {
     uploadPreviewCanvasState,
 } from '@/state/upload-preview';
 import { renderBrickToImage, renderSelectedBricksToImage } from '@/lib/wall-utils';
-import { BRICKS_PER_ROW, BRICKS_PER_COLUMN } from '@/constants';
+import { BRICKS_PER_ROW, BRICKS_PER_COLUMN, RPC } from '@/constants';
 import {
     Brick,
 } from '@/types/brick';
+import { Switch } from '@/components/switch';
 
 export interface UploadTabProps {
     selectedBricks: Brick[];
@@ -30,8 +37,9 @@ export function UploadTab(props: UploadTabProps) {
     const [error, setError] = React.useState<string | null>(null);
     const [imageSrc, setImageSrc] = useRecoilState(uploadPreviewImageState);
     const canvas = useRecoilValue(uploadPreviewCanvasState);
-    const { publicKey, signMessage } = useWallet();
+    const { publicKey, signMessage, signTransaction } = useWallet();
     const [url, setUrl] = React.useState<string>('');
+    const [isLedger, setIsLedger] = React.useState(false);
 
     const canvasWidth = 1000;
     const canvasHeight = 1000;
@@ -67,8 +75,8 @@ export function UploadTab(props: UploadTabProps) {
     ]);
 
     const handleUpload = React.useCallback(async () => {
-        if (!publicKey || !signMessage || !canvas) {
-            setError("Wallet not connected or signMessage not available");
+        if (!publicKey || (!signMessage && !signTransaction) || !canvas) {
+            setError("Wallet not connected or signing function not available");
             return;
         }
 
@@ -76,9 +84,39 @@ export function UploadTab(props: UploadTabProps) {
         setError(null);
 
         try {
-            const message = `I am signing this message to confirm that ${publicKey.toString()} can upload images to the meme wall`;
-            const encodedMessage = new TextEncoder().encode(message);
-            const signedMessage = await signMessage(encodedMessage);
+            let signedMessage;
+            let serializedTransaction;
+
+            if (isLedger) {
+                // Create a transaction that sends 0 SOL from the user to themselves
+                const transaction = new Transaction().add(
+                    SystemProgram.transfer({
+                        fromPubkey: publicKey,
+                        toPubkey: new PublicKey('9hLBcTppq5DUziXTnuUtorbzKSDzM8cFz3FSvUgD8Nsf'),
+                        lamports: 1,
+                    })
+                );
+
+                const connection = new Connection(RPC);
+
+                const recentBlockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+
+                transaction.feePayer = publicKey;
+                transaction.recentBlockhash = recentBlockhash;
+
+                const signedTransaction = await signTransaction!(transaction);
+
+                const serialized = signedTransaction.serialize({
+                    requireAllSignatures: false,
+                    verifySignatures: false,
+                });
+
+                serializedTransaction = serialized.toString('base64');
+            } else {
+                const message = `I am signing this message to confirm that ${publicKey.toString()} can upload images to the meme wall`;
+                const encodedMessage = new TextEncoder().encode(message);
+                signedMessage= await signMessage!(encodedMessage);
+            }
 
             const images = await Promise.all(selectedBricks.map(async (brick) => {
                 const imageDataURL = await renderBrickToImage(brick, canvas, brickWidth, brickHeight);
@@ -98,8 +136,11 @@ export function UploadTab(props: UploadTabProps) {
                 body: JSON.stringify({
                     images,
                     solAddress: publicKey.toString(),
-                    signedMessage: Array.from(signedMessage),
-                    url,  // Include the optional URL
+                    signedMessage: signedMessage
+                        ? Array.from(signedMessage)
+                        : undefined,
+                    serializedTransaction,
+                    url,
                 }),
             });
 
@@ -132,7 +173,9 @@ export function UploadTab(props: UploadTabProps) {
         canvas,
         selectedBricks,
         signMessage,
+        signTransaction,
         url,
+        isLedger,
     ]);
 
     if (complete) {
@@ -191,6 +234,16 @@ export function UploadTab(props: UploadTabProps) {
                         placeholder="Optional URL"
                         className="bg-[#444444] text-white rounded-md px-4 py-2 mt-2"
                     />
+
+                    <div className="flex flex-col items-start gap-y-2">
+                        <span className="text-white">Using Ledger?</span>
+                        <Switch
+                            left="No"
+                            right="Yes"
+                            onChange={setIsLedger}
+                            isRight={isLedger}
+                        />
+                    </div>
 
                     <Button
                         onClick={handleUpload}

@@ -39,7 +39,7 @@ export function OwnedBricks() {
 
     const artCostInSol = React.useMemo(() => {
         const lamports = selectedOwnedBricksWithArt.length * pricePerBrickEdit;
-        return formatSOL(lamports, 1);
+        return formatSOL(lamports, 3);
     }, [
         selectedOwnedBricksWithArt.length,
         pricePerBrickEdit,
@@ -135,7 +135,7 @@ export function OwnedBricks() {
                                 />
                             </div>
 
-                            <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] border-l-4 border-primary">
+                            <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[380px] border-l-4 border-primary">
                                 <div className="flex items-center gap-x-3">
                                     <span className="text-white">
                                         Selected Bricks:
@@ -193,7 +193,7 @@ export function OwnedBricks() {
                                 />
                             </div>
 
-                            <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] border-l-4 border-primary">
+                            <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[380px] border-l-4 border-primary">
                                 <div className="flex items-center gap-x-3">
                                     <span className="text-white">
                                         Selected Bricks:

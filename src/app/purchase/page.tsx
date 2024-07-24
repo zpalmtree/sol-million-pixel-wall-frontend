@@ -32,7 +32,7 @@ export default function Component() {
 
     const costInSol = React.useMemo(() => {
         const lamports = selectedBricks.length * pricePerBrick;
-        return formatSOL(lamports, 1);
+        return formatSOL(lamports, 3);
     }, [
         selectedBricks,
         pricePerBrick,
@@ -72,7 +72,7 @@ export default function Component() {
                                 </div>
 
                                 <div className="flex flex-col gap-4 xl:gap-6 h-[630px]">
-                                    <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[370px] mx-auto relative border-l-4 border-primary">
+                                    <div className="flex flex-col gap-3 rounded-lg bg-[#2A2A2A] p-4 w-[350px] xl:w-[380px] mx-auto relative border-l-4 border-primary">
                                         <div className="flex items-center gap-x-3">
                                             <span className="text-white">
                                                 Selected Bricks:
@@ -111,7 +111,7 @@ export default function Component() {
                                         </Link>
                                     </div>
                                     <div className="flex flex-wrap justify-center gap-4 h-full">
-                                        <div className="flex flex-col gap-4 rounded-lg bg-[#2d2d2d] p-4 w-[350px] xl:w-[370px] relative border-l-4 border-primary">
+                                        <div className="flex flex-col gap-4 rounded-lg bg-[#2d2d2d] p-4 w-[350px] xl:w-[380px] relative border-l-4 border-primary">
                                             <p className="text-primary text-bold text-lg tracking-tighter">
                                                 Elevate Your Digital Presence on the Ultimate Canvas
                                             </p>

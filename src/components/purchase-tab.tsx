@@ -89,7 +89,7 @@ export function PurchaseTab(props: PurchaseTabProps) {
 
     const costInSol = React.useMemo(() => {
         const lamports = selectedBricks.length * lamportsPerAction;
-        return formatSOL(lamports, 1);
+        return formatSOL(lamports, 3);
     }, [
         selectedBricks,
         lamportsPerAction,
